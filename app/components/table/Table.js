@@ -20,12 +20,13 @@ export default class Table extends Component {
     onEdit: PropTypes.func,
     onDelete: PropTypes.func,
     onDateRangeChange: PropTypes.func,
+    onDateRangeClear: PropTypes.func,
     refs: RefsPropType.isRequired,
     locale: LocalePropType.isRequired,
     events: PropTypes.arrayOf(EventPropType),
     gates: PropTypes.arrayOf(GatePropType),
     auth: PropTypes.bool,
-    defaultRange: PropTypes.arrayOf(PropTypes.instanceOf(Date))
+    range: PropTypes.arrayOf(PropTypes.instanceOf(Date)).isRequired
   }
 
   static defaultProps = {
@@ -34,16 +35,11 @@ export default class Table extends Component {
     onEdit: () => { },
     onDelete: () => { },
     onDateRangeChange: () => { },
+    onDateRangeClear: () => { },
     events: [],
     gates: [],
     auth: false,
     defaultRange: [null, null]
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = { range: props.defaultRange };
   }
 
   handleCreate = (formData, valid) => {
@@ -59,7 +55,7 @@ export default class Table extends Component {
     this.eventAddDialog.toggleDialog();
   }
 
-  handleRefresh = () => this.props.onRefresh(this.state.range)
+  handleRefresh = () => this.props.onRefresh()
 
   handlePreDelete = (id) => this.deleteAlert.open(id)
 
@@ -82,16 +78,17 @@ export default class Table extends Component {
 
   handleChange = (range_) => {
     this.props.onDateRangeChange(range_);
-    this.setState({ range: range_ });
   }
 
   handleClearRange = () => {
-    this.props.onDateRangeChange(this.props.defaultRange);
-    this.setState({ range: this.props.defaultRange });
+    this.props.onDateRangeClear();
+  }
+
+  suggestNext = (pre) => {
+    this.eventAddDialog.suggestNext(pre);
   }
 
   render() {
-    const { range } = this.state;
     const { refs, locale, events, gates, auth } = this.props;
 
     return (
@@ -118,7 +115,7 @@ export default class Table extends Component {
           <Button className="pt-minimal" iconName="add" onClick={this.handleAddClick} />
           <Button className="pt-minimal" iconName="refresh" onClick={this.handleRefresh} />
           <div>
-            <DateRangeInput value={range} onChange={this.handleChange} />
+            <DateRangeInput defaultValue={this.props.range} onChange={this.handleChange} />
             <Button className="pt-minimal" iconName="remove" onClick={this.handleClearRange} />
           </div>
         </div>

@@ -26,7 +26,7 @@ export default class EventAddDialog extends Component {
     gates: []
   }
 
-  state = { isOpen: false, date: null }
+  state = { isOpen: false, date: null, suggestion: 0 }
 
   passState = () => {
     const data = this.form.getFormData();
@@ -43,6 +43,10 @@ export default class EventAddDialog extends Component {
    */
   openWith = (date_) => {
     this.setState({ isOpen: true, date: date_ });
+  }
+
+  suggestNext = (pre) => {
+    this.form.suggestNext(pre);
   }
 
   render() {

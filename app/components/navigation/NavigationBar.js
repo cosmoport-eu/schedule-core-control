@@ -63,7 +63,7 @@ export default class NavigationBar extends Component {
             <Navigate to="/simulation" icon="globe" />
             <Navigate to="/table" icon="timeline-events" />
             {auth_ && <Navigate to="/translation" icon="translate" />}
-            <Navigate to="/settings" icon="cog" />
+            {auth_ && <Navigate to="/settings" icon="cog" />}
             {!auth_ && <Navigate to="/login" icon="lock" />}
             {auth_ && <Navigate to="/logout" icon="unlock" />}
           </div>

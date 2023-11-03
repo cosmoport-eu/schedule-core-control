@@ -254,13 +254,12 @@ export default class App extends Component {
       return <div>Loading...</div>;
     }
 
-    const commonProps = { api: api_, auth: auth_, onRefresh: this.handleRefresh };
+    const commonProps = { api: api_, auth: auth_, pre: boarding, onRefresh: this.handleRefresh };
 
     return (
       <div>
         <Simulator
           ref={s => { this.simulator = s; }}
-          active
           events={events_}
           boarding={boarding}
           business={bs}

@@ -71,7 +71,7 @@ export default class SimulationContainer extends Component {
         <div className="pt-callout" style={{ fontSize: '80%' }}>
           Here you can control the system simulation somewhat.
           Be aware it will change statuses of events.
-          After you enter the password, you can use these actions.
+          After you enter the password, you can use all the actions.
         </div>
         <p />
         <div>

@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Menu, MenuItem } from '@blueprintjs/core';
+import { Menu, MenuItem, MenuDivider } from '@blueprintjs/core';
 import onClickOutside from 'react-onclickoutside';
 
 import styles from './EventMenu.css';
 
-class EventMenu extends Component {
+class EventMenu extends PureComponent {
   static propTypes = {
     onEventTickets: PropTypes.func,
     onEventCreate: PropTypes.func
@@ -58,14 +58,15 @@ class EventMenu extends Component {
       top: this.state.y
     };
 
+    const isEvent = this.state.type === 'event';
+
     return (
       <div className={`${styles.menu} ${this.state.isOpen ? styles.active : styles.hidden}`} style={style}>
         <div className={`pt-icon-standard pt-icon-chevron-left ${styles.mark}`} />
         <Menu>
+          {isEvent && <MenuDivider title={`${this.state.data.start.format('HH:mm')} ${this.state.data.title}`} />}
           <MenuItem iconName="add" onClick={this.handleClick} text="New event" />
-          {this.state.type === 'event' &&
-            <MenuItem iconName="dollar" onClick={this.handleEventClick} text="Sell tickets" />
-          }
+          {isEvent && <MenuItem iconName="dollar" onClick={this.handleEventClick} text="Sell tickets" />}
         </Menu>
       </div>
     );

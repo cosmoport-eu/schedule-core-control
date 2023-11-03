@@ -12,14 +12,18 @@ import Message from '../components/messages/Message';
 import EventAddDialog from '../components/dialog/EventAddDialog';
 import _date from '../components/date/_date';
 
+import styles from './App.css';
+
 export default class MainPage extends Component {
   static propTypes = {
     api: PropTypes.instanceOf(Api).isRequired,
-    onRefresh: PropTypes.func
+    onRefresh: PropTypes.func,
+    pre: PropTypes.number
   }
 
   static defaultProps = {
-    onRefresh: () => { }
+    onRefresh: () => { },
+    pre: 10
   }
 
   state = {
@@ -49,7 +53,8 @@ export default class MainPage extends Component {
       this.props.api.fetchEventsInRange(this.state.start, this.state.end),
       this.props.api.fetchGates()
     ])
-      .then(([r, l, e, g]) => this.setState({ hasData: true, refs: r, locale: l.en, events: e, gates: g }))
+      .then(([r, l, e, g]) =>
+        this.setState({ hasData: true, refs: r, locale: l.en, events: e, gates: g }))
       .catch(error => ApiError(error));
   }
 
@@ -101,6 +106,7 @@ export default class MainPage extends Component {
     this.props.api
       .createEvent(formData)
       .then(result => Message.show(`Event has been created [${result.id}].`))
+      .then(() => this.eventAddDialog.suggestNext(this.props.pre))
       .then(() => this.handleRefresh())
       .catch(error => ApiError(error));
   }
@@ -115,6 +121,27 @@ export default class MainPage extends Component {
       () => {
         this.refreshEventsData();
       });
+  }
+
+  /**
+   * Handles time suggestions for creation forms.
+   *
+   * @param {number} gate The id number of required gate.
+   * @param {string} date A date value for which a suggestion is being looked for.
+   * @param {Function} callback A callback function to pass suggestion back to form.
+   * @since 0.1.3
+   * @deprecated
+   */
+  handleSuggestion = (date, gate, callback) => {
+    this.setState({ sug_date: date, sug_gate: gate });
+    this.props.api
+      .get(`/timetable/suggest/next?date=${date}&gate=${gate}`)
+      .then(result => {
+        callback(result.time >= 0 ? result.time + this.props.pre + 1 : 0);
+
+        return 1;
+      })
+      .catch(error => ApiError(error));
   }
 
   render() {

@@ -145,6 +145,12 @@ export default class EventForm extends Component {
     this.setState({ [name]: value });
   }
 
+  suggestNext = (pre) => {
+    if (this.props.forCreate && this.state.repeat_interval > 0) {
+      this.setState({ time: this.state.time + this.state.repeat_interval + pre });
+    }
+  }
+
   /**
    * Handles a type selection with additional BS logic.
    *
@@ -272,7 +278,7 @@ export default class EventForm extends Component {
           <div className={`pt-form-content ${styles.formTimeRange}${invalidTimeRangeMaybeClass}`}>
             <TimeFieldGroup name="time" caption="Start" minutes={this.state.time} onChange={this.handleChange} />
             <TimeFieldGroup name="duration" caption="Duration" minutes={this.state.duration} onChange={this.handleChange} />
-            <NumberFieldGroup name="repeat_interval" className={styles.repeat} caption="Repeat" number={this.state.repeat_interval} onChange={this.handleChange} />
+            {this.state.default_repeat_interval > 0 && <NumberFieldGroup name="repeat_interval" className={styles.repeat} caption="Repeat" number={this.state.repeat_interval} onChange={this.handleChange} />}
             <LabelFieldGroup className={styles.totalTime} value={totalTime} />
             {invalidTimeRange && <div className="pt-form-helper-text">{time()}</div>}
             {warnings && warnings}

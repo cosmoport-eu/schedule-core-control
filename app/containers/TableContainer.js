@@ -13,7 +13,8 @@ export default class TableContainer extends Component {
   static propTypes = {
     api: PropTypes.instanceOf(Api).isRequired,
     auth: PropTypes.bool,
-    onRefresh: PropTypes.func
+    onRefresh: PropTypes.func,
+    pre: PropTypes.number.isRequired
   }
 
   static defaultProps = {
@@ -27,18 +28,20 @@ export default class TableContainer extends Component {
     locale: {},
     refs: {},
     gates: [],
-    defaultRange: _date.getThreeDaysRange()
+    defaultRange: _date.getThreeDaysRange(),
+    range: _date.getThreeDaysRange()
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.getData();
   }
 
-  getData = (range) => {
+  getData = () => {
+    console.log(this.state);
     Promise.all([
       this.props.api.fetchReferenceData(),
       this.props.api.fetchTranslations(),
-      this.apiGetEventInRange(range || this.state.defaultRange),
+      this.apiGetEventInRange(this.state.range),
       this.props.api.fetchGates()
     ])
       .then(data => this.setState(
@@ -51,6 +54,7 @@ export default class TableContainer extends Component {
     this.props.api
       .createEvent(formData)
       .then(result => Message.show(`Event has been created [${result.id}].`))
+      .then(() => this.table.suggestNext(this.props.pre))
       .then(() => this.handleRefresh())
       .catch(error => ApiError(error));
   }
@@ -71,15 +75,19 @@ export default class TableContainer extends Component {
       .catch(error => ApiError(error));
   }
 
-  handleRefresh = (range) => {
-    this.getData(range);
+  handleRefresh = () => {
+    this.getData();
     this.props.onRefresh();
   }
 
-  handleDateChange = (range) => {
-    this.apiGetEventInRange(range)
-      .then(data => this.setState({ events: data }))
+  handleDateChange = (range_) => {
+    this.apiGetEventInRange(range_)
+      .then(data => this.setState({ events: data, range: range_ }))
       .catch(error => ApiError(error));
+  }
+
+  handleDateClear = () => {
+    this.handleDateChange(this.state.defaultRange);
   }
 
   apiGetEventInRange = (range) =>
@@ -90,17 +98,20 @@ export default class TableContainer extends Component {
       return <span>Loading...</span>;
     }
 
-    const { events, refs, locale, gates } = this.state;
+    const { events, refs, locale, gates, range } = this.state;
 
     return (
       <div>
         <PageCaption text="03 Timetable" />
         <Table
+          ref={table => { this.table = table; }}
           events={events}
           refs={refs}
           locale={locale}
           gates={gates}
+          range={range}
           onDateRangeChange={this.handleDateChange}
+          onDateRangeClear={this.handleDateClear}
           defaultRange={this.state.defaultRange}
           onCreate={this.handleCreate}
           onEdit={this.handleEdit}

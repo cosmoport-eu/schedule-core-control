@@ -16,8 +16,6 @@ import _date from '../../date/_date';
 export default class Simulator extends Component {
   static propTypes = {
     events: PropTypes.arrayOf(EventPropType),
-    // Wether or not to activate the simulator
-    active: PropTypes.bool,
     // A number of minutes for action calculations before the events
     business: PropTypes.shape({
       start: PropTypes.number,
@@ -86,6 +84,10 @@ export default class Simulator extends Component {
     }
   }
 
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
   inBusiness = (props) => {
     if (props.non) {
       return false;
@@ -98,10 +100,6 @@ export default class Simulator extends Component {
     const current = _date.toMinutes(new Date());
 
     return current >= props.start && current <= props.end;
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timer);
   }
 
   update = () => {
@@ -126,13 +124,11 @@ export default class Simulator extends Component {
     });
   }
 
-  calculateBusiness = (callback) => {
-    const active_ = this.inBusiness(this.props.business);
+  calculateBusiness = () => {
+    const works = this.inBusiness(this.props.business);
 
-    if (this.state.active !== active_) {
-      this.setState({ active: active_ }, () => {
-        this.props.onSimulationTick(this.state);
-      });
+    if (this.state.active !== works) {
+      this.setState({ active: works }, () => { this.props.onSimulationTick(this.state); });
     }
   }
 

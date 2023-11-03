@@ -9,6 +9,8 @@ import EventPropType from '../../props/EventPropType';
 
 require('fullcalendar/dist/fullcalendar.min.js');
 
+const eventTypeColorMap = (type) => ({ 1: '#f44336', 2: '#9c27b0', 3: '#2196f3', 4: '#009688' }[type]);
+
 /**
  * Hybrid React/Fullcalendar component.
  *
@@ -39,7 +41,8 @@ export default class Calendar extends Component {
     const self = this;
 
     this.$node.fullCalendar({
-      // height: 'auto',
+      height: 'auto',
+      eventLimit: 20,
       // aspectRatio: 1,
       header: {
         left: '',
@@ -109,13 +112,15 @@ export default class Calendar extends Component {
   getEvents = (start, end, timezone, callback) => {
     const events = this.events.map(event => {
       const eventData = this.l18n.findEventRefByEventTypeId(event.eventTypeId);
+      const finish = _date.minutesToHm(event.startTime + event.durationTime);
 
       return {
         id: event.id,
         title: `${this.l18n.findTranslationById(eventData, 'i18nEventTypeName')} / 
         ${this.l18n.findTranslationById(eventData, 'i18nEventTypeSubname')}`,
         start: `${event.eventDate}T${_date.minutesToHm(event.startTime)}`,
-        end: `${event.eventDate}T${_date.minutesToHm(event.startTime + event.durationTime)}`
+        end: `${event.eventDate}T${finish}`,
+        color: eventTypeColorMap(event.eventTypeId) || '#defe'
       };
     });
 
