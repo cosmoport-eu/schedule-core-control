@@ -1,3 +1,3 @@
-[submodule "lib/core-api-client"]
-	path = lib/core-api-client
+[submodule "src/lib/core-api-client"]
+	path = src/lib/core-api-client
 	url = https://github.com/sergystepanov/cosmoport-core-api-client.git

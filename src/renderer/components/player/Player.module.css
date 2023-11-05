@@ -1,0 +1,31 @@
+
+.centred {
+  text-align: center;
+}
+
+.overlay {
+  background-color: white;
+}
+
+.player {
+  font-size: 85%;
+  cursor: default;
+}
+
+.controls {
+  display: flex;
+}
+
+.periodBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.number div input {
+  width: 2em !important;
+}
+
+.number div input {
+  height: 1em;
+}

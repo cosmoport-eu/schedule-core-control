@@ -1,0 +1,17 @@
+{
+  "name": "cosmoport-core-control",
+  "version": "0.2.0",
+  "description": "Cosmoport core control",
+  "license": "MIT",
+  "private": true,
+  "author": {
+    "name": "Sergey Stepanov",
+    "email": "sergystepanov@gmail.com"
+  },
+  "main": "./dist/main/main.js",
+  "scripts": {
+    "rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "postinstall": "npm run rebuild && npm run link-modules",
+    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
+  }
+}

@@ -1,0 +1,83 @@
+
+.fill {
+    width: 100%;
+}
+
+.label_lpad label {
+    text-transform: capitalize;
+    display: inline-block;
+    width: 20%;
+}
+
+.event_form {
+    margin-top: 1em;
+}
+
+.event_form label input {
+    width: 82%;
+}
+
+.label_text, .label_text_short {
+    text-transform: capitalize;
+    display: inline-block;
+    width: 20%;
+}
+
+
+.label_text_short {
+    width: 5.4em;
+}
+
+.noPadding {
+    padding: 0 !important;
+}
+
+.fullWidth, .fullWidthChild span {
+    width: 100%;
+}
+
+.dropdown {
+    margin: 0 0 1em 5.3em;
+}
+
+.formTimeRangeContainer, .formGatesContainer {
+    flex-direction: row !important;
+}
+
+.formGatesContainer {
+    margin-bottom: 0 !important;
+}
+
+.formGates {
+    width: 84%;
+}
+
+.formTimeRange {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 84%;
+}
+
+.formTimeRange div {
+    margin: 0 .15em 0 0;
+}
+
+.timeLabel {
+    width: 19%;
+}
+
+.repeat {
+    width: 4em;
+}
+
+.totalTime {
+    padding-top: 1.5em;
+}
+
+.warningBlock {
+    color: #bf7326;
+    margin-top: 5px;
+    font-size: 12px;
+}
