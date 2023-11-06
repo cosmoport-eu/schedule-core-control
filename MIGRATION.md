@@ -15,7 +15,6 @@ iconName= ---> icon=
 <NumericInput>:
 leftIconName= ---> leftIcon
 
-
 React:
 
 npx react-codemod rename-unsafe-lifecycles
