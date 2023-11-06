@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import EventPropType from '../../../props/EventPropType';
 import Action from '../action/Action';
-import { eventStatus } from '../../../../lib/core-api-client/ApiV1';
+import { eventStatus } from 'cosmoport-core-api-client/ApiV1';
 import _date from '../../date/_date';
 
 /**

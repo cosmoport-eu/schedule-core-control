@@ -4,8 +4,8 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { FocusStyleManager } from '@blueprintjs/core';
 
 import NavigationBar from '../components/navigation/NavigationBar';
-import Api from '../../lib/core-api-client/ApiV1';
-import Socket0 from '../../lib/core-api-client/WebSocketWrapper';
+import Api from 'cosmoport-core-api-client/ApiV1';
+import Socket0 from 'cosmoport-core-api-client/WebSocketWrapper';
 import Rupor from '../components/player/Announcer';
 import ApiError from '../components/indicators/ApiError';
 import MainPage from './MainPage';

@@ -7,7 +7,7 @@ import Message from '../components/messages/Message';
 import Translation from '../components/translation/Translation';
 import TranslationTable from '../components/translation/TranslationTable';
 import LocaleAddDialog from '../components/dialog/LocaleAddDialog';
-import Api from '../../lib/core-api-client/ApiV1';
+import Api from 'cosmoport-core-api-client/ApiV1';
 import ApiError from '../components/indicators/ApiError';
 
 import styles from './App.module.css';

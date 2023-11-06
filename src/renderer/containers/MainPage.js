@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Calendar from '../components/calendar/Calendar';
-import Api from '../../lib/core-api-client/ApiV1';
+import Api from 'cosmoport-core-api-client/ApiV1';
 import ApiError from '../components/indicators/ApiError';
 import PageCaption from '../components/page/PageCaption';
 import EventMenu from '../components/calendar/EventMenu';

@@ -53,8 +53,6 @@ export default class EventEditDialog extends PureComponent {
 
     if (!event) return ;
 
-    console.log('edit event', event);
-
     return (
       <Dialog
         isOpen={isOpen}
