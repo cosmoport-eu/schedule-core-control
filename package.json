@@ -74,7 +74,9 @@
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
     },
-    "transformIgnorePatterns": ["/node_modules/(?!(cosmoport-core-api-client)/)"]
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(cosmoport-core-api-client)/)"
+    ]
   },
   "dependencies": {
     "@blueprintjs/core": "^5.6.0",
