@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Calendar from '../components/calendar/Calendar';
-import Api from 'cosmoport-core-api-client/ApiV1';
+import { Api } from 'cosmoport-core-api-client';
 import ApiError from '../components/indicators/ApiError';
 import PageCaption from '../components/page/PageCaption';
 import EventMenu from '../components/calendar/EventMenu';
@@ -16,13 +16,13 @@ export default class MainPage extends Component {
   static propTypes = {
     api: PropTypes.instanceOf(Api).isRequired,
     onRefresh: PropTypes.func,
-    pre: PropTypes.number
-  }
+    pre: PropTypes.number,
+  };
 
   static defaultProps = {
-    onRefresh: () => { },
-    pre: 10
-  }
+    onRefresh: () => {},
+    pre: 10,
+  };
 
   state = {
     hasData: false,
@@ -32,15 +32,15 @@ export default class MainPage extends Component {
     refs: {},
     gates: [],
     start: _date.current(),
-    end: _date.current()
-  }
+    end: _date.current(),
+  };
 
   componentDidMount() {
     this.getData();
   }
 
   componentWillUnmount() {
-    this.onViewChange = () => { };
+    this.onViewChange = () => {};
   }
 
   getData = () => {
@@ -49,37 +49,46 @@ export default class MainPage extends Component {
       this.props.api.fetchTranslations(),
       // Fetch all the events between the current calendar view range
       this.props.api.fetchEventsInRange(this.state.start, this.state.end),
-      this.props.api.fetchGates()
+      this.props.api.fetchGates(),
     ])
       .then(([r, l, e, g]) =>
-        this.setState({ hasData: true, refs: r, locale: l.en, events: e, gates: g }))
-      .catch(error => ApiError(error));
-  }
+        this.setState({
+          hasData: true,
+          refs: r,
+          locale: l.en,
+          events: e,
+          gates: g,
+        }),
+      )
+      .catch((error) => ApiError(error));
+  };
 
   refreshEventsData = () => {
-    this.props.api.fetchEventsInRange(this.state.start, this.state.end)
-      .then(result => this.setState({ events: result }))
-      .catch(error => ApiError(error));
-  }
+    this.props.api
+      .fetchEventsInRange(this.state.start, this.state.end)
+      .then((result) => this.setState({ events: result }))
+      .catch((error) => ApiError(error));
+  };
 
   handleMenu = (event, data, type) => {
     this.eventMenu.getInstance().show(event, data, type);
-  }
+  };
 
   handleEventTickets = (id) => {
     this.props.api
       .fetchEventsByIdForGate(id)
-      .then(data => this.eventTicketsDialog.toggle(data[0]))
-      .catch(error => ApiError(error));
-  }
+      .then((data) => this.eventTicketsDialog.toggle(data[0]))
+      .catch((error) => ApiError(error));
+  };
 
   handleTickets = (eventId, tickets_, force) => {
-    this.props.api.post('/timetable/tickets', {
-      id: eventId,
-      tickets: tickets_,
-      force_open: force
-    })
-      .then(response => {
+    this.props.api
+      .post('/timetable/tickets', {
+        id: eventId,
+        tickets: tickets_,
+        force_open: force,
+      })
+      .then((response) => {
         if (response.result) {
           this.eventTicketsDialog.close();
           Message.show('Ticket data have been updated.');
@@ -87,13 +96,13 @@ export default class MainPage extends Component {
 
         return 1;
       })
-      .catch(error => ApiError(error));
-  }
+      .catch((error) => ApiError(error));
+  };
 
   handleEventCreate = (date) => {
     this.eventMenu.getInstance().close();
     this.eventAddDialog.openWith(date);
-  }
+  };
 
   handleCreate = (formData, valid) => {
     if (!valid) {
@@ -103,23 +112,28 @@ export default class MainPage extends Component {
 
     this.props.api
       .createEvent(formData)
-      .then(result => Message.show(`Event has been created [${result.id}].`))
+      .then((result) => Message.show(`Event has been created [${result.id}].`))
       .then(() => this.eventAddDialog.suggestNext(this.props.pre))
       .then(() => this.handleRefresh())
-      .catch(error => ApiError(error));
-  }
+      .catch((error) => ApiError(error));
+  };
 
   handleRefresh = () => {
     this.getData();
     this.props.onRefresh();
-  }
+  };
 
   handleCalendarViewChange = (dates) => {
-    this.setState({ start: dates.start.format('YYYY-MM-DD'), end: dates.end.format('YYYY-MM-DD') },
+    this.setState(
+      {
+        start: dates.start.format('YYYY-MM-DD'),
+        end: dates.end.format('YYYY-MM-DD'),
+      },
       () => {
         this.refreshEventsData();
-      });
-  }
+      },
+    );
+  };
 
   /**
    * Handles time suggestions for creation forms.
@@ -134,13 +148,13 @@ export default class MainPage extends Component {
     this.setState({ sug_date: date, sug_gate: gate });
     this.props.api
       .get(`/timetable/suggest/next?date=${date}&gate=${gate}`)
-      .then(result => {
+      .then((result) => {
         callback(result.time >= 0 ? result.time + this.props.pre + 1 : 0);
 
         return 1;
       })
-      .catch(error => ApiError(error));
-  }
+      .catch((error) => ApiError(error));
+  };
 
   render() {
     if (!this.state.hasData) {
@@ -154,19 +168,25 @@ export default class MainPage extends Component {
       <div>
         <PageCaption text="01 Calendar" />
         <EventTicketBuyDialog
-          ref={(dialog) => { this.eventTicketsDialog = dialog; }}
+          ref={(dialog) => {
+            this.eventTicketsDialog = dialog;
+          }}
           l18n={l18n}
           onTicketUpdate={this.handleTickets}
         />
         <EventAddDialog
-          ref={(dialog) => { this.eventAddDialog = dialog; }}
+          ref={(dialog) => {
+            this.eventAddDialog = dialog;
+          }}
           callback={this.handleCreate}
           refs={refs}
           locale={locale}
           gates={gates}
         />
         <EventMenu
-          ref={(em) => { this.eventMenu = em; }}
+          ref={(em) => {
+            this.eventMenu = em;
+          }}
           onEventTickets={this.handleEventTickets}
           onEventCreate={this.handleEventCreate}
         />

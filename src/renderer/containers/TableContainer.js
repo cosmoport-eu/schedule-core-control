@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import PageCaption from '../components/page/PageCaption';
 import Table from '../components/table/Table';
 import ApiError from '../components/indicators/ApiError';
-import Api from 'cosmoport-core-api-client/ApiV1';
+import { Api } from 'cosmoport-core-api-client';
 import Message from '../components/messages/Message';
 import _date from '../components/date/_date';
 

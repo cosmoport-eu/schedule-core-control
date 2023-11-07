@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, EditableText } from '@blueprintjs/core';
 
-import Api from 'cosmoport-core-api-client/ApiV1';
+import { Api } from 'cosmoport-core-api-client';
 import DefaultLocaleMessage from '../components/locale/DefaultLocaleMessage';
 import EventTypeAddDialog from '../components/dialog/EventTypeAddDialog';
 import EventTypeDelDialog from '../components/dialog/EventTypeDelDialog';
