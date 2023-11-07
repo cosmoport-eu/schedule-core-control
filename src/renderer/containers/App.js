@@ -98,24 +98,20 @@ export default class App extends Component {
       api.fetchSettings(),
     ])
       .then(([time, nodes_, events_, settings_]) => {
-        const find = settings_.find;
-        const events = events_ || [];
+        const settings = Array.isArray(settings_) ? settings_ : [];
+        const events = Array.isArray(events_) ? events_ : [];
 
-        let boardingTime = 10;
-        let dayBs;
-        if (find) {
-          boardingTime =
-            parseInt(
-              find((setting) => setting.param === 'boarding_time').value,
-              10,
-            ) || 10;
+        const boardingTime =
+          parseInt(
+            settings.find((setting) => setting.param === 'boarding_time').value,
+            10,
+          ) || 10;
 
-          const todayBs = JSON.parse(
-            find((setting) => setting.param === 'business_hours').value,
-          );
+        const todayBs = JSON.parse(
+          settings.find((setting) => setting.param === 'business_hours').value,
+        );
 
-          dayBs = todayBs.hours[(new Date().getDay() + 6) % 7];
-        }
+        const dayBs = todayBs.hours[(new Date().getDay() + 6) % 7];
 
         this.setState({
           timestamp: time.timestamp,
