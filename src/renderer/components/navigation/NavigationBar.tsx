@@ -46,17 +46,14 @@ export default function NavigationBar({
 	auth = false,
 	audio = { path: '', files: [] },
 	nodes = { timetables: 0, gates: 0 },
-	timestamp = 1,
+	timestamp = 0,
 	simulation = { active: false },
 }: NavBar) {
 	return (
-		<Navbar style={{ position: 'fixed' }}>
+		<Navbar style={{ cursor: 'default', position: 'fixed' }}>
 			<Navbar.Group align={Alignment.LEFT}>
-				<Navbar.Heading className="app-caption">
-					Control
-					<span className="version">0.2.0</span>
-				</Navbar.Heading>
-				<div className="menu">
+				<Navbar.Heading className="app-caption">Cosmoport</Navbar.Heading>
+				<>
 					<Navigate to="/" icon={'Home'} />
 					<Navigate to="/simulation" icon={'Simulation'} />
 					<Navigate to="/table" icon={'Timetable'} />
@@ -64,7 +61,7 @@ export default function NavigationBar({
 					{auth && <Navigate to="/settings" icon={'Settings'} />}
 					{!auth && <Navigate to="/login" icon={<Lock />} />}
 					{auth && <Navigate to="/logout" icon={<Unlock />} />}
-				</div>
+				</>
 			</Navbar.Group>
 			<Navbar.Group align={Alignment.RIGHT}>
 				<Player music={audio} />
@@ -81,7 +78,9 @@ export default function NavigationBar({
 					/>
 				</Tooltip>
 				<Navbar.Divider />
-				<ServerTime timestamp={timestamp} />
+				<Tooltip content={'Server time'} position={Position.BOTTOM}>
+					<ServerTime timestamp={timestamp} />
+				</Tooltip>
 			</Navbar.Group>
 		</Navbar>
 	);

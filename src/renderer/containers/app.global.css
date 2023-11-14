@@ -23,17 +23,6 @@ button:focus {
   margin-right: 2em;
 }
 
-.menu {
-  margin-left: 2em;
-}
-
-.app-caption .version {
-  position: absolute;
-  top: -0.5em;
-  right: -2.2em;
-  font-size: 60%;
-}
-
 h2 {
   margin: 0;
   font-size: 2.25rem;

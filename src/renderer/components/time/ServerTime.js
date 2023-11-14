@@ -1,52 +1,28 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 
-export default class ServerTime extends Component {
-  static propTypes = {
-    timestamp: PropTypes.number,
-  };
+export default function ServerTime({ timestamp = 0 }) {
+  const current = +new Date();
+  const diff = current - (timestamp > 0 ? timestamp * 1000 : current);
 
-  static defaultProps = {
-    timestamp: 1,
-  };
+  const [delta, setDelta] = useState(diff);
+  const [x, setX] = useState(true);
 
-  constructor(props) {
-    super(props);
+  const date = new Date(current - delta);
 
-    this.state = {
-      showColon: true,
-      date: new Date(this.props.timestamp * 1000),
-    };
-  }
+  // timestamp prop change
+  useEffect(() => setDelta(diff), [timestamp]);
 
-  componentDidMount() {
-    this.timerID = setInterval(() => this.tick(), 999);
-  }
+  // on 1sec timer
+  useEffect(() => {
+    const interval = setInterval(() => setX((prev) => !prev), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-  }
-
-  tick() {
-    this.setState({
-      date: new Date(),
-      showColon: !this.state.showColon,
-    });
-  }
-
-  format00 = (value) => (value < 10 ? `0${value}` : value);
-
-  showHide = () => ({ opacity: this.state.showColon ? '.999' : '0' });
-
-  renderTime = () => (
-    <div className="time__number">
-      <span>{this.state.date.getHours()}</span>
-      <span style={this.showHide()}>:</span>
-      <span>{this.format00(this.state.date.getMinutes())}</span>
-    </div>
+  return (
+    <>
+      {date.getHours()}
+      <span style={{ opacity: x ? '.999' : '0' }}>:</span>
+      {`${date.getMinutes()}`.padStart(2, '0')}
+    </>
   );
-
-  render() {
-    return <span>{this.renderTime()}</span>;
-  }
 }

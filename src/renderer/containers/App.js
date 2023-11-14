@@ -29,7 +29,7 @@ export default class App extends Component {
     super(props);
 
     this.state = {
-      timestamp: 1,
+      timestamp: 0,
       nodes: { gates: 0, timetables: 0 },
       boarding: 10,
       events: [],
