@@ -49,7 +49,7 @@ export default class EventForm extends Component {
       time: 0,
       // Duration of the event (in minutes)
       duration: 0,
-      limit: 1,
+      limit: 0,
       bought: 0,
       type: 0,
       destination: 0,
@@ -57,10 +57,11 @@ export default class EventForm extends Component {
       gate2: 0,
       status: 0,
       state: 1,
-      cost: 1,
+      cost: 0,
       repeat_interval: 0,
       default_duration: 0,
       default_repeat_interval: 0,
+      default_cost: 0,
     };
 
     // Overrides initial data with passed in parameters
@@ -139,6 +140,7 @@ export default class EventForm extends Component {
         repeat_interval: event.repeatInterval,
         default_duration: eventTypeData.defaultDuration,
         default_repeat_interval: eventTypeData.defaultRepeatInterval,
+        default_cost: eventTypeData.defaultCost,
       };
     }
   };
@@ -181,14 +183,17 @@ export default class EventForm extends Component {
     const eventTypeData = this.findEventTypeData(value) || {
       defaultDuration: 0,
       defaultRepeatInterval: 0,
+      defaultCost: 0,
     };
 
     // fill fields with default values
     this.setState({
+      cost: eventTypeData.defaultCost,
       duration: eventTypeData.defaultDuration,
       repeat_interval: eventTypeData.defaultRepeatInterval,
       default_duration: eventTypeData.defaultDuration,
       default_repeat_interval: eventTypeData.defaultRepeatInterval,
+      default_cost: eventTypeData.defaultCost,
     });
   };
 
@@ -282,7 +287,7 @@ export default class EventForm extends Component {
       </option>
     ));
 
-    const date = this.state.date;
+    const { date } = this.state;
     const timeRange = this.state.time + this.state.duration;
     const invalidTimeRange = time() !== '';
     const invalidTimeRangeMaybeClass = invalidTimeRange
@@ -402,7 +407,7 @@ export default class EventForm extends Component {
         <NumberFieldGroup
           name="cost"
           number={this.state.cost}
-          icon={'euro'}
+          icon="euro"
           onChange={this.handleChange}
           inline
         />

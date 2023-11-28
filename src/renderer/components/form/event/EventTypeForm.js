@@ -12,11 +12,13 @@ export default class EventTypeForm extends Component {
       subname: '',
       description: '',
       default_duration: 0,
-      default_repeat_interval: 0
+      default_repeat_interval: 0,
+      default_cost: 0,
     };
 
     this.validators = {
-      notEmpty: (field) => (this.state[field] === '' ? "Field shouldn't be empty." : '')
+      notEmpty: (field) =>
+        this.state[field] === '' ? "Field shouldn't be empty." : '',
     };
   }
 
@@ -35,7 +37,8 @@ export default class EventTypeForm extends Component {
    * @return {boolean} The result of validation.
    * @since 0.1.0
    */
-  isValid = () => !Object.keys(this.validators).some(key => this.validators[key]() !== '')
+  isValid = () =>
+    !Object.keys(this.validators).some((key) => this.validators[key]() !== '');
 
   /**
    * Handles a component's value change.
@@ -44,18 +47,55 @@ export default class EventTypeForm extends Component {
    */
   handleChange = (name, value) => {
     this.setState({ [name]: value });
-  }
+  };
 
   render() {
     const { notEmpty } = this.validators;
 
     return (
       <div>
-        <TextFieldGroup name="name" value={this.state.name} validator={notEmpty('name')} onChange={this.handleChange} inline />
-        <TextFieldGroup name="subname" value={this.state.subname} validator={notEmpty('subname')} onChange={this.handleChange} inline />
-        <TextFieldGroup name="description" value={this.state.description} validator={notEmpty('description')} onChange={this.handleChange} inline />
-        <NumberFieldGroup name="default_duration" caption="Duration" number={this.state.default_duration} onChange={this.handleChange} inline />
-        <NumberFieldGroup name="default_repeat_interval" caption="Repeat" number={this.state.default_repeat_interval} onChange={this.handleChange} inline />
+        <TextFieldGroup
+          name="name"
+          value={this.state.name}
+          validator={notEmpty('name')}
+          onChange={this.handleChange}
+          inline
+        />
+        <TextFieldGroup
+          name="subname"
+          value={this.state.subname}
+          validator={notEmpty('subname')}
+          onChange={this.handleChange}
+          inline
+        />
+        <TextFieldGroup
+          name="description"
+          value={this.state.description}
+          validator={notEmpty('description')}
+          onChange={this.handleChange}
+          inline
+        />
+        <NumberFieldGroup
+          name="default_duration"
+          caption="Duration"
+          number={this.state.default_duration}
+          onChange={this.handleChange}
+          inline
+        />
+        <NumberFieldGroup
+          name="default_repeat_interval"
+          caption="Repeat"
+          number={this.state.default_repeat_interval}
+          onChange={this.handleChange}
+          inline
+        />
+        <NumberFieldGroup
+          name="default_cost"
+          caption="Cost"
+          number={this.state.default_cost}
+          onChange={this.handleChange}
+          inline
+        />
       </div>
     );
   }

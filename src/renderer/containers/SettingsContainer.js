@@ -19,11 +19,14 @@ import styles from '../components/settings/Settings.module.css';
 const mapEvent = (data) => ({
   default_duration: data.default_duration,
   default_repeat_interval: data.default_repeat_interval,
+  default_cost: data.default_cost,
   description: data.description,
   name: data.name,
   subname: data.subname,
 });
-const Caption = (props) => <p className={styles.caption}>{props.text}</p>;
+function Caption(props) {
+  return <p className={styles.caption}>{props.text}</p>;
+}
 Caption.propTypes = { text: PropTypes.string.isRequired };
 const updateLocale = (locale, locales) => {
   const jo = locales.map((l) => (l.id === locale.id ? locale : l));
@@ -115,9 +118,7 @@ export default class SettingsContainer extends Component {
   };
 
   handleLocaleTimeoutChange = (locale, value) => {
-    const updated = Object.assign({}, LocaleMapper.map(locale), {
-      show_time: value,
-    });
+    const updated = { ...LocaleMapper.map(locale), show_time: value };
 
     this.props.api
       .updateLocaleShowData(updated)
@@ -134,9 +135,7 @@ export default class SettingsContainer extends Component {
   };
 
   handleCheck = (locale, value) => {
-    const updated = Object.assign({}, LocaleMapper.map(locale), {
-      show: value,
-    });
+    const updated = { ...LocaleMapper.map(locale), show: value };
 
     this.props.api
       .updateLocaleShowData(updated)
@@ -253,7 +252,7 @@ export default class SettingsContainer extends Component {
         </div>
 
         <div className={styles.container}>
-          <Caption text={'00 Simulation'} />
+          <Caption text="00 Simulation" />
           <div>
             <div>
               Before each depart event there is a boarding interval and before
@@ -286,7 +285,7 @@ export default class SettingsContainer extends Component {
             </div>
           </div>
 
-          <Caption text={'01 Events'} />
+          <Caption text="01 Events" />
           <div>
             <Button
               className="bp5-minimal"
@@ -300,7 +299,7 @@ export default class SettingsContainer extends Component {
             />
           </div>
 
-          <Caption text={'02 Locales'} />
+          <Caption text="02 Locales" />
           <div>
             {localeMessage}
             <div>
@@ -330,7 +329,7 @@ export default class SettingsContainer extends Component {
             lines of events.
           </div>
 
-          <Caption text={'04 Protection'} />
+          <Caption text="04 Protection" />
           <div>
             <span>Change the password:</span>
             <div className="bp5-control-group" style={{ marginTop: '.6em' }}>
@@ -349,7 +348,7 @@ export default class SettingsContainer extends Component {
             </div>
           </div>
 
-          <Caption text={'05 Synchronization'} />
+          <Caption text="05 Synchronization" />
           <div style={{ marginBottom: '1em' }}>
             All tickets data will be being synchronized with the server by the
             address:&nbsp;
