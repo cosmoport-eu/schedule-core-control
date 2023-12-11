@@ -8,7 +8,7 @@ import {
 	Colors,
 	Navbar,
 } from '@blueprintjs/core';
-import { Exchange, Lock, Unlock } from '@blueprintjs/icons';
+import { Exchange, Lock, Unlock, Translate } from '@blueprintjs/icons';
 
 import ServerTime from '../time/ServerTime';
 import Player from '../player/Player';
@@ -54,11 +54,20 @@ export default function NavigationBar({
 			<Navbar.Group align={Alignment.LEFT}>
 				<Navbar.Heading className="app-caption">Cosmoport</Navbar.Heading>
 				<>
-					<Navigate to="/" icon={'Home'} />
-					<Navigate to="/simulation" icon={'Simulation'} />
-					<Navigate to="/table" icon={'Timetable'} />
-					{auth && <Navigate to="/translation" icon={'Translation'} />}
-					{auth && <Navigate to="/settings" icon={'Settings'} />}
+					<Navigate to="/" icon="Home" />
+					<Navigate to="/simulation" icon="Simulation" />
+					<Navigate to="/table" icon="Timetable" />
+					{auth && (
+						<Navigate
+							to="/translation"
+							icon={
+								<>
+									<Translate /> Translation
+								</>
+							}
+						/>
+					)}
+					{auth && <Navigate to="/settings" icon="Settings" />}
 					{!auth && <Navigate to="/login" icon={<Lock />} />}
 					{auth && <Navigate to="/logout" icon={<Unlock />} />}
 				</>
@@ -78,7 +87,7 @@ export default function NavigationBar({
 					/>
 				</Tooltip>
 				<Navbar.Divider />
-				<Tooltip content={'Server time'} position={Position.BOTTOM}>
+				<Tooltip content="Server time" position={Position.BOTTOM}>
 					<ServerTime timestamp={timestamp} />
 				</Tooltip>
 			</Navbar.Group>

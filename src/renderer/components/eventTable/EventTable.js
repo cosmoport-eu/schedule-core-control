@@ -10,6 +10,7 @@ import EventTableRow from './EventTableRow';
 import L18n from '../l18n/L18n';
 
 import styles from './EventTable.module.css';
+import EventType from '../eventType/EventType';
 
 export default class EventTable extends PureComponent {
   handleEdit = (event) => this.props.editCallback(event);
@@ -18,6 +19,11 @@ export default class EventTable extends PureComponent {
   render() {
     const { locale, refs, events: events_ } = this.props;
     const l18n = new L18n(locale, refs);
+
+    const et = EventType({
+      categories: refs.type_categories,
+      translation: locale,
+    });
 
     if (!events_ || events_.length === 0) {
       return (
@@ -54,6 +60,7 @@ export default class EventTable extends PureComponent {
               event={event}
               refs={this.props.refs}
               l18n={l18n}
+              et={et}
               editCallback={this.handleEdit}
               callback={this.handleRemove}
               auth={this.props.auth}

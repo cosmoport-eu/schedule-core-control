@@ -15,18 +15,22 @@ import TextValueEditor from '../components/editor/TextValueEditor';
 import BusinessHoursEditor from '../components/editor/bs/BusinessHoursEditor';
 
 import styles from '../components/settings/Settings.module.css';
+import EventType from '../components/eventType/EventType';
 
 const mapEvent = (data) => ({
+  category_id: data.category_id,
   default_duration: data.default_duration,
   default_repeat_interval: data.default_repeat_interval,
   default_cost: data.default_cost,
   description: data.description,
   name: data.name,
-  subname: data.subname,
+  subtypes: data.subtypes,
 });
+
 function Caption(props) {
   return <p className={styles.caption}>{props.text}</p>;
 }
+
 Caption.propTypes = { text: PropTypes.string.isRequired };
 const updateLocale = (locale, locales) => {
   const jo = locales.map((l) => (l.id === locale.id ? locale : l));
@@ -52,6 +56,8 @@ export default class SettingsContainer extends Component {
       locales: [],
       trans: {},
       settings: [],
+
+      eventTypeAddDialogIsOpen: false,
     };
   }
 
@@ -78,8 +84,13 @@ export default class SettingsContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
+  onEventTypeAddDialogToggle = () =>
+    this.setState({
+      eventTypeAddDialogIsOpen: !this.state.eventTypeAddDialogIsOpen,
+    });
+
   handleCreateEventType = () => {
-    this.eventTypeAddDialog.toggleDialog();
+    this.onEventTypeAddDialogToggle();
   };
 
   handleDeleteEventType = () => {
@@ -95,7 +106,8 @@ export default class SettingsContainer extends Component {
     this.props.api
       .createEventType(mapEvent(formData))
       .then((result) => {
-        Message.show(`Event type has been created [${result.id}].`);
+        const id = result.eventTypes[0].id;
+        Message.show(`Event type has been created [${id}].`);
         this.getData();
         callback();
 
@@ -104,14 +116,25 @@ export default class SettingsContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
+  handleNewCategory = (name) => {
+    if (name === '') return;
+
+    this.props.api
+      .createEventTypeCategory({ name: name })
+      .then((result) => {
+        Message.show(`Event type category has been created [${result.id}].`);
+        this.getData();
+      })
+      .catch((error) => ApiError(error));
+  };
+
   handleDelete = (id, callback) => {
     this.props.api
       .deleteEventType(id)
       .then((result) => {
-        Message.show(`Event type has been created [:${result.deleted}]`);
+        Message.show(`Event type has been deleted [:${result.deleted}]`);
         this.getData();
         callback();
-
         return 1;
       })
       .catch((error) => ApiError(error));
@@ -197,12 +220,21 @@ export default class SettingsContainer extends Component {
   };
 
   render() {
-    if (!this.state.hasData) {
+    const {
+      hasData,
+      locales,
+      refs,
+      settings,
+      trans,
+      eventTypeAddDialogIsOpen,
+    } = this.state;
+
+    if (!hasData) {
       return null;
     }
 
-    const localeMessage = DefaultLocaleMessage(this.state.locales);
-    const localeTimeouts = this.state.locales.map((locale) => (
+    const localeMessage = DefaultLocaleMessage(locales);
+    const localeTimeouts = locales.map((locale) => (
       <LocaleInput
         key={locale.id}
         locale={locale}
@@ -210,34 +242,29 @@ export default class SettingsContainer extends Component {
         onCheck={this.handleCheck}
       />
     ));
-    const linesSetting = this.findSetting(
-      this.state.settings,
-      'timetable_screen_lines',
-    );
-    const boardingSetting = this.findSetting(
-      this.state.settings,
-      'boarding_time',
-    );
-    const syncServerAddressSetting = this.findSetting(
-      this.state.settings,
-      'sync_server_address',
-    );
-    const businessHoursSetting = this.findSetting(
-      this.state.settings,
-      'business_hours',
-    );
+    const linesSetting = this.findSetting(settings, 'timetable_screen_lines');
+    const boardingSetting = this.findSetting(settings, 'boarding_time');
+    const syncAddrSetting = this.findSetting(settings, 'sync_server_address');
+    const businessHoursSetting = this.findSetting(settings, 'business_hours');
+
+    const et = EventType({
+      categories: refs.type_categories,
+      translation: trans,
+    });
 
     return (
-      <div>
+      <>
         <EventTypeAddDialog
-          ref={(c) => {
-            this.eventTypeAddDialog = c;
-          }}
+          categories={refs.type_categories}
+          etDisplay={et}
+          isOpen={eventTypeAddDialogIsOpen}
+          toggle={this.onEventTypeAddDialogToggle}
           callback={this.handleCreate}
+          categoryCreateCallback={this.handleNewCategory}
         />
         <EventTypeDelDialog
-          trans={this.state.trans}
-          refs={this.state.refs}
+          etDisplay={et}
+          types={refs.types}
           ref={(c) => {
             this.eventTypeDelDialog = c;
           }}
@@ -354,14 +381,14 @@ export default class SettingsContainer extends Component {
             address:&nbsp;
             <EditableText
               className={styles.baseEdit}
-              value={syncServerAddressSetting.value}
+              value={syncAddrSetting.value}
               placeholder=""
             />
             .
           </div>
           <p />
         </div>
-      </div>
+      </>
     );
   }
 }

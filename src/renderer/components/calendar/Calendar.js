@@ -1,4 +1,3 @@
-// @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
@@ -9,7 +8,8 @@ import EventPropType from '../../props/EventPropType';
 
 require('fullcalendar/dist/fullcalendar');
 
-const eventTypeColorMap = (type) => ({ 1: '#f44336', 2: '#9c27b0', 3: '#2196f3', 4: '#009688' }[type]);
+const eventTypeColorMap = (type) =>
+  ({ 1: '#f44336', 2: '#9c27b0', 3: '#2196f3', 4: '#009688' })[type];
 
 /**
  * Hybrid React/Fullcalendar component.
@@ -21,14 +21,14 @@ export default class Calendar extends Component {
     events: PropTypes.arrayOf(EventPropType),
     l18n: PropTypes.instanceOf(L18n).isRequired,
     onMenu: PropTypes.func,
-    onViewChange: PropTypes.func
-  }
+    onViewChange: PropTypes.func,
+  };
 
   static defaultProps = {
     events: [],
-    onMenu: () => { },
-    onViewChange: () => { }
-  }
+    onMenu: () => {},
+    onViewChange: () => {},
+  };
 
   constructor(props) {
     super(props);
@@ -47,7 +47,7 @@ export default class Calendar extends Component {
       header: {
         left: '',
         center: 'title',
-        right: 'prev,next today,month,agendaWeek,agendaDay'
+        right: 'prev,next today,month,agendaWeek,agendaDay',
       },
       defaultView: 'month',
       timeFormat: 'HH:mm',
@@ -65,7 +65,7 @@ export default class Calendar extends Component {
       dayClick: self.handleDayClick,
       eventClick: self.handleEventClick,
       editable: false,
-      viewRender: self.handleViewChange
+      viewRender: self.handleViewChange,
     });
   }
 
@@ -99,41 +99,47 @@ export default class Calendar extends Component {
 
   handleDayClick = (date, jsEvent) => {
     this.props.onMenu(jsEvent, date, 'day');
-  }
+  };
 
   handleEventClick = (calEvent, jsEvent) => {
     this.props.onMenu(jsEvent, calEvent, 'event');
-  }
+  };
 
   handleViewChange = () => {
     this.props.onViewChange(this.getCurrentDateRange());
-  }
+  };
 
   getEvents = (start, end, timezone, callback) => {
-    const events = this.events.map(event => {
+    const events = this.events.map((event) => {
       const eventData = this.l18n.findEventRefByEventTypeId(event.eventTypeId);
       const finish = _date.minutesToHm(event.startTime + event.durationTime);
 
       return {
         id: event.id,
-        title: `${this.l18n.findTranslationById(eventData, 'i18nEventTypeName')} / 
-        ${this.l18n.findTranslationById(eventData, 'i18nEventTypeSubname')}`,
+        title: this.props.et.getFullName(eventData),
         start: `${event.eventDate}T${_date.minutesToHm(event.startTime)}`,
         end: `${event.eventDate}T${finish}`,
-        color: eventTypeColorMap(event.eventTypeId) || '#defe'
+        color: eventTypeColorMap(event.eventTypeId) || '#defe',
       };
     });
 
     callback(events);
-  }
+  };
 
   getCurrentDateRange = () => {
     const view = this.$node.fullCalendar('getView');
 
     return { start: view.start, end: view.end };
-  }
+  };
 
   render() {
-    return <div style={{ padding: '0 5em' }} ref={(div) => { this.calendar = div; }} />;
+    return (
+      <div
+        style={{ padding: '0 5em' }}
+        ref={(div) => {
+          this.calendar = div;
+        }}
+      />
+    );
   }
 }

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Dialog, Button } from '@blueprintjs/core';
+import { Dialog, DialogBody, DialogFooter, Button } from '@blueprintjs/core';
 
 import RefsPropType from '../../props/RefsPropType';
 import LocalePropType from '../../props/LocalePropType';
@@ -51,7 +51,7 @@ export default class EventEditDialog extends PureComponent {
     const { locale, refs, gates } = this.props;
     const { isOpen, event } = this.state;
 
-    if (!event) return ;
+    if (!event) return;
 
     return (
       <Dialog
@@ -60,7 +60,7 @@ export default class EventEditDialog extends PureComponent {
         canOutsideClickClose={false}
         title="Edit event"
       >
-        <div className="bp5-dialog-body">
+        <DialogBody>
           <EventForm
             event={event}
             ref={(c) => {
@@ -70,12 +70,10 @@ export default class EventEditDialog extends PureComponent {
             refs={refs}
             gates={gates}
           />
-        </div>
-        <div className="bp5-dialog-footer">
-          <div className="bp5-dialog-footer-actions">
-            <Button onClick={this.passState} text="Update" />
-          </div>
-        </div>
+        </DialogBody>
+        <DialogFooter
+          actions={<Button onClick={this.passState} text="Update" />}
+        />
       </Dialog>
     );
   }

@@ -2,17 +2,17 @@ import PropTypes from 'prop-types';
 
 import styles from '../EventForm.module.css';
 
-export default function TextFieldGroup({
-  name,
-  validator,
-  onChange,
+export default function TextAreaGroup({
   caption,
   className,
+  name,
+  onChange,
+  validator,
   inline,
-  noLabel,
   value,
-  fill,
+  noLabel,
   placeholder,
+  disabled,
 }) {
   const handleChange = (event) => {
     onChange(name, event.target.value);
@@ -39,14 +39,13 @@ export default function TextFieldGroup({
       <div
         className={`bp5-form-content ${styles.fullWidth}${invalidMaybeClass}`}
       >
-        <input
+        <textarea
           id={name}
-          className={`bp5-input ${
-            fill ? styles.fill : ''
-          } ${invalidMaybeClass}`}
+          className={`bp5-input ${styles.fill} ${invalidMaybeClass}`}
           value={value}
           onChange={handleChange}
           placeholder={placeholder}
+          disabled={disabled}
         />
         {invalid && <div className="bp5-form-helper-text">{validator}</div>}
       </div>
@@ -54,7 +53,7 @@ export default function TextFieldGroup({
   );
 }
 
-TextFieldGroup.propTypes = {
+TextAreaGroup.propTypes = {
   name: PropTypes.string.isRequired,
   caption: PropTypes.string,
   value: PropTypes.string,
@@ -62,19 +61,19 @@ TextFieldGroup.propTypes = {
   validator: PropTypes.string,
   inline: PropTypes.bool,
   className: PropTypes.string,
-  fill: PropTypes.bool,
   noLabel: PropTypes.bool,
   placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
 };
 
-TextFieldGroup.defaultProps = {
+TextAreaGroup.defaultProps = {
   caption: '',
   value: '',
   onChange: () => {},
   validator: '',
   inline: false,
   className: '',
-  fill: false,
   noLabel: false,
   placeholder: '',
+  disabled: false,
 };

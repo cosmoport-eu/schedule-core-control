@@ -5,7 +5,6 @@ import {
   DialogBody,
   DialogFooter,
   Button,
-  Intent,
   Switch,
 } from '@blueprintjs/core';
 
@@ -58,17 +57,14 @@ export default class EventTicketBuyDialog extends Component {
     }
   };
 
-  renderEventInfo = (event, l18n) => {
+  renderEventInfo = (event, l18n, et) => {
     const typeRef = l18n.findEventRefByEventTypeId(event.eventTypeId);
     const stateRef = l18n.findEventRefByEventStateId(event.eventStateId);
     const statusRef = l18n.findEventRefByEventStatusId(event.eventStatusId);
 
     return (
       <div className={styles.eventInfo}>
-        <div className={styles.eventTitle}>
-          {`${l18n.findTranslationById(typeRef, 'i18nEventTypeName')} /
-        ${l18n.findTranslationById(typeRef, 'i18nEventTypeSubname')}`}
-        </div>
+        <div className={styles.eventTitle}>{et.getFullName(typeRef)}</div>
         <div className={styles.eventProperty}>
           <span>Date</span>
           <span>{_date.format(event.eventDate, 'D MMMM YYYY')}</span>
@@ -139,7 +135,7 @@ export default class EventTicketBuyDialog extends Component {
 
   render() {
     const { isOpen, event } = this.state;
-    const { l18n } = this.props;
+    const { l18n, et } = this.props;
 
     if (!isOpen) {
       return null;
@@ -148,16 +144,16 @@ export default class EventTicketBuyDialog extends Component {
     return (
       <Dialog
         isOpen={isOpen}
-        icon={"dollar"}
+        icon={'dollar'}
         onClose={this.toggle}
         canOutsideClickClose={false}
-        title="Tickets"
+        title="Sell tickets"
       >
         <DialogBody>
           <div className={styles.notice}>
             Here you can update tickets selling information.
           </div>
-          {this.renderEventInfo(event, l18n)}
+          {this.renderEventInfo(event, l18n, et)}
         </DialogBody>
         <DialogFooter
           actions={

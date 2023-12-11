@@ -77,7 +77,7 @@ export default class Table extends PureComponent {
   suggestNext = (pre) => this.eventAddDialog.suggestNext(pre);
 
   render() {
-    const { refs, locale, events, gates, range, auth } = this.props;
+    const { refs, locale, events, gates, range, auth, et } = this.props;
 
     return (
       <div>

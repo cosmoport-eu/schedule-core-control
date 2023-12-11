@@ -4,7 +4,6 @@
 }
 
 .label_lpad label {
-    text-transform: capitalize;
     display: inline-block;
     width: 20%;
 }

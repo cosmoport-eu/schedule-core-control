@@ -9,8 +9,18 @@ export default class NumberFieldGroup extends React.PureComponent {
   handleValueChange = (value) => this.props.onChange(this.props.name, value);
 
   render() {
-    const { caption, className, icon, inline, name, number, validator } =
-      this.props;
+    const {
+      caption,
+      className,
+      icon,
+      info,
+      inline,
+      name,
+      number,
+      validator,
+      leftElement,
+      rightElement,
+    } = this.props;
     const intent = validator !== '' ? Intent.DANGER : Intent.NONE;
 
     return (
@@ -19,6 +29,7 @@ export default class NumberFieldGroup extends React.PureComponent {
         contentClassName={styles.fill}
         inline={inline}
         labelFor={name}
+        labelInfo={info}
         label={caption || name}
         helperText={validator}
         intent={intent}
@@ -27,8 +38,10 @@ export default class NumberFieldGroup extends React.PureComponent {
           id={name}
           allowNumericCharactersOnly
           intent={intent}
-          buttonPosition={'none'}
+          buttonPosition="none"
           leftIcon={icon}
+          leftElement={leftElement}
+          rightElement={rightElement}
           min={0}
           fill
           value={number}
@@ -46,6 +59,9 @@ NumberFieldGroup.propTypes = {
   onChange: PropTypes.func,
   validator: PropTypes.string,
   icon: PropTypes.string,
+  info: PropTypes.string,
+  leftElement: PropTypes.element,
+  rightElement: PropTypes.element,
   inline: PropTypes.bool,
   className: PropTypes.string,
 };
@@ -56,6 +72,9 @@ NumberFieldGroup.defaultProps = {
   onChange: () => {},
   validator: '',
   icon: null,
+  info: '',
+  leftElement: null,
+  rightElement: null,
   inline: false,
   className: '',
 };

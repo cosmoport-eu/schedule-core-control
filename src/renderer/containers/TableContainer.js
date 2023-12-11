@@ -7,6 +7,7 @@ import ApiError from '../components/indicators/ApiError';
 import { Api } from 'cosmoport-core-api-client';
 import Message from '../components/messages/Message';
 import _date from '../components/date/_date';
+import EventType from '../components/eventType/EventType';
 
 export default class TableContainer extends Component {
   static propTypes = {

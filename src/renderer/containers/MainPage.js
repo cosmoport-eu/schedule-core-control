@@ -11,6 +11,7 @@ import L18n from '../components/l18n/L18n';
 import Message from '../components/messages/Message';
 import EventAddDialog from '../components/dialog/EventAddDialog';
 import _date from '../components/date/_date';
+import EventType from '../components/eventType/EventType';
 
 export default class MainPage extends Component {
   static propTypes = {
@@ -164,6 +165,11 @@ export default class MainPage extends Component {
     const { events, locale, refs, gates } = this.state;
     const l18n = new L18n(locale, refs);
 
+    const et = EventType({
+      categories: refs.type_categories,
+      translation: locale,
+    });
+
     return (
       <div>
         <PageCaption text="01 Calendar" />
@@ -172,6 +178,7 @@ export default class MainPage extends Component {
             this.eventTicketsDialog = dialog;
           }}
           l18n={l18n}
+          et={et}
           onTicketUpdate={this.handleTickets}
         />
         <EventAddDialog
@@ -193,6 +200,7 @@ export default class MainPage extends Component {
         <Calendar
           events={events}
           l18n={l18n}
+          et={et}
           onMenu={this.handleMenu}
           onViewChange={this.handleCalendarViewChange}
         />
