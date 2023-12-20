@@ -113,6 +113,8 @@ const createWindow = async () => {
 		if (!mainWindow) {
 			throw new Error('"mainWindow" is not defined');
 		}
+		mainWindow.webContents.setZoomLevel(0);
+		mainWindow.webContents.setZoomFactor(1.0);
 		if (process.env.START_MINIMIZED) {
 			mainWindow.minimize();
 		} else {
