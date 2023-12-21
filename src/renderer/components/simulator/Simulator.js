@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import EventPropType from '../../../props/EventPropType';
-import Action from '../action/Action';
+import EventPropType from '../../props/EventPropType';
 import { eventStatus } from 'cosmoport-core-api-client';
-import _date from '../../date/_date';
+import _date from '../date/_date';
 
 /**
  * A client-side Cosmoport activity simulation.
@@ -14,43 +13,6 @@ import _date from '../../date/_date';
  * @version 0.0.0
  */
 export default class Simulator extends Component {
-  static propTypes = {
-    events: PropTypes.arrayOf(EventPropType),
-    // A number of minutes for action calculations before the events
-    business: PropTypes.shape({
-      start: PropTypes.number,
-      end: PropTypes.number,
-      non: PropTypes.bool,
-    }),
-    boarding: PropTypes.number.isRequired,
-    onStatusChange: PropTypes.func,
-    onAnnouncement: PropTypes.func,
-    onTurnGateOn: PropTypes.func,
-    onArchive: PropTypes.func,
-    onReturn: PropTypes.func,
-    onSimulationTick: PropTypes.func,
-    onActionsUpdate: PropTypes.func,
-    onNewDay: PropTypes.func,
-  };
-
-  static defaultProps = {
-    events: [],
-    active: false,
-    business: {
-      start: 0,
-      end: 0,
-      non: false,
-    },
-    onStatusChange: () => {},
-    onAnnouncement: () => {},
-    onTurnGateOn: () => {},
-    onArchive: () => {},
-    onReturn: () => {},
-    onSimulationTick: () => {},
-    onActionsUpdate: () => {},
-    onNewDay: () => {},
-  };
-
   constructor(props) {
     super(props);
 
@@ -70,22 +32,23 @@ export default class Simulator extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      this.props.events !== nextProps.events ||
-      this.props.boarding !== nextProps.boarding
-    ) {
+    const { boarding, business, events, onActionsUpdate, onSimulationTick } =
+      this.props;
+    const { archiveTime } = this.state;
+
+    if (events !== nextProps.events || boarding !== nextProps.boarding) {
       const newActions = this.scheduleActions(
         nextProps.events,
         nextProps.boarding,
-        this.state.archiveTime,
+        archiveTime,
       );
       this.setState({ actions: newActions });
-      this.props.onActionsUpdate(newActions);
+      onActionsUpdate(newActions);
     }
 
-    if (this.props.business !== nextProps.business) {
+    if (business !== nextProps.business) {
       this.setState({ active: this.inBusiness(nextProps.business) }, () => {
-        this.props.onSimulationTick(this.state);
+        onSimulationTick(this.state);
       });
     }
   }
@@ -131,11 +94,13 @@ export default class Simulator extends Component {
   };
 
   calculateBusiness = () => {
-    const works = this.inBusiness(this.props.business);
+    const { business, onSimulationTick } = this.props;
+    const { active } = this.state;
+    const works = this.inBusiness(business);
 
-    if (this.state.active !== works) {
+    if (active !== works) {
       this.setState({ active: works }, () => {
-        this.props.onSimulationTick(this.state);
+        onSimulationTick(this.state);
       });
     }
   };
@@ -154,59 +119,51 @@ export default class Simulator extends Component {
   eventsToActions = (event, pre, archive) => {
     const boardingTime = event.startTime - pre > 0 ? event.startTime - pre : 0;
     const eventTime = event.startTime;
-    const returningTime = event.startTime + event.durationTime;
-    const beforeReturnTime = returningTime - pre > 0 ? returningTime - pre : 0;
+    const timeOfReturn = event.startTime + event.durationTime;
+    const beforeReturnTime = timeOfReturn - pre > 0 ? timeOfReturn - pre : 0;
     const archiveTime = eventTime + archive;
 
     return [
       // set the event status to boarding
-      new Action(event, boardingTime, 'set_status_boarding', 1),
+      { event, time: boardingTime, do: 'set_status_boarding', weight: 1 },
       // Gate? show the number
       // Play sound
-      new Action(event, boardingTime, 'play_boarding_sound', 2),
+      { event, time: boardingTime, do: 'play_boarding_sound', weight: 2 },
       // Turn on the gate display
-      new Action(event, boardingTime, 'turn_on_gate', 3),
+      { event, time: boardingTime, do: 'turn_on_gate', weight: 3 },
       // Set event status to departed
-      new Action(event, eventTime, 'set_status_departed', 4),
+      { event, time: eventTime, do: 'set_status_departed', weight: 4 },
       // Play sound
-      new Action(event, eventTime, 'play_departed_sound', 5),
+      { event, time: eventTime, do: 'play_departed_sound', weight: 5 },
       // Archive the event
-      new Action(event, archiveTime, 'archive', 6),
-      new Action(event, beforeReturnTime, 'show_return', 7),
-      new Action(event, returningTime, 'set_status_returned', 8),
+      { event, time: archiveTime, do: 'archive', weight: 6 },
+      { event, time: beforeReturnTime, do: 'show_return', weight: 7 },
+      { event, time: timeOfReturn, do: 'set_status_returned', weight: 8 },
     ];
   };
 
-  mapActionToReaction = (action) =>
-    ({
-      set_status_boarding: 'handleSetStatus',
-      play_boarding_sound: 'handleAnnouncement',
-      turn_on_gate: 'handleGateTurning',
-      set_status_departed: 'handleSetStatus',
-      play_departed_sound: 'handleAnnouncement',
-      archive: 'handleArchive',
-      show_return: 'handleReturn',
-      set_status_returned: 'handleSetStatus',
-    })[action.do];
+  action_reaction = {
+    set_status_boarding: 'handleSetStatus',
+    play_boarding_sound: 'handleAnnouncement',
+    turn_on_gate: 'handleGateTurning',
+    set_status_departed: 'handleSetStatus',
+    play_departed_sound: 'handleAnnouncement',
+    archive: 'handleArchive',
+    show_return: 'handleReturn',
+    set_status_returned: 'handleSetStatus',
+  };
 
-  mapAnnouncement = (action) =>
-    ({ play_boarding_sound: 'boarding', play_departed_sound: 'departure' })[
-      action.do
-    ];
+  action_sound_reaction = {
+    play_boarding_sound: 'boarding',
+    play_departed_sound: 'departure',
+  };
 
   doActionsForMinute = (minute) => {
-    if (!this.state.active) {
-      return;
-    }
-
-    this.state.actions
-      .filter((a) => a.time === minute)
-      .forEach((a) => {
-        this.doIt(a);
-      });
+    const { active, actions } = this.state;
+    active && actions.filter((a) => a.time === minute).forEach(this.doIt);
   };
 
-  doIt = (action) => this[this.mapActionToReaction(action)](action);
+  doIt = (action) => this[this.action_reaction[action.do]](action);
 
   handleSetStatus = (action) => this.props.onStatusChange(action);
 
@@ -214,7 +171,7 @@ export default class Simulator extends Component {
     this.props.onAnnouncement({
       id: action.event.id,
       time: new Date().getTime(),
-      type: this.mapAnnouncement(action),
+      type: this.action_sound_reaction[action.do],
     });
 
   handleGateTurning = (action) => this.props.onTurnGateOn(action);
@@ -225,3 +182,40 @@ export default class Simulator extends Component {
 
   render = () => <span />;
 }
+
+Simulator.propTypes = {
+  events: PropTypes.arrayOf(EventPropType),
+  // A number of minutes for action calculations before the events
+  business: PropTypes.shape({
+    start: PropTypes.number,
+    end: PropTypes.number,
+    non: PropTypes.bool,
+  }),
+  boarding: PropTypes.number.isRequired,
+  onStatusChange: PropTypes.func,
+  onAnnouncement: PropTypes.func,
+  onTurnGateOn: PropTypes.func,
+  onArchive: PropTypes.func,
+  onReturn: PropTypes.func,
+  onSimulationTick: PropTypes.func,
+  onActionsUpdate: PropTypes.func,
+  onNewDay: PropTypes.func,
+};
+
+Simulator.defaultProps = {
+  events: [],
+  active: false,
+  business: {
+    start: 0,
+    end: 0,
+    non: false,
+  },
+  onStatusChange: () => {},
+  onAnnouncement: () => {},
+  onTurnGateOn: () => {},
+  onArchive: () => {},
+  onReturn: () => {},
+  onSimulationTick: () => {},
+  onActionsUpdate: () => {},
+  onNewDay: () => {},
+};

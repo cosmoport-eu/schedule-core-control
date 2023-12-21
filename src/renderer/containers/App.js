@@ -14,7 +14,7 @@ import Translation from './TranslationContainer';
 import Settings from './SettingsContainer';
 import Lock from './LockContainer';
 import Unlock from './UnlockContainer';
-import Simulator from '../components/simulator/v0/Simulator';
+import Simulator from '../components/simulator/Simulator';
 import EventMapper from '../components/mapper/EventMapper';
 import _date from '../components/date/_date';
 import Message from '../components/messages/Message';
@@ -41,6 +41,7 @@ export default class App extends Component {
       ),
       socket: null,
       simulationAnnouncements: [],
+      simulationAnnouncementsPlay: 'PLAYING',
       simulation: {
         active: true,
         actions: [],
@@ -133,6 +134,7 @@ export default class App extends Component {
 
   handleAnnouncement = (ann) => {
     this.setState({
+      simulationAnnouncementsPlay: 'PLAYING',
       simulationAnnouncements: this.state.simulationAnnouncements.concat(ann),
     });
     console.info('announcement', ann.type);
@@ -224,6 +226,13 @@ export default class App extends Component {
     this.simulator.doIt(action);
   };
 
+  handleStopAnnounce = () => {
+    this.setState({
+      simulationAnnouncements: [],
+      simulationAnnouncementsPlay: 'STOPPED',
+    });
+  };
+
   handleSimulationTick = (state) => {
     this.setState({ simulation: state });
   };
@@ -248,6 +257,7 @@ export default class App extends Component {
       events: events_,
       simulation: sim,
       simulationAnnouncements: sa,
+      simulationAnnouncementsPlay: playStatus,
       timestamp,
       nodes,
       audio,
@@ -284,6 +294,7 @@ export default class App extends Component {
         />
         <Rupor
           audio={audio}
+          status={playStatus}
           announcements={sa}
           onAnnouncementEnd={this.handleAnnouncementEnd}
         />
@@ -304,9 +315,11 @@ export default class App extends Component {
                     path="/simulation"
                     element={
                       <Simulation
+                        auth={auth_}
                         simulation={sim}
                         announcements={sa}
                         onActionClick={this.handleAction}
+                        onStopAnnounce={this.handleStopAnnounce}
                         events={events_}
                         {...commonProps}
                       />

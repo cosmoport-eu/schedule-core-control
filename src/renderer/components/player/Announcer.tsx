@@ -6,6 +6,7 @@ type Announcer = {
 		id: number;
 		type: string;
 	}[];
+	status: 'PLAYING' | 'STOPPED' | 'PAUSED';
 	onAnnouncementEnd: () => void;
 };
 
@@ -15,6 +16,7 @@ const buildUrl = (path: string, track: string) =>
 export default function Announcer({
 	audio = { path: '' },
 	announcements = [],
+	status = 'PLAYING',
 	onAnnouncementEnd = () => {},
 }: Announcer) {
 	if (announcements.length === 0) return null;
@@ -22,7 +24,7 @@ export default function Announcer({
 	return (
 		<Sound
 			url={buildUrl(audio.path, `${announcements[0].type}.mp3`)}
-			playStatus={'PLAYING'}
+			playStatus={status}
 			playFromPosition={0}
 			volume={30}
 			onFinishedPlaying={onAnnouncementEnd}

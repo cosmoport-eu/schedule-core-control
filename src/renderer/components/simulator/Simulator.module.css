@@ -1,4 +1,58 @@
 
+.cap {
+    display: flex;
+    justify-content: space-between;
+}
+
+.announcementInfo {
+    display: grid;
+    grid-template-columns: repeat(8, 8.5em);
+    grid-template-rows: 1em;
+    grid-gap: 5px;
+    text-align: center;
+}
+
+.heart {
+    animation: 1.5s ease 0s infinite beat;
+}
+
+@keyframes beat {
+    0%, 50%, 100% { transform: scale(1, 1); }
+    30%, 80% { transform: scale(0.92, 0.95); }
+}
+
+.actionListRecord {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.actionList {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.simulationInfo {
+    display: grid;
+    grid-template-columns: 4em 5em 15em;
+    grid-gap: 3px;
+}
+
+.simulationInfo span, .simulationInfo div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .done {
     color: #aaa !important;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+.noSelect {
+    user-select: none;
 }
