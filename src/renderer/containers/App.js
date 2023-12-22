@@ -18,6 +18,7 @@ import Simulator from '../components/simulator/Simulator';
 import EventMapper from '../components/mapper/EventMapper';
 import _date from '../components/date/_date';
 import Message from '../components/messages/Message';
+import { defaultBusiness } from '../components/simulator/Defaults';
 
 import './app.global.css';
 import styles from './App.module.css';
@@ -72,7 +73,7 @@ export default class App extends Component {
           self.state.api
             .fetchNodes()
             .then((data) => self.setState({ nodes: data }))
-            .catch((error) => console.error(error));
+            .catch(console.error);
         }
       },
 
@@ -104,14 +105,15 @@ export default class App extends Component {
 
         const boardingTime =
           parseInt(
-            settings.find((setting) => setting.param === 'boarding_time').value,
+            settings.find((setting) => setting.param === 'boarding_time')
+              ?.value,
             10,
           ) || 10;
 
-        const todayBs = JSON.parse(
-          settings.find((setting) => setting.param === 'business_hours').value,
-        );
-
+        const business = settings.find(
+          (setting) => setting.param === 'business_hours',
+        )?.value;
+        const todayBs = business ? JSON.parse(business) : defaultBusiness;
         const dayBs = todayBs.hours[(new Date().getDay() + 6) % 7];
 
         this.setState({
@@ -129,7 +131,7 @@ export default class App extends Component {
 
         return 1;
       })
-      .catch((error) => console.error(error));
+      .catch(console.error);
   };
 
   handleAnnouncement = (ann) => {
