@@ -1,8 +1,13 @@
 
 .eventTable {
-  width: 100%;
+    width: 100%;
 }
 
 .eventTable tbody tr td {
-  vertical-align: middle;
+    vertical-align: middle;
+}
+
+.dateCol {
+    font-size: 80%;
+    margin-bottom: 0.3em;
 }

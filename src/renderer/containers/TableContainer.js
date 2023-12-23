@@ -7,7 +7,6 @@ import ApiError from '../components/indicators/ApiError';
 import { Api } from 'cosmoport-core-api-client';
 import Message from '../components/messages/Message';
 import _date from '../components/date/_date';
-import EventType from '../components/eventType/EventType';
 
 export default class TableContainer extends Component {
   static propTypes = {
@@ -55,11 +54,11 @@ export default class TableContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleCreate = (formData) => {
+  handleCreate = (formData, suggester) => {
     this.props.api
       .createEvent(formData)
       .then((result) => Message.show(`Event has been created [${result.id}].`))
-      .then(() => this.table.suggestNext(this.props.pre))
+      .then(() => suggester && suggester(this.props.pre))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
@@ -110,12 +109,9 @@ export default class TableContainer extends Component {
     const { events, refs, locale, gates, range } = this.state;
 
     return (
-      <div>
+      <>
         <PageCaption text="03 Timetable" />
         <Table
-          ref={(table) => {
-            this.table = table;
-          }}
           events={events}
           refs={refs}
           locale={locale}
@@ -130,7 +126,7 @@ export default class TableContainer extends Component {
           onRefresh={this.handleRefresh}
           auth={this.props.auth}
         />
-      </div>
+      </>
     );
   }
 }
