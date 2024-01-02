@@ -8,9 +8,6 @@ import EventPropType from '../../props/EventPropType';
 
 require('fullcalendar/dist/fullcalendar');
 
-const eventTypeColorMap = (type) =>
-  ({ 1: '#f44336', 2: '#9c27b0', 3: '#2196f3', 4: '#009688' })[type];
-
 /**
  * Hybrid React/Fullcalendar component.
  *
@@ -119,7 +116,7 @@ export default class Calendar extends Component {
         title: this.props.et.getFullName(eventData),
         start: `${event.eventDate}T${_date.minutesToHm(event.startTime)}`,
         end: `${event.eventDate}T${finish}`,
-        color: eventTypeColorMap(event.eventTypeId) || '#defe',
+        color: event.eventColor || '#defe',
       };
     });
 
