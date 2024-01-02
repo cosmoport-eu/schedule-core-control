@@ -116,11 +116,11 @@ export default class SettingsContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleNewCategory = (name) => {
+  handleNewCategory = (name, color) => {
     if (name === '') return;
 
     this.props.api
-      .createEventTypeCategory({ name: name })
+      .createEventTypeCategory({ name: name, color: color})
       .then((result) => {
         Message.show(`Event type category has been created [${result.id}].`);
         this.getData();

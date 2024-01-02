@@ -1,9 +1,9 @@
 {
   "description": "Cosmoport core control",
-  "homepage": "https://github.com/sergystepanov/cosmoport-core-control",
+  "homepage": "https://github.com/cosmoport-eu/cosmoport-core-control",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sergystepanov/cosmoport-core-control.git"
+    "url": "git+https://github.com/cosmoport-eu/cosmoport-core-control.git"
   },
   "private": true,
   "author": {
@@ -83,7 +83,7 @@
     "@blueprintjs/datetime": "^5.2.5",
     "@blueprintjs/datetime2": "^2.2.3",
     "@blueprintjs/icons": "^5.3.0",
-    "cosmoport-core-api-client": "github:sergystepanov/cosmoport-core-api-client#v0.2.4",
+    "cosmoport-core-api-client": "https://github.com/cosmoport-eu/schedule-core-api-client/archive/refs/tags/v0.2.5.tar.gz",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^6.1.4",

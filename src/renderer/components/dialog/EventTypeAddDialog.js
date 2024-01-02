@@ -31,8 +31,8 @@ export default function EventTypeAddDialog({
     callback(ref.current.getFormData(), toggle);
   };
 
-  const handleNewCategory = (name) => {
-    categoryCreateCallback(name);
+  const handleNewCategory = (name, color) => {
+    categoryCreateCallback(name, color);
   };
 
   // build root cats

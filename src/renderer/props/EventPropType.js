@@ -11,6 +11,7 @@ export default PropTypes.shape({
   eventStateId: PropTypes.number,
   eventStatusId: PropTypes.number,
   eventTypeId: PropTypes.number,
+  eventColor: PropTypes.string,
   gateId: PropTypes.number,
   gate2Id: PropTypes.number,
   peopleLimit: PropTypes.number,

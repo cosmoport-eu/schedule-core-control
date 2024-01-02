@@ -22,7 +22,7 @@ import styles from './EventTypeForm.module.css';
 const uuid = () => crypto.randomUUID();
 
 function EventTypeForm(
-  { categories = [], categoryCreateCallback = (name) => {} },
+  { categories = [], categoryCreateCallback = (name, color) => {} },
   ref,
 ) {
   const [
@@ -36,6 +36,7 @@ function EventTypeForm(
       sections,
       section_last_pos,
       category_name,
+      category_color,
     },
     setState,
   ] = useState({
@@ -51,6 +52,7 @@ function EventTypeForm(
     section_last_pos: 0,
 
     category_name: '',
+    category_color: '#808080',
   });
 
   const validate_section_name = (s) =>
@@ -75,6 +77,17 @@ function EventTypeForm(
         .join(',');
     },
     category_name: () => (category_name === '' ? "It shouldn't be empty" : ''),
+    categoryColor: () => {
+      if (category_color === '') {
+        return "It shouldn't be empty";
+      }
+      const hexColorPattern =
+        /^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{4}){1,2}$/;
+      if (!hexColorPattern.test(category_color)) {
+        return 'Invalid color format. Color should be in hex format (#RRGGBB, #RGB, #RRGGBBAA, or #RGBA)';
+      }
+      return '';
+    },
   };
 
   /**
@@ -168,7 +181,7 @@ function EventTypeForm(
   };
 
   const handleCategoryCreate = () => {
-    categoryCreateCallback(category_name);
+    categoryCreateCallback(category_name, category_color);
   };
 
   return (
@@ -200,10 +213,21 @@ function EventTypeForm(
                 <>
                   <div style={{ fontWeight: 'bold' }}>Create new category</div>
                   <br />
+                  <div>Name</div>
                   <TextFieldGroup
                     name="category_name"
                     value={category_name}
                     validator={validators.category_name()}
+                    onChange={handleChange}
+                    inline
+                    noLabel
+                    fill
+                  />
+                  <div style={{ color: category_color }}>Color</div>
+                  <TextFieldGroup
+                    name="category_color"
+                    value={category_color}
+                    validator={validators.categoryColor()}
                     onChange={handleChange}
                     inline
                     noLabel
