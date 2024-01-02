@@ -1,38 +1,57 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EditableText } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 
 export default class TextValueEditor extends Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     className: PropTypes.string,
-    onConfirm: PropTypes.func.isRequired,
+    onSet: PropTypes.func,
   };
 
   static defaultProps = {
     className: '',
+    onSet: () => {},
   };
 
-  onConfirm = (val) => {
-    this.props.onConfirm(this.props.id, val, this.props.text);
+  constructor(props) {
+    super(props);
+
+    this.value = props.text;
+  }
+
+  handleChange = (newValue) => {
+    if (this.value !== newValue) {
+      this.value = newValue;
+    }
   };
 
-  onChange = (val) => {
-    this.setState({ value: val });
+  handleClick = () => {
+    this.props.onSet(this.props.id, this.value);
   };
 
   render() {
     const { className, text } = this.props;
 
     return (
-      <EditableText
-        className={className}
-        placeholder=""
-        selectAllOnFocus
-        defaultValue={text}
-        onConfirm={this.onConfirm}
-      />
+      <div style={{ display: 'flex', margin: '2em 0' }}>
+        <EditableText
+          className={className}
+          style={{ width: '7em' }}
+          type="number"
+          placeholder=""
+          selectAllOnFocus
+          defaultValue={text}
+          onChange={this.handleChange}
+        />
+        <Button
+          style={{ marginLeft: '5em', width: '7em' }}
+          text="Save"
+          onClick={this.handleClick}
+        />
+      </div>
     );
   }
 }
