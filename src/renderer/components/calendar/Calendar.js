@@ -53,6 +53,8 @@ export default class Calendar extends Component {
       // eventLimit: true,
       allDaySlot: false,
       slotDuration: '00:30:00',
+      minTime: '10:00:00',
+      maxTime: '22:00:00',
       slotLabelFormat: 'HH:mm',
       slotEventOverlap: false,
       eventSources: [{ events: this.getEvents }],

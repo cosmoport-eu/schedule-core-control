@@ -20,7 +20,7 @@ const DefaultLocaleMessage = (locales) => {
     sep = ', ';
   });
 
-  return `Default locale is ${defaultLocale.code} (${defaultLocale.localeDescription}) and the rest are ${restText}.`;
+  return `Default locale is ${defaultLocale.localeDescription} (${defaultLocale.code}) and the rest are ${restText}.`;
 };
 
 export default DefaultLocaleMessage;
