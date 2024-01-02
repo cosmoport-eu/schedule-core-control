@@ -72,35 +72,23 @@ export default class SettingsContainer extends Component {
   handleLocaleTimeoutChange = (locale, value) => {
     const updated = { ...LocaleMapper.map(locale), show_time: value };
 
-    this.props.api
-      .updateLocaleShowData(updated)
-      .then((result) => Message.show(`Locale has been updated [${result.id}].`))
-      .then(
-        this.setState({
-          locales: updateLocale(
-            LocaleMapper.unmap(updated),
-            this.state.locales,
-          ),
-        }),
+    this.setState({
+      locales: updateLocale(
+        LocaleMapper.unmap(updated),
+        this.state.locales
       )
-      .catch((error) => ApiError(error));
+    });
   };
 
   handleCheck = (locale, value) => {
     const updated = { ...LocaleMapper.map(locale), show: value };
 
-    this.props.api
-      .updateLocaleShowData(updated)
-      .then((result) => Message.show(`Locale has been updated [${result.id}].`))
-      .then(
-        this.setState({
-          locales: updateLocale(
-            LocaleMapper.unmap(updated),
-            this.state.locales,
-          ),
-        }),
+    this.setState({
+      locales: updateLocale(
+        LocaleMapper.unmap(updated),
+        this.state.locales,
       )
-      .catch((error) => ApiError(error));
+    });
   };
 
   findSetting = (settings, key) =>
@@ -196,7 +184,7 @@ export default class SettingsContainer extends Component {
         <PageCaption text="Settings" />
 
         <div className="bp5-callout" style={{ fontSize: '80%' }}>
-          All of thees changes are applied in real time. 
+          All of these changes are applied in real time. 
           So no need to restart any of the applications.
         </div>
 
