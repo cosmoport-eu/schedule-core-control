@@ -16,10 +16,6 @@ export default class L18n {
     return this.findEventById(eventStateId, 'states');
   }
 
-  findEventRefByEventDestinationId(eventDestinationId) {
-    return this.findEventById(eventDestinationId, 'destinations');
-  }
-
   findEventById = (id, property) =>
     this.refs[property].find((el) => el.id === id) || false;
 
