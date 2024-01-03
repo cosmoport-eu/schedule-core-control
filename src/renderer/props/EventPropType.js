@@ -7,7 +7,6 @@ export default PropTypes.shape({
   dateAdded: PropTypes.string,
   durationTime: PropTypes.number,
   eventDate: PropTypes.string,
-  eventDestinationId: PropTypes.number,
   eventStateId: PropTypes.number,
   eventStatusId: PropTypes.number,
   eventTypeId: PropTypes.number,

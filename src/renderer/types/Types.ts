@@ -6,14 +6,9 @@ export type GateType = {
   gateName: string;
 };
 
-type i18nKeys = 'id' | 'i18nEventDestinationName' | 'i18nStatus' | 'i18nState';
+type i18nKeys = 'id' | 'i18nStatus' | 'i18nState';
 export type EventI18nRecordType = {
   [K in i18nKeys]?: number;
-};
-
-export type EventDestinationType = {
-  id: number;
-  i18nEventDestinationName: number;
 };
 
 export type EventStatusType = {
@@ -54,7 +49,6 @@ export type LocaleType = {
 };
 
 export type RefsType = {
-  destinations: EventDestinationType[];
   statuses: EventStatusType[];
   states: EventStateType[];
   types: EventTypeType[];
