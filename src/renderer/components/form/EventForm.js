@@ -473,13 +473,6 @@ export default class EventForm extends Component {
             {warnings && warnings}
           </div>
         </div>
-        <ListFieldGroup
-          name="status"
-          index={this.state.status}
-          onChange={this.handleChange}
-        >
-          {statusOptions}
-        </ListFieldGroup>
         <div className={`bp5-form-group ${styles.formGatesContainer}`}>
           <label
             htmlFor="time-range"
