@@ -38,7 +38,6 @@ export default class EventForm extends Component {
       subcategory: 0,
       tree: false,
       type: 0,
-      destination: 0,
       gate: 0,
       gate2: 0,
       status: 0,
@@ -76,8 +75,6 @@ export default class EventForm extends Component {
         this.state.gate === 0 ? 'Gate for departion is not selected.' : '',
       gate2: () =>
         this.state.gate2 === 0 ? 'Gate for return is not selected.' : '',
-      destination: () =>
-        this.state.destination === 0 ? 'Destination is not selected.' : '',
       bought: () =>
         this.state.bought > this.state.limit ? 'Beyond the tickets limit.' : '',
     };
@@ -176,7 +173,6 @@ export default class EventForm extends Component {
       subcategory: subcategory,
       tree: tree,
       type: type,
-      destination: event.eventDestinationId,
       gate: event.gateId,
       gate2: event.gate2Id,
       status: event.eventStatusId,
@@ -300,10 +296,10 @@ export default class EventForm extends Component {
   };
 
   render() {
-    const { destinations, types, type_categories, statuses, states } =
+    const { types, type_categories, statuses, states } =
       this.props.refs;
 
-    if (!destinations || !type_categories || !types || !statuses) {
+    if (!type_categories || !types || !statuses) {
       return <div>:(</div>;
     }
 
@@ -312,7 +308,6 @@ export default class EventForm extends Component {
       type,
       category,
       subcategory,
-      destination,
       gate,
       gate2,
       bought,
@@ -327,11 +322,6 @@ export default class EventForm extends Component {
     const stateOptions = states.map((op) => (
       <option key={op.id} value={op.id}>
         {l18n.findTranslationById(op, 'i18nState')}
-      </option>
-    ));
-    const destinationOptions = destinations.map((op) => (
-      <option key={op.id} value={op.id}>
-        {l18n.findTranslationById(op, 'i18nEventDestinationName')}
       </option>
     ));
     const categoryOptions = type_categories
@@ -519,14 +509,6 @@ export default class EventForm extends Component {
             </ListFieldGroup>
           </div>
         </div>
-        <ListFieldGroup
-          name="destination"
-          index={this.state.destination}
-          validator={destination()}
-          onChange={this.handleChange}
-        >
-          {destinationOptions}
-        </ListFieldGroup>
         <NumberFieldGroup
           name="cost"
           caption="Cost"
@@ -576,7 +558,7 @@ EventForm.propTypes = {
 EventForm.defaultProps = {
   forCreate: false,
   event: null,
-  refs: { destinations: [], statuses: [], states: [], types: [] },
+  refs: { statuses: [], states: [], types: [] },
   locale: {},
   gates: [],
   date: '',

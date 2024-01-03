@@ -3,7 +3,6 @@ import { Button, HTMLTable, NonIdealState, Icon } from '@blueprintjs/core';
 import EventType from '../eventType/EventType';
 import L18n from '../l18n/L18n';
 import {
-  EventDestinationType,
   EventI18nRecordType,
   EventStatusType,
   EventType as EvType,
@@ -59,7 +58,6 @@ export default function EventTable({
           <th>Duration</th>
           <th>Type</th>
           <th>Gates</th>
-          <th>Destination</th>
           <th>Cost&nbsp;(€)</th>
           <th>Status</th>
           <th>Tickets</th>
@@ -130,11 +128,6 @@ function EventTableRow({
     return type ? et.getFullName(type) : '???';
   };
 
-  const renderDestCol = (id: number, destinations: EventDestinationType[]) =>
-    renderL18nCell(id, destinations, (l18nId, l18n) =>
-      l18n.findTranslationById(l18nId, 'i18nEventDestinationName'),
-    );
-
   const renderStatusCol = (id: number, statuses: EventStatusType[]) =>
     renderL18nCell(id, statuses, (l18nId, l18n) =>
       l18n.findTranslationById(l18nId, 'i18nStatus'),
@@ -162,7 +155,6 @@ function EventTableRow({
       <td>{_date.minutesToHm(event.durationTime)}</td>
       <td>{renderTypeCol(event.eventTypeId, refs, et)}</td>
       <td>{`${gate1}${event.gateId !== event.gate2Id ? `→${gate2}` : ''}`}</td>
-      <td>{renderDestCol(event.eventDestinationId, refs.destinations)}</td>
       <td>{event.cost}</td>
       <td>{renderStatusCol(event.eventStatusId, refs.statuses)}</td>
       <td>

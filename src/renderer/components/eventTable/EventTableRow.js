@@ -45,17 +45,6 @@ export default function EventTableRow({
   };
 
   /**
-   * Renders the destination column.
-   *
-   * @param {number} id
-   * @param {Array} destinations @see EventDestinationPropType
-   */
-  const renderDestCol = (id, destinations) =>
-    renderL18nCell(id, destinations, (l18nId, l18n) =>
-      l18n.findTranslationById(l18nId, 'i18nEventDestinationName'),
-    );
-
-  /**
    * Renders the status column.
    *
    * @param {number} id
@@ -104,7 +93,6 @@ export default function EventTableRow({
         {gate1}
         {gate1 !== gate2 && `→${gate2}`}
       </td>
-      <td>{renderDestCol(event.eventDestinationId, refs.destinations)}</td>
       <td>{`${event.cost} €`}</td>
       <td>{renderStatusCol(event.eventStatusId, refs.statuses)}</td>
       <td>

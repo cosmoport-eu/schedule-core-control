@@ -5,7 +5,6 @@ export type EventType = {
   dateAdded: string;
   durationTime: number;
   eventDate: string;
-  eventDestinationId: number;
   eventStateId: number;
   eventStatusId: number;
   eventTypeId: number;
