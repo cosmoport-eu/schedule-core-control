@@ -19,7 +19,6 @@ export default class EventDeleteAlert extends Component {
   }
 
   open = (idd) => {
-    console.log("id", idd)
     this.setState({ id: idd, isOpen: !this.state.isOpen });
   };
 

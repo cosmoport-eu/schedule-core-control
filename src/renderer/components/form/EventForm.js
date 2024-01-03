@@ -537,7 +537,7 @@ export default class EventForm extends Component {
         />
         <NumberFieldGroup
           name="limit"
-          caption="Limit"
+          caption="Quantity"
           number={this.state.limit}
           onChange={this.handleChange}
           inline

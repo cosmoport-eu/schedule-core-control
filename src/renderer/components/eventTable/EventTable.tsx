@@ -51,36 +51,52 @@ export default function EventTable({
   }
 
   return (
-    <HTMLTable compact striped className={styles.eventTable}>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Departure</th>
-          <th>Duration</th>
-          <th>Type</th>
-          <th>Gates</th>
-          <th>Destination</th>
-          <th>Cost&nbsp;(€)</th>
-          <th>Status</th>
-          <th>Tickets</th>
-          <th title="It is `operations`">Ops</th>
-        </tr>
-      </thead>
-      <tbody>
-        {events.map((event) => (
-          <EventTableRow
-            key={event.id}
-            event={event}
-            refs={refs}
-            l18n={l18n}
-            et={et}
-            editCallback={editCallback}
-            callback={callback}
-            auth={auth}
-          />
-        ))}
-      </tbody>
-    </HTMLTable>
+    <div className={styles.eventTableContainer}>
+      <HTMLTable compact striped className={styles.eventTable}>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Departure</th>
+            <th>Duration</th>
+            <th>Type</th>
+            <th>Gates</th>
+            <th>Destination</th>
+            <th>Cost&nbsp;(€)</th>
+            <th>Status</th>
+            <th>Tickets</th>
+            <th title="It is `operations`">Ops</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th>#</th>
+            <th>Departure</th>
+            <th>Duration</th>
+            <th>Type</th>
+            <th>Gates</th>
+            <th>Destination</th>
+            <th>Cost&nbsp;(€)</th>
+            <th>Status</th>
+            <th>Tickets</th>
+            <th title="It is `operations`">Ops</th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {events.map((event) => (
+            <EventTableRow
+              key={event.id}
+              event={event}
+              refs={refs}
+              l18n={l18n}
+              et={et}
+              editCallback={editCallback}
+              callback={callback}
+              auth={auth}
+            />
+          ))}
+        </tbody>
+      </HTMLTable>
+    </div>
   );
 }
 
