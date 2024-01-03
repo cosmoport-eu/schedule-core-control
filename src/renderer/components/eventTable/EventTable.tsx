@@ -59,7 +59,6 @@ export default function EventTable({
             <th>Duration</th>
             <th>Type</th>
             <th>Gates</th>
-            <th>Destination</th>
             <th>Cost&nbsp;(€)</th>
             <th>Status</th>
             <th>Tickets</th>
@@ -73,7 +72,6 @@ export default function EventTable({
             <th>Duration</th>
             <th>Type</th>
             <th>Gates</th>
-            <th>Destination</th>
             <th>Cost&nbsp;(€)</th>
             <th>Status</th>
             <th>Tickets</th>

@@ -14,6 +14,7 @@ import EventType from './EventType';
 import EventDeleteAlert from '../dialog/EventDeleteAlert';
 
 import tableStyles from '../eventTable/EventTable.module.css';
+import Table from '../table_new/Table';
 
 export default class EventTypeTable extends PureComponent {
   static propTypes = {
@@ -53,13 +54,20 @@ export default class EventTypeTable extends PureComponent {
     this.onEventTypeAddDialogToggle();
   };
 
-  handleEditModalOpen = () => {
-    this.eventTypeEditDialog.toggleDialog();
-  };
 
-  handleDeleteButtonClick = (type) => {
-    this.eventDeleteAlert.open(type.currentTarget.dataset);
-  };
+  // обработка клика на кнопку в таблице
+  // открыть модальное окно
+  handleEditClick = (row) => {
+    console.log('handleEditClick');
+    console.log(row)
+  }
+  
+  // обработка клика на кнопку в таблице
+  // открыть окно с предупреждением
+  handleRemoveClick = (row_id) => {
+    console.log('handleRemoveClick');
+    this.eventDeleteAlert.open(row_id);
+  }
 
   handleCreate = (formData, valid) => {
     if (!valid) {
@@ -98,6 +106,27 @@ export default class EventTypeTable extends PureComponent {
       );
     }
 
+    const headers = [
+      'ID',
+      'Category',
+      'Type',
+      'Subtype',
+      'Description',
+      'Actions'
+    ];
+
+    const rows_data = types.map((type) => {
+      const category = et.getCategories(type);
+
+      return {
+        id: type.id,
+        subtype_name: et.getName(type),
+        description: et.getDescription(type),
+        category_name: category[0],
+        type_name: category[1] ?? '-'
+      }
+    });
+    
     return (
       <div style={{ marginTop: '2em' }}>
         <EventTypeAddDialog
@@ -108,14 +137,6 @@ export default class EventTypeTable extends PureComponent {
           callback={this.handleCreate}
           categoryCreateCallback={this.handleNewCategory}
         />
-        {/* <EventTypeEditDialog
-          ref={(dialog) => {
-            this.eventEditDialog = dialog;
-          }}
-          callback={this.handleEditApply}
-          refs={refs}
-          locale={locale}
-        /> */}
         <EventDeleteAlert
           ref={(alert) => {
             this.eventDeleteAlert = alert;
@@ -139,65 +160,12 @@ export default class EventTypeTable extends PureComponent {
         </div>
 
         <div className={tableStyles.eventTableContainer}>
-          <HTMLTable compact striped className={tableStyles.eventTable}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Subtype</th>
-                <th>Description</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <th>#</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Subtype</th>
-                <th>Description</th>
-                <th>Actions</th>
-              </tr>
-            </tfoot>
-            <tbody>
-              {
-                types.map((type) => {
-                  const category = et.getCategories(type);
-                  const subtype_name = et.getName(type);
-                  const description = et.getDescription(type);
-                  const category_name = category[0];
-                  const type_name = category[1] ?? '-';
-            
-                  return (
-                    <tr key={type.id}>
-                      <td>{type.id}</td>
-                      <td>{category_name}</td>
-                      <td>{type_name}</td>
-                      <td>{subtype_name}</td>
-                      <td>{description}</td>
-                      <td>
-                        <Button
-                          minimal
-                          icon={'remove'}
-                          data-id={type.id}
-                          data-name={subtype_name}
-                          onClick={this.handleDeleteButtonClick}
-                        />
-                        {/* <Button
-                          minimal
-                          data-id={type.id}
-                          data-subtype_name={subtype_name}
-                          icon={'edit'}
-                          onClick={this.handleEditModalOpen}
-                        /> */}
-                      </td>
-                    </tr>
-                  );
-                })
-              }
-            </tbody>
-          </HTMLTable>
+          <Table
+            headers={headers}
+            rows={rows_data}
+            onRemoveClick={this.handleRemoveClick}
+            onEditClick={this.handleEditClick}
+          />
         </div>
       </div>
     );
