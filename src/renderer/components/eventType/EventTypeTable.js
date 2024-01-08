@@ -82,8 +82,8 @@ export default class EventTypeTable extends PureComponent {
     this.props.onDelete(id, name);
   };
 
-  handleNewCategory = (name) => {
-    this.props.onCreateCategory(name);
+  handleNewCategory = (name, color) => {
+    this.props.onCreateCategory(name, color);
   };
 
   render() {

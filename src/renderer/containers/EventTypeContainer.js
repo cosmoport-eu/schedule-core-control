@@ -76,14 +76,22 @@ export default class EventTypeContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleCreateCategory = (name) => {
+  handleCreateCategory = (name, color) => {
     if (name === '') {
       Message.show('Fill the Category name field.', 'error');
       return;
     }
 
+    if (color === '') {
+      Message.show('Fill the Category color field.', 'error');
+      return;
+    }
+
     this.props.api
-      .createEventTypeCategory({ name: name })
+      .createEventTypeCategory({
+        name: name,
+        color: color
+      })
       .then((result) => {
         Message.show(`Event type category has been created [${result.id}].`);
         this.getData();
