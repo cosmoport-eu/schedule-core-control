@@ -57,6 +57,7 @@ export default function NavigationBar({
 					<Navigate to="/" icon="Home" />
 					<Navigate to="/simulation" icon="Simulation" />
 					<Navigate to="/table" icon="Timetable" />
+					<Navigate to="/types" icon="Types" />
 					{auth && (
 						<Navigate
 							to="/translation"

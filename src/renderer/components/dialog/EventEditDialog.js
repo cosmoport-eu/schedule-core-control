@@ -7,6 +7,7 @@ import LocalePropType from '../../props/LocalePropType';
 import GatePropType from '../../props/GatePropType';
 import EventForm from '../form/EventForm';
 import EventMapper from '../../components/mapper/EventMapper';
+import _date  from '../date/_date';
 
 /**
  * The class for event edit dialog.
@@ -53,6 +54,11 @@ export default class EventEditDialog extends PureComponent {
 
     if (!event) return;
 
+    const timeRange = event.startTime + event.durationTime;
+    const endTime = _date.minutesToHm(timeRange);
+    const eventEndDateTime = new Date(`${event.eventDate} ${endTime}`);
+    const is_past = eventEndDateTime.getTime() < new Date().getTime();
+
     return (
       <Dialog
         isOpen={isOpen}
@@ -72,7 +78,12 @@ export default class EventEditDialog extends PureComponent {
           />
         </DialogBody>
         <DialogFooter
-          actions={<Button onClick={this.passState} text="Update" />}
+          actions={ 
+            <Button
+            onClick={is_past ? this.toggleDialog : this.passState}
+            text={is_past ? 'Close modal' : 'Update'}
+            />
+          }
         />
       </Dialog>
     );
