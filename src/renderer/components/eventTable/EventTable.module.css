@@ -1,13 +1,62 @@
 
-.eventTable {
-    width: 100%;
+.dateCol {
+  font-size: 80%;
+  margin-bottom: 0.3em;
 }
 
 .eventTable tbody tr td {
-    vertical-align: middle;
+  vertical-align: middle;
+  text-align: left;
 }
 
-.dateCol {
-    font-size: 80%;
-    margin-bottom: 0.3em;
+.eventTable {
+  width: 100%;
+  text-align: left;
+  position: relative;
+  border-collapse: collapse;
+}
+
+.eventTable th {
+  background: #fff;
+  position: sticky;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+}
+
+.eventTable thead th {
+  border-bottom: 1px solid #1a1a1a;
+  top: 0;
+}
+
+.eventTable tfoot th {
+  border-top: 1px solid #1a1a1a;
+  bottom: 0;
+}
+
+.eventTable td {
+  border-top: 1px solid #ddd;
+  padding: 8px 20px;
+}
+
+.eventTable tbody tr:first-child td {
+  border-top: none;
+}
+
+.eventTable tbody tr:nth-child(n) td {
+  background: #eff0f0;
+}
+
+.eventTable tbody tr:nth-child(2n) td {
+  background: #fff;
+}
+
+.eventTableContainer {
+  margin-top: 2em;
+  overflow: auto;
+  height: 45em;
+  overflow-y: scroll;
+}
+
+.controls {
+  display: flex;
+  margin-bottom: 1em;
 }
