@@ -90,7 +90,7 @@ export default class EventTypeTable extends PureComponent {
     const { locale, refs, types } = this.props;
 
     const et = EventType({
-      categories: refs.type_categories,
+      categories: refs.typeCategories,
       translation: locale,
     });
 
@@ -130,7 +130,7 @@ export default class EventTypeTable extends PureComponent {
     return (
       <div style={{ marginTop: '2em' }}>
         <EventTypeAddDialog
-          categories={refs.type_categories}
+          categories={refs.typeCategories}
           etDisplay={et}
           isOpen={this.state.eventTypeAddDialogIsOpen}
           toggle={this.onEventTypeAddDialogToggle}

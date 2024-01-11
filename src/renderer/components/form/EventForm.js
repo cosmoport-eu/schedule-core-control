@@ -245,7 +245,7 @@ export default class EventForm extends Component {
     this.props.refs.types.find((type) => type.id === value);
 
   findEventTypeCategory = (value) =>
-    this.props.refs.type_categories.find((type) => type.id === value);
+    this.props.refs.typeCategories.find((type) => type.id === value);
 
   /**
    * Handles the change event on an input field of <day> type.
@@ -296,10 +296,10 @@ export default class EventForm extends Component {
   };
 
   render() {
-    const { types, type_categories, statuses, states } =
+    const { types, typeCategories, statuses, states } =
       this.props.refs;
 
-    if (!type_categories || !types || !statuses) {
+    if (!typeCategories || !types || !statuses) {
       return <div>:(</div>;
     }
 
@@ -324,7 +324,7 @@ export default class EventForm extends Component {
         {l18n.findTranslationById(op, 'i18nState')}
       </option>
     ));
-    const categoryOptions = type_categories
+    const categoryOptions = typeCategories
       .filter((t) => t.parent === 0)
       .map((op) => (
         <option key={op.id} value={op.id}>
@@ -341,7 +341,7 @@ export default class EventForm extends Component {
             {l18n.findTranslationById(op, 'i18nEventTypeName')}
           </option>
         ));
-      const typeSubOptions = type_categories
+      const typeSubOptions = typeCategories
         .filter((t) => t.parent === this.state.category)
         .map((op) => (
           <option key={op.id} value={op.id} data-tree={true}>

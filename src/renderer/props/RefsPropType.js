@@ -9,5 +9,5 @@ export default PropTypes.shape({
   statuses: PropTypes.arrayOf(EventStatusPropType),
   states: PropTypes.arrayOf(EventStatePropType),
   types: PropTypes.arrayOf(EventTypePropType),
-  type_categories: PropTypes.arrayOf(EventTypeCategoryPropType),
+  typeCategories: PropTypes.arrayOf(EventTypeCategoryPropType),
 });
