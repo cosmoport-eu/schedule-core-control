@@ -10,10 +10,10 @@ import styles from '../components/eventTable/EventTable.module.css';
 import EventTypeTable from '../components/eventType/EventTypeTable';
 
 const mapEvent = (data) => ({
-  category_id: data.category_id,
-  default_duration: data.default_duration,
-  default_repeat_interval: data.default_repeat_interval,
-  default_cost: data.default_cost,
+  categoryId: data.category_id,
+  defaultDuration: data.default_duration,
+  defaultRepeatInterval: data.default_repeat_interval,
+  defaultCost: data.default_cost,
   description: data.description,
   name: data.name,
   subtypes: data.subtypes,

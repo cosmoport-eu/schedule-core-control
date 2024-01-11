@@ -52,5 +52,5 @@ export type RefsType = {
   statuses: EventStatusType[];
   states: EventStateType[];
   types: EventTypeType[];
-  type_categories: EventTypeCategoryType[];
+  typeCategories: EventTypeCategoryType[];
 };
