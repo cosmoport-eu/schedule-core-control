@@ -33,7 +33,7 @@ export default function EventTable({
   const l18n = new L18n(locale, refs);
 
   const et = EventType({
-    categories: refs.type_categories,
+    categories: refs.typeCategories,
     translation: locale,
   });
 
