@@ -87,7 +87,7 @@ export default class MainPage extends Component {
       .post('/timetable/tickets', {
         id: eventId,
         tickets: tickets_,
-        force_open: force,
+        forceOpen: force,
       })
       .then((response) => {
         if (response.result) {
