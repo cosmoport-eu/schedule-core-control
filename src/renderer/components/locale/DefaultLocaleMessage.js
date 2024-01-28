@@ -6,7 +6,7 @@ const DefaultLocaleMessage = (locales) => {
   let defaultLocale = false;
   const rest = [];
   locales.forEach((locale) => {
-    if (!defaultLocale && locale.default) {
+    if (!defaultLocale && locale.isDefault) {
       defaultLocale = locale;
     } else {
       rest.push(locale);

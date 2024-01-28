@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from '@blueprintjs/core';
-
-import PageCaption from '../components/page/PageCaption';
-import Message from '../components/messages/Message';
-import Translation from '../components/translation/Translation';
-import TranslationTable from '../components/translation/TranslationTable';
-import LocaleAddDialog from '../components/dialog/LocaleAddDialog';
 import { Api } from 'cosmoport-core-api-client';
 import ApiError from '../components/indicators/ApiError';
 
+import { Button } from '@blueprintjs/core';
+import PageCaption from '../components/page/PageCaption';
+import Message from '../components/messages/Message';
 import styles from './App.module.css';
+import TranslationCategories from '../components/translation/TranslationCategories';
+import TranslationCategoryTable from '../components/translation/TranslationCategoryTable';
 
 export default class TranslationContainer extends Component {
   static propTypes = {
@@ -24,98 +22,140 @@ export default class TranslationContainer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { locales: [], translations: [], currentTranslation: '' };
+    this.state = {
+      hasData: false,
+      locales: [],
+      category: {
+        id: 0,
+        name: 'unknown',
+        apiUrl: 'unknown'
+      },
+      categoryData: [],
+      categories: [
+        { id: 1, apiUrl: '/dictionary/states', name: 'States' },
+        { id: 2, apiUrl: '/dictionary/statuses', name: 'Statuses' },
+        { id: 3, apiUrl: '/dictionary/categories', name: 'Categories' },
+        // { id: 4, apiUrl: '/dictionary/types', name: 'Types' },
+        // { id: 5, apiUrl: '/gates', name: 'Gates' },
+      ],
+      headers: [],
+      fieldNames: [],
+    };
   }
 
   componentDidMount() {
-    this.fetchLocales();
+    this.getData();
   }
 
-  fetchLocales = () => {
+  getData = () => {
     this.props.api
       .fetchLocales()
-      .then((data) => this.setState({ locales: data }))
+      .then((data) => {
+        const headers_ = ['Value'];
+        const fieldNames_ = ['field_name'];
+
+        // разные в зависимости от apiUrl
+        data.map((locale) => {
+          headers_.push(`${locale.localeDescription} (${locale.code})`);
+          fieldNames_.push(locale.code);
+        });
+
+        this.setState({
+          locales: data,
+          headers: headers_,
+          fieldNames: fieldNames_,
+        });
+      })
       .catch((error) => ApiError(error));
   };
 
-  handleLocaleSelect = (locale) => {
+  handleCategorySelect = (category) => {
     this.props.api
-      .fetchTranslationsForLocale(locale)
-      .then((data) =>
-        this.setState({ translations: data, currentTranslation: locale }),
-      )
+      .get(category.apiUrl)
+      .then((data) => {
+        this.setState({
+          hasData: true,
+          category: category,
+          categoryData: data,
+        });
+      })
       .catch((error) => ApiError(error));
   };
 
-  handleTextChange = (id, value, okCallback, notOkCallback) => {
-    const valueObject = { text: value };
-
-    this.props.api
-      .updateTranslationTextForId(id, valueObject)
-      .then(() =>
-        Message.show('Translation value has been saved successfully.'),
-      )
-      .then(() => this.updateTranslationStateById(id, value))
-      .then(() => okCallback)
-      .catch((error) => {
-        ApiError(error);
-        notOkCallback();
-      });
-  };
-
-  handleAddClick = () => {
-    this.addDialog.toggleDialog();
-  };
-
-  handleLocaleCreate = (data) => {
-    this.props.api
-      .createLocale({ code: data.code, locale_description: data.description })
-      .then(() => Message.show('Locale has been created.'))
-      .then(() => this.addDialog.toggleDialog())
-      .then(() => this.fetchLocales())
-      .catch((error) => ApiError(error));
-  };
-
-  updateTranslationStateById = (id, value) => {
-    const ts = this.state.translations;
-    const i = ts.findIndex((el) => el.id === id);
-
-    if (i > -1) {
-      ts[i].text = value;
-      this.setState({ translations: ts });
-    }
+  // todo
+  handleRefresh = (apiUrl) => {
+    console.log(`[handleRefresh] ${apiUrl}`);
+    handleCategorySelect(apiUrl);
   };
 
   render() {
-    const locales = this.state.locales.map((locale) => (
-      <Translation
-        key={locale.id}
-        locale={locale}
-        onLocaleSelect={this.handleLocaleSelect}
+    const {
+      hasData,
+      locales,
+      category,
+      categoryData,
+      categories,
+      headers,
+      fieldNames
+    } = this.state;
+
+    // преобразовать полученные данные для формирования таблицы
+    // если для всех категорий будет одна схема, перенести эту функцию в TranslationCategoryTable
+
+    // ??
+    // можно ли возвращать редактируемое поле, html реактовый ??
+    // if (1) {
+      const tableData = categoryData.map((category) => {
+        return {
+          field_name: category.code,
+          en: category.translations[1],
+          ru: category.translations[2],
+          el: category.translations[3]
+        }
+      });
+    // } else {
+    //   const tableData = categoryData.map((category) => {
+    //     return {
+    //       field_name: category.code,
+    //       en: category.translations[1],
+    //       ru: category.translations[2],
+    //       el: category.translations[3]
+    //     }
+    //   });
+    // }
+
+    const categoriesButtons = categories.map((category) => (
+      <TranslationCategories
+        key={category.id}
+        category={category}
+        onCategorySelect={this.handleCategorySelect}
       />
     ));
 
     return (
       <div>
         <PageCaption text="04 Translations" />
-        <LocaleAddDialog
-          ref={(c) => {
-            this.addDialog = c;
-          }}
-          callback={this.handleLocaleCreate}
-        />
+
         <div className={styles.inlineContainer}>
-          {locales}
-          <Button
-            className="bp5-minimal"
-            icon="add"
-            onClick={this.handleAddClick}
-          />
+          {categoriesButtons}
         </div>
-        <TranslationTable
-          translations={this.state.translations}
-          onTextChange={this.handleTextChange}
-        />
+
+        {
+          hasData ?
+          <div style={{ marginTop: '2em' }} >
+            <TranslationCategoryTable
+              key={category.id}
+              headers={headers}
+              data={tableData}
+              fieldNames={fieldNames}
+              pageCaption={category.name}
+              apiUrl={category.apiUrl}
+              onRefresh={this.handleRefresh}
+            />
+          </div>
+          :
+          <></>
+        }
       </div>
     );
   }
