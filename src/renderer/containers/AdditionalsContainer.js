@@ -84,6 +84,12 @@ export default class AdditionalsContainer extends Component {
       return <span>Loading...</span>;
     }
 
+    const headers = [
+      'ID',
+      'Name',
+      'Actions'
+    ];
+
     return (
       <>
         <div style={{
@@ -99,6 +105,7 @@ export default class AdditionalsContainer extends Component {
             pageCaption="Facilities"
             apiUrl="/facility"
             data={this.state.facilities}
+            headers={headers}
             onRefresh={this.handleRefresh}
             onCreateCallback={this.onCreateRecord}
             onDeleteCallback={this.onDeleteRecord}
@@ -108,6 +115,7 @@ export default class AdditionalsContainer extends Component {
             pageCaption="Materials"
             apiUrl="/material"
             data={this.state.materials}
+            headers={headers}
             onRefresh={this.handleRefresh}
             onCreateCallback={this.onCreateRecord}
             onDeleteCallback={this.onDeleteRecord}

@@ -55,6 +55,7 @@ export default class EventTypeTable extends PureComponent {
   };
 
 
+  // todo
   // обработка клика на кнопку в таблице
   // открыть модальное окно
   handleEditClick = (row) => {
@@ -62,6 +63,7 @@ export default class EventTypeTable extends PureComponent {
     console.log(row)
   }
   
+  // todo
   // обработка клика на кнопку в таблице
   // открыть окно с предупреждением
   handleRemoveClick = (row_id) => {
