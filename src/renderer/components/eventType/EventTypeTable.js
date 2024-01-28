@@ -14,7 +14,7 @@ import EventType from './EventType';
 import EventDeleteAlert from '../dialog/EventDeleteAlert';
 
 import tableStyles from '../eventTable/EventTable.module.css';
-import Table from '../table_new/Table';
+import Table from '../tableStructure/Table';
 
 export default class EventTypeTable extends PureComponent {
   static propTypes = {
@@ -163,6 +163,7 @@ export default class EventTypeTable extends PureComponent {
           <Table
             headers={headers}
             rows={rows_data}
+            fieldNames={['id', 'subtype_name', 'description', 'category_name', 'type_name']}
             onRemoveClick={this.handleRemoveClick}
             onEditClick={this.handleEditClick}
           />
