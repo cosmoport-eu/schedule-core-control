@@ -25,18 +25,21 @@ export default class TranslationContainer extends Component {
     this.state = {
       hasData: false,
       locales: [],
-      category: {
+      currentCategory: {
         id: 0,
         name: 'unknown',
         apiUrl: 'unknown'
       },
-      categoryData: [],
-      categories: [
+      currentCategoryData: [],
+      buttonLinks: [
         { id: 1, apiUrl: '/dictionary/states', name: 'States' },
         { id: 2, apiUrl: '/dictionary/statuses', name: 'Statuses' },
         { id: 3, apiUrl: '/dictionary/categories', name: 'Categories' },
-        // { id: 4, apiUrl: '/dictionary/types', name: 'Types' },
-        // { id: 5, apiUrl: '/gates', name: 'Gates' },
+        { id: 4, apiUrl: '/dictionary/types', name: 'Types' },
+
+        // жду метод, который вернёт записи с переводами
+        { id: 5, apiUrl: '/facility', name: 'Facilities' },
+        { id: 6, apiUrl: '/material', name: 'Materials' },
       ],
       headers: [],
       fieldNames: [],
@@ -51,10 +54,9 @@ export default class TranslationContainer extends Component {
     this.props.api
       .fetchLocales()
       .then((data) => {
-        const headers_ = ['Value'];
-        const fieldNames_ = ['field_name'];
+        const headers_ = ['ID', 'Value'];
+        const fieldNames_ = ['id', 'field_name'];
 
-        // разные в зависимости от apiUrl
         data.map((locale) => {
           headers_.push(`${locale.localeDescription} (${locale.code})`);
           fieldNames_.push(locale.code);
@@ -75,56 +77,87 @@ export default class TranslationContainer extends Component {
       .then((data) => {
         this.setState({
           hasData: true,
-          category: category,
-          categoryData: data,
+          currentCategory: category,
+          currentCategoryData: data,
         });
       })
       .catch((error) => ApiError(error));
   };
 
-  // todo
-  handleRefresh = (apiUrl) => {
-    console.log(`[handleRefresh] ${apiUrl}`);
-    handleCategorySelect(apiUrl);
+  // пока нет api
+  handleTextChange = (apiUrl, id, value, oldValue, locale, okCallback, notOkCallback) => {
+    console.log(`[handleTextChange] id: ${id}, value: ${value}`);
+    const valueObject = { name: value };
+
+    // this.props.api
+    // .post(`${apiUrl}/${id}`, valueObject)
+    // .then((result) => {
+    //   Message.show(`Event category updated`);
+    //   // this.getData();
+    // })
+    // .catch((error) => ApiError(error));
+
+    // this.props.api
+    //   .updateTranslationTextForId(id, valueObject)
+    //   .then(() =>
+    //     Message.show('Translation value has been saved successfully.'),
+    //   )
+    //   .then(() => this.updateTranslationStateById(id, value))
+    //   .then(() => okCallback)
+    //   .catch((error) => {
+    //     ApiError(error);
+    //     notOkCallback();
+    //   });
   };
 
   render() {
     const {
       hasData,
       locales,
-      category,
-      categoryData,
-      categories,
+      currentCategory,
+      currentCategoryData,
+      buttonLinks,
       headers,
       fieldNames
     } = this.state;
 
-    // преобразовать полученные данные для формирования таблицы
-    // если для всех категорий будет одна схема, перенести эту функцию в TranslationCategoryTable
+    let tableData = [];
 
-    // ??
-    // можно ли возвращать редактируемое поле, html реактовый ??
-    // if (1) {
-      const tableData = categoryData.map((category) => {
+    if (currentCategory.apiUrl.includes('types')) {
+      let nameData = [];
+      let descrData = [];
+
+      currentCategoryData.map((category) => {
+        nameData.push({
+          id: category.id,
+          field_name: category.nameCode,
+          en: category.nameTranslations[1],
+          ru: category.nameTranslations[2],
+          el: category.nameTranslations[3]
+        })
+
+        descrData.push({
+          id: category.id,
+          field_name: category.descCode,
+          en: category.descTranslations[1],
+          ru: category.descTranslations[2],
+          el: category.descTranslations[3]
+        })
+      });
+      tableData = nameData.concat(descrData);
+    } else if (currentCategory.apiUrl.includes('dictionary')) {
+      tableData = currentCategoryData.map((category) => {
         return {
+          id: category.id,
           field_name: category.code,
           en: category.translations[1],
           ru: category.translations[2],
           el: category.translations[3]
         }
       });
-    // } else {
-    //   const tableData = categoryData.map((category) => {
-    //     return {
-    //       field_name: category.code,
-    //       en: category.translations[1],
-    //       ru: category.translations[2],
-    //       el: category.translations[3]
-    //     }
-    //   });
-    // }
+    }
 
-    const categoriesButtons = categories.map((category) => (
+    const categoriesButtons = buttonLinks.map((category) => (
       <TranslationCategories
         key={category.id}
         category={category}
@@ -144,13 +177,14 @@ export default class TranslationContainer extends Component {
           hasData ?
           <div style={{ marginTop: '2em' }} >
             <TranslationCategoryTable
-              key={category.id}
+              key={currentCategory.id}
               headers={headers}
               data={tableData}
               fieldNames={fieldNames}
-              pageCaption={category.name}
-              apiUrl={category.apiUrl}
-              onRefresh={this.handleRefresh}
+              pageCaption={currentCategory.name}
+              apiUrl={currentCategory.apiUrl}
+              onRefresh={this.handleCategorySelect}
+              onTextChange={this.handleTextChange}
             />
           </div>
           :
