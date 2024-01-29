@@ -38,8 +38,8 @@ export default class TranslationContainer extends Component {
         { id: 4, apiUrl: '/dictionary/types', name: 'Types' },
 
         // жду метод, который вернёт записи с переводами
-        { id: 5, apiUrl: '/facility', name: 'Facilities' },
-        { id: 6, apiUrl: '/material', name: 'Materials' },
+        // { id: 5, apiUrl: '/facility', name: 'Facilities' },
+        // { id: 6, apiUrl: '/material', name: 'Materials' },
       ],
       headers: [],
       fieldNames: [],
@@ -54,8 +54,8 @@ export default class TranslationContainer extends Component {
     this.props.api
       .fetchLocales()
       .then((data) => {
-        const headers_ = ['ID', 'Value'];
-        const fieldNames_ = ['id', 'field_name'];
+        const headers_ = ['Value'];
+        const fieldNames_ = ['field_name'];
 
         data.map((locale) => {
           headers_.push(`${locale.localeDescription} (${locale.code})`);
@@ -92,7 +92,7 @@ export default class TranslationContainer extends Component {
     // this.props.api
     // .post(`${apiUrl}/${id}`, valueObject)
     // .then((result) => {
-    //   Message.show(`Event category updated`);
+    //   Message.show('Translation updated');
     //   // this.getData();
     // })
     // .catch((error) => ApiError(error));
@@ -100,7 +100,7 @@ export default class TranslationContainer extends Component {
     // this.props.api
     //   .updateTranslationTextForId(id, valueObject)
     //   .then(() =>
-    //     Message.show('Translation value has been saved successfully.'),
+    //     Message.show('Translation updated.'),
     //   )
     //   .then(() => this.updateTranslationStateById(id, value))
     //   .then(() => okCallback)
@@ -124,27 +124,27 @@ export default class TranslationContainer extends Component {
     let tableData = [];
 
     if (currentCategory.apiUrl.includes('types')) {
-      let nameData = [];
-      let descrData = [];
-
-      currentCategoryData.map((category) => {
-        nameData.push({
-          id: category.id,
-          field_name: category.nameCode,
-          en: category.nameTranslations[1],
-          ru: category.nameTranslations[2],
-          el: category.nameTranslations[3]
-        })
-
-        descrData.push({
-          id: category.id,
-          field_name: category.descCode,
-          en: category.descTranslations[1],
-          ru: category.descTranslations[2],
-          el: category.descTranslations[3]
-        })
-      });
-      tableData = nameData.concat(descrData);
+      // такие стрёмные ID для того, чтобы можно было отдельно редактировать name и description
+      // либо надо добавлять поля в таблице, чтобы вывести и то и другое в одной строке
+      // но тогда будет 7 столбцов - не удобно
+      tableData = tableData.concat(
+        currentCategoryData.flatMap(category => [
+          {
+            id: `${category.id}_${category.nameCode}`,
+            field_name: category.nameCode,
+            en: category.nameTranslations[1],
+            ru: category.nameTranslations[2],
+            el: category.nameTranslations[3]
+          },
+          {
+            id: `${category.id}_${category.descCode}`,
+            field_name: category.descCode,
+            en: category.descTranslations[1],
+            ru: category.descTranslations[2],
+            el: category.descTranslations[3]
+          }
+        ])
+      );
     } else if (currentCategory.apiUrl.includes('dictionary')) {
       tableData = currentCategoryData.map((category) => {
         return {
@@ -171,6 +171,15 @@ export default class TranslationContainer extends Component {
 
         <div className={styles.inlineContainer}>
           {categoriesButtons}
+        </div>
+
+        <div className="bp5-callout" style={{ fontSize: '80%', marginTop: '1em' }}>
+          To see a list of records to be translated, click one of the buttons above.
+        </div>
+
+        <div className="bp5-callout" style={{ fontSize: '80%', marginTop: '1em' }}>
+          Чтобы начать редактировать текст, кликните в нужную ячейку.
+          При клике вне её данные сохранятся автоматически.
         </div>
 
         {
