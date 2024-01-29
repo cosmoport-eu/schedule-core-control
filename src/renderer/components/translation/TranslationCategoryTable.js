@@ -38,7 +38,7 @@ export default function TranslationCategoryTable ({
 
   const records = data.map((record) => (
     <tr key={record.id}>
-      <td>{record.id}</td>
+      {/* <td>{record.id}</td> */}
       <td>{record.field_name}</td>
       <td>
         <TextEditor
