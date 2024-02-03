@@ -110,7 +110,7 @@ export default class Calendar extends Component {
 
   getEvents = (start, end, timezone, callback) => {
     const events = this.events.map((event) => {
-      const eventData = this.refsData.findById(event.eventTypeId, 'types');
+      const eventData = this.refsData.findTypeById(event.eventTypeId);
       const finish = _date.minutesToHm(event.startTime + event.durationTime);
 
       return {

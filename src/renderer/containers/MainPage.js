@@ -191,7 +191,7 @@ export default class MainPage extends Component {
           callback={this.handleCreate}
           refs={refs}
           locale={locale}
-          gates={gates}Z
+          gates={gates}
         />
         <EventMenu
           ref={(em) => {
