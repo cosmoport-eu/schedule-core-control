@@ -1,11 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TableHeader from './TableHeader';
-import TableFooter from './TableFooter';
 import { HTMLTable } from '@blueprintjs/core';
 import TableBody from './TableBody';
+import TableSection from './TableSection';
+import styles from '../eventTable/EventTable.module.css';
 
-export default function Table({ headers, rows, onRemoveClick, onEditClick }) {
+export default function Table({
+    headers = [],
+    rows = {},
+    fieldNames = [],
+    onRemoveClick = () => {},
+    onEditClick = () => {}
+}) {
     const handleRemoveClick = (row_id) => {
         onRemoveClick(row_id)
     }
@@ -15,15 +21,18 @@ export default function Table({ headers, rows, onRemoveClick, onEditClick }) {
     }
 
     return (
-        <HTMLTable compact striped>
-            <TableHeader
-                headers={headers}
+        <HTMLTable compact striped className={styles.eventTable}>
+            <TableSection
+                data={headers}
+                isHeader={true}
             />
-            <TableFooter
-                footers={headers}
+            <TableSection
+                data={headers}
+                isHeader={false}
             />
             <TableBody
                 rows={rows}
+                fieldNames={fieldNames}
                 onRemoveClick={handleRemoveClick}
                 onEditClick={handleEditClick}
             />
@@ -33,14 +42,7 @@ export default function Table({ headers, rows, onRemoveClick, onEditClick }) {
 
 Table.propTypes = {
     headers: PropTypes.array.isRequired,
-    rows: PropTypes.arrayOf(PropTypes.array).isRequired,
+    // rows: PropTypes.arrayOf(PropTypes.array).isRequired,
     onRemoveClick: PropTypes.func.isRequired,
     onEditClick: PropTypes.func.isRequired
 }
-
-Table.defaultProps = {
-    headers: [],
-    rows: {},
-    onRemoveClick: () => {},
-    onEditClick: () => {}
-};
