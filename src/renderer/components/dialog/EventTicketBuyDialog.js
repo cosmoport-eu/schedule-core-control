@@ -60,9 +60,9 @@ export default class EventTicketBuyDialog extends Component {
   };
 
   renderEventInfo = (event, l18n, refsData, et) => {
-    const typeRef = refsData.findById(event.eventTypeId, 'types');
-    const stateRef = refsData.findById(event.eventStateId, 'states');
-    const statusRef = refsData.findById(event.eventStatusId, 'statuses');
+    const typeRef = refsData.findTypeById(event.eventTypeId);
+    const stateRef = refsData.findStateById(event.eventStateId);
+    const statusRef = refsData.findStatusById(event.eventStatusId);
     const state_name = l18n.findByCode(stateRef.code);
     const status_name = l18n.findByCode(statusRef.code);
 

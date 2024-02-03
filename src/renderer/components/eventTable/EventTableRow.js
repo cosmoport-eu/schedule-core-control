@@ -27,7 +27,7 @@ export default function EventTableRow({
   const handleEditClick = () => editCallback(event);
 
   const renderTypeCol = (id) => {
-    const typeData = refsData.findById(id, 'types');
+    const typeData = refsData.findTypeById(id);
     return et.getFullName(typeData);
   };
 
@@ -53,16 +53,18 @@ export default function EventTableRow({
   const refsData = new RefsData(refs);
   const translation = new L18n(locale);
 
-  const name = event.status === 'inactive' ? 'canceled' : '';
+  const className = event.status === 'inactive' ? 'canceled' : '';
+
   const gate1 = event.gateId;
   const gate2 = event.gate2Id;
   const gatesText = gate1 + (gate1 !== gate2 && `→${gate2}`);
+
   const state = getTranslation(event.eventStateId, 'states');
   const status = getTranslation(event.eventStatusId, 'statuses');
   const statusText = state + (typeof status === 'undefined' ? '' : ` / ${status}`);
 
   return (
-    <tr className={name}>
+    <tr className={className}>
       <td>{event.id}</td>
       <td>
         <div style={{ fontSize: '80%', marginBottom: '0.3em' }}>
