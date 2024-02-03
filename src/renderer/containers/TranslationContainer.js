@@ -36,13 +36,10 @@ export default class TranslationContainer extends Component {
         { id: 2, apiUrl: '/dictionary/statuses', name: 'Statuses' },
         { id: 3, apiUrl: '/dictionary/categories', name: 'Categories' },
         { id: 4, apiUrl: '/dictionary/types', name: 'Types' },
-
-        // жду метод, который вернёт записи с переводами
-        // { id: 5, apiUrl: '/facility', name: 'Facilities' },
-        // { id: 6, apiUrl: '/material', name: 'Materials' },
+        { id: 5, apiUrl: '/facility/all', name: 'Facilities' },
+        { id: 6, apiUrl: '/material/all', name: 'Materials' },
       ],
       headers: [],
-      fieldNames: [],
     };
   }
 
@@ -55,17 +52,14 @@ export default class TranslationContainer extends Component {
       .fetchLocales()
       .then((data) => {
         const headers_ = ['Value'];
-        const fieldNames_ = ['field_name'];
 
         data.map((locale) => {
           headers_.push(`${locale.localeDescription} (${locale.code})`);
-          fieldNames_.push(locale.code);
         });
 
         this.setState({
           locales: data,
           headers: headers_,
-          fieldNames: fieldNames_,
         });
       })
       .catch((error) => ApiError(error));
@@ -84,30 +78,16 @@ export default class TranslationContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  // пока нет api
-  handleTextChange = (apiUrl, id, value, oldValue, locale, okCallback, notOkCallback) => {
-    console.log(`[handleTextChange] id: ${id}, value: ${value}`);
-    const valueObject = { name: value };
-
-    // this.props.api
-    // .post(`${apiUrl}/${id}`, valueObject)
-    // .then((result) => {
-    //   Message.show('Translation updated');
-    //   // this.getData();
-    // })
-    // .catch((error) => ApiError(error));
-
-    // this.props.api
-    //   .updateTranslationTextForId(id, valueObject)
-    //   .then(() =>
-    //     Message.show('Translation updated.'),
-    //   )
-    //   .then(() => this.updateTranslationStateById(id, value))
-    //   .then(() => okCallback)
-    //   .catch((error) => {
-    //     ApiError(error);
-    //     notOkCallback();
-    //   });
+  handleTextChange = (id, value, okCallback, notOkCallback) => {
+    this.props.api
+      .post(`/translations/update/${id}`, value)
+      .then((result) => {
+        Message.show('Translation updated');
+        this.getData();
+      })
+      .catch((error) => {
+        ApiError(error);
+      });
   };
 
   render() {
@@ -117,42 +97,33 @@ export default class TranslationContainer extends Component {
       currentCategory,
       currentCategoryData,
       buttonLinks,
-      headers,
-      fieldNames
+      headers
     } = this.state;
 
     let tableData = [];
 
     if (currentCategory.apiUrl.includes('types')) {
-      // такие стрёмные ID для того, чтобы можно было отдельно редактировать name и description
-      // либо надо добавлять поля в таблице, чтобы вывести и то и другое в одной строке
-      // но тогда будет 7 столбцов - не удобно
+      // такие стрёмные ID, чтобы можно было отдельно редактировать поля name и description
       tableData = tableData.concat(
         currentCategoryData.flatMap(category => [
           {
             id: `${category.id}_${category.nameCode}`,
             field_name: category.nameCode,
-            en: category.nameTranslations[1],
-            ru: category.nameTranslations[2],
-            el: category.nameTranslations[3]
+            translations: category.nameTranslations
           },
           {
             id: `${category.id}_${category.descCode}`,
             field_name: category.descCode,
-            en: category.descTranslations[1],
-            ru: category.descTranslations[2],
-            el: category.descTranslations[3]
+            translations: category.descTranslations
           }
         ])
       );
-    } else if (currentCategory.apiUrl.includes('dictionary')) {
+    } else {
       tableData = currentCategoryData.map((category) => {
         return {
           id: category.id,
           field_name: category.code,
-          en: category.translations[1],
-          ru: category.translations[2],
-          el: category.translations[3]
+          translations: category.translations
         }
       });
     }
@@ -189,7 +160,6 @@ export default class TranslationContainer extends Component {
               key={currentCategory.id}
               headers={headers}
               data={tableData}
-              fieldNames={fieldNames}
               pageCaption={currentCategory.name}
               apiUrl={currentCategory.apiUrl}
               onRefresh={this.handleCategorySelect}
