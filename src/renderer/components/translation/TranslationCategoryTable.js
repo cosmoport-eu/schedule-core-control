@@ -11,11 +11,10 @@ import TextEditor from '../translation/TextEditor';
 export default function TranslationCategoryTable ({
   data = {},
   headers = [],
-  fieldNames = [],
   apiUrl = '',
   pageCaption = 'Unknown Table',
   onRefresh = (apiUrl) => {},
-  onTextChange = (apiUrl) => {},
+  onTextChange = () => {},
 }) {
   const [
     {name},
@@ -28,42 +27,27 @@ export default function TranslationCategoryTable ({
     name: () => (name === '' ? "It shouldn't be empty" : ''),
   };
 
-  const handleTextChange = (id, value, oldValue, locale) => {
+  const handleTextChange = (id, value, oldValue) => {
     if (value === oldValue) {
       return;
     }
     
-    onTextChange(apiUrl, id, value, oldValue, locale);
+    onTextChange(id, value);
   };
 
   const records = data.map((record) => (
     <tr key={record.id}>
-      {/* <td>{record.id}</td> */}
       <td>{record.field_name}</td>
-      <td>
-        <TextEditor
-          id={record.id}
-          text={record.en}
-          locale={1}
-          onConfirm={handleTextChange}
-        />
-      </td>
-      <td>
-        <TextEditor
-          id={record.id}
-          text={record.ru}
-          locale={2}
-          onConfirm={handleTextChange}
-        />
-      </td>
-      <td>
-        <TextEditor
-          id={record.id}
-          text={record.el}
-          locale={3}
-          onConfirm={handleTextChange}
-        />
-      </td>
+
+      {record.translations.map(translation => (
+        <td key={translation.id}>
+          <TextEditor
+            id={translation.id}
+            text={translation.text}
+            onConfirm={handleTextChange}
+          />
+        </td>
+      ))}
     </tr>
   ));
 
@@ -93,16 +77,6 @@ export default function TranslationCategoryTable ({
               />
               <tbody>{records}</tbody>
             </HTMLTable>
-
-            // todo: сделать редактируемые поля
-            // <Table
-            //   headers={headers}
-            //   fieldNames={fieldNames}
-            //   rows={data}
-            //   editable_rows={true}
-            //   has_actions={false}
-            //   onTextChange={handleTextChange}
-            // />
           }
         </div>
     </>

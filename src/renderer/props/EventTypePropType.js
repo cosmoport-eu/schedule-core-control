@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 
 export default PropTypes.shape({
-  id: PropTypes.number,
+  categoryId: PropTypes.number,
+  defaultCost: PropTypes.number,
   defaultDuration: PropTypes.number,
   defaultRepeatInterval: PropTypes.number,
-  i18nEventTypeDescription: PropTypes.number,
-  i18nEventTypeName: PropTypes.number,
-  i18nEventTypeSubname: PropTypes.number
+  descCode: PropTypes.string,
+  id: PropTypes.number,
+  nameCode: PropTypes.string
 });

@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 
 import EventPropType from '../../props/EventPropType';
 import RefsPropType from '../../props/RefsPropType';
-import LocalePropType from '../../props/LocalePropType';
 import GatePropType from '../../props/GatePropType';
-import L18n from '../l18n/L18n';
+import L18n from '../l18n/L18n_new';
 import DateFiledGroup from './group/DateFieldGroup';
 import TimeFieldGroup from './group/TimeFieldGroup';
 import ListFieldGroup from './group/ListFieldGroup';
@@ -296,11 +295,11 @@ export default class EventForm extends Component {
   };
 
   render() {
-    const { types, typeCategories, statuses, states } =
+    const { states, statuses, typeCategories, types } =
       this.props.refs;
 
     if (!typeCategories || !types || !statuses) {
-      return <div>:(</div>;
+      return <div>Data not found</div>;
     }
 
     const {
@@ -312,23 +311,23 @@ export default class EventForm extends Component {
       gate2,
       bought,
     } = this.validators;
-    const l18n = new L18n(this.props.locale, this.props.refs);
+    const l18n = new L18n(this.props.locale);
 
     const statusOptions = statuses.map((op) => (
       <option key={op.id} value={op.id}>
-        {l18n.findTranslationById(op, 'i18nStatus')}
+        {l18n.findByCode(op.code)}
       </option>
     ));
     const stateOptions = states.map((op) => (
       <option key={op.id} value={op.id}>
-        {l18n.findTranslationById(op, 'i18nState')}
+        {l18n.findByCode(op.code)}
       </option>
     ));
     const categoryOptions = typeCategories
       .filter((t) => t.parent === 0)
       .map((op) => (
         <option key={op.id} value={op.id}>
-          {l18n.findTranslationById(op, 'i18nEventTypeCategoryName')}
+          {l18n.findByCode(op.code)}
         </option>
       ));
 
@@ -338,14 +337,14 @@ export default class EventForm extends Component {
         .filter((t) => t.categoryId === this.state.category)
         .map((op) => (
           <option key={op.id} value={op.id}>
-            {l18n.findTranslationById(op, 'i18nEventTypeName')}
+            {l18n.findByCode(op.nameCode)}
           </option>
         ));
       const typeSubOptions = typeCategories
         .filter((t) => t.parent === this.state.category)
         .map((op) => (
           <option key={op.id} value={op.id} data-tree={true}>
-            {l18n.findTranslationById(op, 'i18nEventTypeCategoryName')}
+            {l18n.findByCode(op.code)}
           </option>
         ));
       typeOptions.push(typeSubOptions);
@@ -357,7 +356,7 @@ export default class EventForm extends Component {
         .filter((t) => t.categoryId === this.state.type)
         .map((op) => (
           <option key={op.id} value={op.id}>
-            {l18n.findTranslationById(op, 'i18nEventTypeName')}
+            {l18n.findByCode(op.nameCode)}
           </option>
         ));
     }
@@ -366,7 +365,7 @@ export default class EventForm extends Component {
     if (this.state.subcategory) {
       const desc = types
         .filter((t) => t.id === this.state.subcategory)
-        .map((op) => l18n.findTranslationById(op, 'i18nEventTypeDescription'));
+        .map((op) => l18n.findByCode(op.descCode));
 
       if (desc.length > 0) {
         subTypeDescription = desc[0];
@@ -543,7 +542,7 @@ EventForm.propTypes = {
   forCreate: PropTypes.bool,
   event: EventPropType,
   refs: RefsPropType.isRequired,
-  locale: LocalePropType.isRequired,
+  locale: PropTypes.objectOf(PropTypes.string).isRequired,
   gates: PropTypes.arrayOf(GatePropType).isRequired,
   date: PropTypes.string,
 };
@@ -551,7 +550,12 @@ EventForm.propTypes = {
 EventForm.defaultProps = {
   forCreate: false,
   event: null,
-  refs: { statuses: [], states: [], types: [] },
+  refs: {
+    states: [],
+    statuses: [],
+    typeCategories: [],
+    types: [],
+  },
   locale: {},
   gates: [],
   date: '',

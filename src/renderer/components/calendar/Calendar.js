@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 
-import L18n from '../l18n/L18n';
 import _date from '../date/_date';
 import EventPropType from '../../props/EventPropType';
+import RefsData from '../references/RefsData';
 
 require('fullcalendar/dist/fullcalendar');
 
@@ -16,7 +16,7 @@ require('fullcalendar/dist/fullcalendar');
 export default class Calendar extends Component {
   static propTypes = {
     events: PropTypes.arrayOf(EventPropType),
-    l18n: PropTypes.instanceOf(L18n).isRequired,
+    refsData: PropTypes.instanceOf(RefsData).isRequired,
     onMenu: PropTypes.func,
     onViewChange: PropTypes.func,
   };
@@ -78,7 +78,7 @@ export default class Calendar extends Component {
    */
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.events = nextProps.events;
-    this.l18n = nextProps.l18n;
+    this.refsData = nextProps.refsData;
     this.$node.fullCalendar('refetchEvents');
   }
 
@@ -110,7 +110,7 @@ export default class Calendar extends Component {
 
   getEvents = (start, end, timezone, callback) => {
     const events = this.events.map((event) => {
-      const eventData = this.l18n.findEventRefByEventTypeId(event.eventTypeId);
+      const eventData = this.refsData.findById(event.eventTypeId, 'types');
       const finish = _date.minutesToHm(event.startTime + event.durationTime);
 
       return {

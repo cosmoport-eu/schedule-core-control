@@ -8,14 +8,16 @@ import {
   Switch,
 } from '@blueprintjs/core';
 
-import L18n from '../../components/l18n/L18n';
 import _date from '../../components/date/_date';
 
 import styles from './EventTicketBuyDialog.module.css';
+import L18n_new from '../l18n/L18n_new';
+import RefsData from '../references/RefsData';
 
 export default class EventTicketBuyDialog extends Component {
   static propTypes = {
-    l18n: PropTypes.instanceOf(L18n).isRequired,
+    l18n: PropTypes.instanceOf(L18n_new).isRequired,
+    refsData: PropTypes.instanceOf(RefsData).isRequired,
     onTicketUpdate: PropTypes.func,
   };
 
@@ -57,10 +59,12 @@ export default class EventTicketBuyDialog extends Component {
     }
   };
 
-  renderEventInfo = (event, l18n, et) => {
-    const typeRef = l18n.findEventRefByEventTypeId(event.eventTypeId);
-    const stateRef = l18n.findEventRefByEventStateId(event.eventStateId);
-    const statusRef = l18n.findEventRefByEventStatusId(event.eventStatusId);
+  renderEventInfo = (event, l18n, refsData, et) => {
+    const typeRef = refsData.findById(event.eventTypeId, 'types');
+    const stateRef = refsData.findById(event.eventStateId, 'states');
+    const statusRef = refsData.findById(event.eventStatusId, 'statuses');
+    const state_name = l18n.findByCode(stateRef.code);
+    const status_name = l18n.findByCode(statusRef.code);
 
     return (
       <div className={styles.eventInfo}>
@@ -77,10 +81,7 @@ export default class EventTicketBuyDialog extends Component {
         </div>
         <div className={styles.eventProperty}>
           <span>State</span>
-          <span>{`${l18n.findTranslationById(
-            stateRef,
-            'i18nState',
-          )} / ${l18n.findTranslationById(statusRef, 'i18nStatus')}`}</span>
+          <span>{state_name + (status_name ? ` / ${status_name}` : '')}</span>
         </div>
         <div className={styles.eventProperty}>
           <span>Gates</span>
@@ -135,7 +136,7 @@ export default class EventTicketBuyDialog extends Component {
 
   render() {
     const { isOpen, event } = this.state;
-    const { l18n, et } = this.props;
+    const { l18n, refsData, et } = this.props;
 
     if (!isOpen) {
       return null;
@@ -153,7 +154,7 @@ export default class EventTicketBuyDialog extends Component {
           <div className={styles.notice}>
             Here you can update tickets selling information.
           </div>
-          {this.renderEventInfo(event, l18n, et)}
+          {this.renderEventInfo(event, l18n, refsData, et)}
         </DialogBody>
         <DialogFooter
           actions={
