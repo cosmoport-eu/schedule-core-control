@@ -7,7 +7,7 @@ import ApiError from '../components/indicators/ApiError';
 import PageCaption from '../components/page/PageCaption';
 import EventMenu from '../components/calendar/EventMenu';
 import EventTicketBuyDialog from '../components/dialog/EventTicketBuyDialog';
-import L18n from '../components/l18n/L18n_new';
+import L18n from '../components/l18n/L18n';
 import Message from '../components/messages/Message';
 import EventAddDialog from '../components/dialog/EventAddDialog';
 import _date from '../components/date/_date';

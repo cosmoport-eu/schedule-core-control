@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import EventPropType from '../../props/EventPropType';
 import RefsPropType from '../../props/RefsPropType';
 import GatePropType from '../../props/GatePropType';
-import L18n from '../l18n/L18n_new';
+import L18n from '../l18n/L18n';
 import DateFiledGroup from './group/DateFieldGroup';
 import TimeFieldGroup from './group/TimeFieldGroup';
 import ListFieldGroup from './group/ListFieldGroup';
