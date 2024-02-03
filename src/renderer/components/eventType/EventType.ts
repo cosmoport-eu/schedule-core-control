@@ -1,4 +1,4 @@
-import L18n from '../l18n/L18n_new';
+import L18n from '../l18n/L18n';
 
 type Type = {
 	categoryId: number;

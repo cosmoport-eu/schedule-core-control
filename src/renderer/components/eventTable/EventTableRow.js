@@ -6,7 +6,7 @@ import RefsPropType from '../../props/RefsPropType';
 
 import _date from '../date/_date';
 import RefsData from '../references/RefsData';
-import L18n from '../l18n/L18n_new';
+import L18n from '../l18n/L18n';
 
 /*
  * The class for rendering event table row.

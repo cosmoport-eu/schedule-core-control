@@ -11,12 +11,12 @@ import {
 import _date from '../../components/date/_date';
 
 import styles from './EventTicketBuyDialog.module.css';
-import L18n_new from '../l18n/L18n_new';
+import L18n from '../l18n/L18n';
 import RefsData from '../references/RefsData';
 
 export default class EventTicketBuyDialog extends Component {
   static propTypes = {
-    l18n: PropTypes.instanceOf(L18n_new).isRequired,
+    l18n: PropTypes.instanceOf(L18n).isRequired,
     refsData: PropTypes.instanceOf(RefsData).isRequired,
     onTicketUpdate: PropTypes.func,
   };
