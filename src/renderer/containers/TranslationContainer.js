@@ -78,10 +78,12 @@ export default class TranslationContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleTextChange = (id, value, okCallback, notOkCallback) => {
+  handleTextChange = (id, value) => {
+    const valueObject = { text: value };
+
     this.props.api
-      .post(`/translations/update/${id}`, value)
-      .then((result) => {
+      .updateTranslationTextForId(id, valueObject)
+      .then(() => {
         Message.show('Translation updated');
         this.getData();
       })
