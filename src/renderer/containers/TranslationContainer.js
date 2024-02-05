@@ -56,6 +56,7 @@ export default class TranslationContainer extends Component {
         data.map((locale) => {
           headers_.push(`${locale.localeDescription} (${locale.code})`);
         });
+        headers_.push('Opt');
 
         this.setState({
           locales: data,
@@ -88,6 +89,41 @@ export default class TranslationContainer extends Component {
       .catch((error) => {
         ApiError(error);
       });
+  };
+  
+  handleCreateRecord = (apiUrl, data) => {
+    console.log('[handleCreateRecord]');
+    console.log(`apiUrl: ${apiUrl}`);
+    console.log(data);
+
+    // this.props.api
+    //   .post(apiUrl, name)
+    //   .then((response) => {
+    //     Message.show('Record has been created.');
+
+    //     this.getData();
+
+    //     return 1;
+    //   })
+    //   .then(() => this.handleRefresh())
+    //   .catch((error) => ApiError(error));
+  };
+  
+  handleDeleteRecord = (apiUrl, data) => {
+    console.log('[handleDeleteRecord]');
+    console.log(`apiUrl: ${apiUrl}`);
+    console.log(data);
+
+    // this.props.api
+    //   .delete(`${apiUrl}/${id}`)
+    //   .then((result) => {
+    //     Message.show(`Record #${id} has been deleted`);
+
+    //     this.handleRefresh();
+
+    //     return 1;
+    //   })
+    //   .catch((error) => ApiError(error));
   };
 
   render() {
@@ -138,7 +174,7 @@ export default class TranslationContainer extends Component {
 
     return (
       <div>
-        <PageCaption text="04 Translations" />
+        <PageCaption text="Translations" />
 
         <div className={styles.inlineContainer}>
           {categoriesButtons}
@@ -162,6 +198,8 @@ export default class TranslationContainer extends Component {
               data={tableData}
               pageCaption={currentCategory.name}
               apiUrl={currentCategory.apiUrl}
+              onDelete={this.handleCreateRecord}
+              onCreate={this.handleDeleteRecord}
               onRefresh={this.handleCategorySelect}
               onTextChange={this.handleTextChange}
             />
