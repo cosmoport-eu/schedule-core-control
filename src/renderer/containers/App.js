@@ -23,7 +23,6 @@ import { defaultBusiness } from '../components/simulator/Defaults';
 import './app.global.css';
 import styles from './App.module.css';
 import EventTypeContainer from './EventTypeContainer';
-import AdditionalsContainer from './AdditionalsContainer';
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -335,7 +334,6 @@ export default class App extends Component {
                   />
                   <Route path="/table" element={<Table {...commonProps} />} />
                   <Route path="/types" element={<EventTypeContainer {...commonProps} />} />
-                  <Route path="/additionals" element={<AdditionalsContainer {...commonProps} />} />
                   <Route
                     path="/login"
                     element={<Unlock onAuth={this.handlePassword} />}
