@@ -59,14 +59,7 @@ export default function NavigationBar({
 					<Navigate to="/table" icon="Timetable" />
 					<Navigate to="/types" icon="Types" />
 					{auth && (
-						<Navigate
-							to="/translation"
-							icon={
-								<>
-									<Translate /> Translation
-								</>
-							}
-						/>
+						<Navigate to="/translation" icon="Translations" />
 					)}
 					{auth && <Navigate to="/settings" icon="Settings" />}
 					{!auth && <Navigate to="/login" icon={<Lock />} />}

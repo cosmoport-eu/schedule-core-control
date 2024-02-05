@@ -110,7 +110,7 @@ export default class TableContainer extends Component {
 
     return (
       <>
-        <PageCaption text="03 Timetable" />
+        <PageCaption text="Timetable" />
         <Table
           events={events}
           refs={refs}

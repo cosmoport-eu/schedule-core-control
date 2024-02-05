@@ -129,7 +129,7 @@ export default class EventTypeContainer extends Component {
 
     return (
       <div>
-        <PageCaption text="04 Types" />
+        <PageCaption text="Types" />
 
         <EventTypeTable
           ref={(table) => {

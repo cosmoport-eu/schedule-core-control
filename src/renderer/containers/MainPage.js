@@ -174,7 +174,7 @@ export default class MainPage extends Component {
 
     return (
       <div>
-        <PageCaption text="01 Calendar" />
+        <PageCaption text="Calendar" />
         <EventTicketBuyDialog
           ref={(dialog) => {
             this.eventTicketsDialog = dialog;

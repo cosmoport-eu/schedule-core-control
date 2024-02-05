@@ -28,16 +28,68 @@ export default class TranslationContainer extends Component {
       currentCategory: {
         id: 0,
         name: 'unknown',
-        apiUrl: 'unknown'
+        apiUrl: {
+          get: 'unknown',
+          create: 'unknown',
+          delete: 'unknown',
+        }
       },
       currentCategoryData: [],
       buttonLinks: [
-        { id: 1, apiUrl: '/dictionary/states', name: 'States' },
-        { id: 2, apiUrl: '/dictionary/statuses', name: 'Statuses' },
-        { id: 3, apiUrl: '/dictionary/categories', name: 'Categories' },
-        { id: 4, apiUrl: '/dictionary/types', name: 'Types' },
-        { id: 5, apiUrl: '/facility/all', name: 'Facilities' },
-        { id: 6, apiUrl: '/material/all', name: 'Materials' },
+        {
+          id: 1,
+          apiUrl: {
+            get: '/dictionary/states',
+            create: 'create',
+            delete: '/t_events/states', // пока нет апи
+          },
+          name: 'States'
+        },
+        {
+          id: 2,
+          apiUrl: {
+            get: '/dictionary/statuses',
+            create: 'create',
+            delete: '/t_events/statuses', // пока нет апи
+          },
+          name: 'Statuses'
+        },
+        {
+          id: 3,
+          apiUrl: {
+            get: '/dictionary/categories',
+            create: 'create',
+            delete: '/t_events/categories', // пока нет апи
+          },
+          name: 'Categories'
+        },
+        {
+          id: 4,
+          apiUrl: {
+            get: '/dictionary/types',
+            create: 'create', // создание типов в отдельном разделе, слишком много полей для этого раздела
+            delete: '/t_events/types', // пока нет апи
+          },
+          name: 'Types'
+        },
+        {
+          id: 5,
+          apiUrl: {
+            get: '/facility/all',
+            create: '/facility?localeId=1',
+            delete: '/facility',
+          },
+          name: 'Facilities'
+        },
+        {
+          id: 6,
+          apiUrl: {
+            get: '/material/all',
+            create: '/material?localeId=1',
+            delete: '/material',
+          },
+          name: 'Materials'
+        },
       ],
       headers: [],
     };
@@ -66,9 +118,13 @@ export default class TranslationContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
+  handleRefresh = () => {
+    console.log('handleRefresh');
+  }
+
   handleCategorySelect = (category) => {
     this.props.api
-      .get(category.apiUrl)
+      .get(category.apiUrl.get)
       .then((data) => {
         this.setState({
           hasData: true,
@@ -80,9 +136,11 @@ export default class TranslationContainer extends Component {
   };
 
   handleTextChange = (id, value, okCallback, notOkCallback) => {
+    const valueObject = { text: value };
+
     this.props.api
-      .post(`/translations/update/${id}`, value)
-      .then((result) => {
+      .updateTranslationTextForId(id, valueObject)
+      .then(() => {
         Message.show('Translation updated');
         this.getData();
       })
@@ -91,39 +149,39 @@ export default class TranslationContainer extends Component {
       });
   };
   
-  handleCreateRecord = (apiUrl, data) => {
+  handleCreateRecord = (apiUrlCreate, data) => {
     console.log('[handleCreateRecord]');
-    console.log(`apiUrl: ${apiUrl}`);
+    console.log(`apiUrlCreate: ${apiUrlCreate}`);
     console.log(data);
 
-    // this.props.api
-    //   .post(apiUrl, name)
-    //   .then((response) => {
-    //     Message.show('Record has been created.');
+    this.props.api
+      .post(apiUrlCreate, data)
+      .then((response) => {
+        Message.show('Record has been created.');
 
-    //     this.getData();
+        this.getData();
 
-    //     return 1;
-    //   })
-    //   .then(() => this.handleRefresh())
-    //   .catch((error) => ApiError(error));
+        return 1;
+      })
+      .then(() => this.handleRefresh())
+      .catch((error) => ApiError(error));
   };
   
-  handleDeleteRecord = (apiUrl, data) => {
+  handleDeleteRecord = (apiUrlDelete, data) => {
     console.log('[handleDeleteRecord]');
-    console.log(`apiUrl: ${apiUrl}`);
+    console.log(`apiUrlDelete: ${apiUrlDelete}`);
     console.log(data);
 
-    // this.props.api
-    //   .delete(`${apiUrl}/${id}`)
-    //   .then((result) => {
-    //     Message.show(`Record #${id} has been deleted`);
+    this.props.api
+      .delete(`${apiUrlDelete}/${data.id}`)
+      .then((result) => {
+        Message.show(`Record #${data.id} has been deleted`);
 
-    //     this.handleRefresh();
+        this.handleRefresh();
 
-    //     return 1;
-    //   })
-    //   .catch((error) => ApiError(error));
+        return 1;
+      })
+      .catch((error) => ApiError(error));
   };
 
   render() {
@@ -138,17 +196,16 @@ export default class TranslationContainer extends Component {
 
     let tableData = [];
 
-    if (currentCategory.apiUrl.includes('types')) {
-      // такие стрёмные ID, чтобы можно было отдельно редактировать поля name и description
+    if (currentCategory.apiUrl.get.includes('types')) {
       tableData = tableData.concat(
         currentCategoryData.flatMap(category => [
           {
-            id: `${category.id}_${category.nameCode}`,
+            id: category.nameCode,
             field_name: category.nameCode,
             translations: category.nameTranslations
           },
           {
-            id: `${category.id}_${category.descCode}`,
+            id: category.descCode,
             field_name: category.descCode,
             translations: category.descTranslations
           }
@@ -198,9 +255,9 @@ export default class TranslationContainer extends Component {
               data={tableData}
               pageCaption={currentCategory.name}
               apiUrl={currentCategory.apiUrl}
-              onDelete={this.handleCreateRecord}
-              onCreate={this.handleDeleteRecord}
-              onRefresh={this.handleCategorySelect}
+              onDelete={this.handleDeleteRecord}
+              onCreate={this.handleCreateRecord}
+              onRefresh={this.handleRefresh}
               onTextChange={this.handleTextChange}
             />
           </div>
