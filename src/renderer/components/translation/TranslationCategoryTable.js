@@ -12,12 +12,16 @@ import TextFieldGroup from '../form/group/TextFieldGroup';
 export default function TranslationCategoryTable ({
   data = {},
   headers = [],
-  apiUrl = '',
+  apiUrl = {
+    get: 'unknown',
+    create: 'unknown',
+    delete: 'unknown',
+  },
   pageCaption = 'Unknown Table',
-  onRefresh = (apiUrl) => {},
+  onRefresh = () => {},
   onTextChange = () => {},
-  onCreate = (apiUrl, data) => {},
-  onDelete = (apiUrl, data) => {}
+  onCreate = (apiUrlCreate, data) => {},
+  onDelete = (apiUrlDelete, data) => {}
 }) {
   const [
     {name, color},
@@ -53,14 +57,14 @@ export default function TranslationCategoryTable ({
   };
 
   const handleCreate = () => {
-    onCreate(apiUrl, {
+    onCreate(apiUrl.create, {
       name: name,
       color: color
     });
   };
 
   const onRemoveClick = (record) => {
-    onDelete(apiUrl, {
+    onDelete(apiUrl.delete, {
       id: record.id,
       name: record.field_name
     });
