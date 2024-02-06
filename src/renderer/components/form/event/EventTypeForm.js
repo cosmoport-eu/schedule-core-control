@@ -22,7 +22,11 @@ import styles from './EventTypeForm.module.css';
 const uuid = () => crypto.randomUUID();
 
 function EventTypeForm(
-  { categories = [], categoryCreateCallback = (name, color) => {} },
+  {
+    eventType = null,
+    categories = [],
+    categoryCreateCallback = (name, color) => {}
+  },
   ref,
 ) {
   const [
@@ -40,6 +44,7 @@ function EventTypeForm(
     },
     setState,
   ] = useState({
+    id: 0,
     category_id: 0,
     name: '',
     description: '',
@@ -54,6 +59,30 @@ function EventTypeForm(
     category_name: '',
     category_color: '#808080',
   });
+  console.log(sections);
+
+  if (eventType !== null) {
+    setState({
+      // descCode
+      // id
+      // nameCode
+      id: eventType.id,
+      category_id: eventType.categoryId,
+      name: 'Name 111',
+      description: 'Descr 111',
+      default_duration: eventType.defaultDuration,
+      default_repeat_interval: eventType.defaultRepeatInterval,
+      default_cost: eventType.defaultCost,
+
+      // the initial 1 section
+      // sections: { [uuid()]: { pos: 0, name: '', description: '' } },
+      // попробовать для каждого subtype формировать section
+      section_last_pos: 0,
+
+      category_name: 'category',
+      category_color: '#808080',
+    });
+  }
 
   const validate_section_name = (s) =>
     s && s.name === '' ? "Name shouldn't be empty." : '';
@@ -184,13 +213,12 @@ function EventTypeForm(
     categoryCreateCallback(category_name, category_color);
   };
 
+  console.log(sections);
   return (
     <>
       <Callout className={styles.smaller}>
         Fill the fields in English and don&apos;t forget to translate it later
-        in the dedicated translation interface of the application (
-        <Translate size={14} />
-        ).
+        in the dedicated Translation section.
         <br />
         Empty custom event list allows adding event type with a name and
         description, otherwise multiple event types will be created with the

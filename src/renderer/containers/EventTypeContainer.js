@@ -102,6 +102,7 @@ export default class EventTypeContainer extends Component {
   // todo
   handleEdit = (formData) => {
     console.log('EDIT');
+    console.log(formData);
   };
 
   handleDelete = (data) => {
