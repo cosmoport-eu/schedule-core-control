@@ -15,6 +15,8 @@ import EventDeleteAlert from '../dialog/EventDeleteAlert';
 import tableStyles from '../eventTable/EventTable.module.css';
 import Table from '../tableStructure/Table';
 import EventTypeEditDialog from '../dialog/EventTypeEditDialog';
+import FacilityPropType from '../../props/FacilityPropType';
+import MaterialPropType from '../../props/MaterialPropType';
 
 export default class EventTypeTable extends PureComponent {
   static propTypes = {
@@ -24,6 +26,8 @@ export default class EventTypeTable extends PureComponent {
     refs: RefsPropType.isRequired,
     locale: PropTypes.objectOf(PropTypes.string).isRequired,
     types: PropTypes.arrayOf(EventTypePropType),
+    facilities: PropTypes.arrayOf(FacilityPropType),
+    materials: PropTypes.arrayOf(MaterialPropType)
   };
   
   static defaultProps = {
@@ -39,7 +43,9 @@ export default class EventTypeTable extends PureComponent {
     this.state = {
       eventTypeAddDialogIsOpen: false,
       eventTypeEditDialogIsOpen: false,
-      types: []
+      types: [],
+      facilities: [],
+      materials: [],
     };
   }
 
@@ -98,7 +104,7 @@ export default class EventTypeTable extends PureComponent {
   };
 
   render() {
-    const { locale, refs, types } = this.props;
+    const { locale, refs, types, facilities, materials } = this.props;
 
     const et = EventType({
       categories: refs.typeCategories,
@@ -141,6 +147,8 @@ export default class EventTypeTable extends PureComponent {
       <div style={{ marginTop: '2em' }}>
         <EventTypeAddDialog
           categories={refs.typeCategories}
+          facilities={facilities}
+          materials={materials}
           etDisplay={et}
           isOpen={this.state.eventTypeAddDialogIsOpen}
           toggle={this.onEventTypeAddDialogToggle}
@@ -149,6 +157,8 @@ export default class EventTypeTable extends PureComponent {
         />
         <EventTypeEditDialog
           categories={refs.typeCategories}
+          facilities={facilities}
+          materials={materials}
           eventType={this.state.eventType}
           etDisplay={et}
           isOpen={this.state.eventTypeEditDialogIsOpen}
