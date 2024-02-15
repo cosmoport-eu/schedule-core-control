@@ -105,11 +105,11 @@ export default class EventTypeContainer extends Component {
     console.log(formData);
   };
 
-  handleDelete = (data) => {
+  handleDelete = (id) => {
     this.props.api
-      .deleteEventType(data.id)
+      .deleteEventType(id)
       .then((result) => {
-        Message.show(`Subtype ${data.name} has been deleted [:${result.deleted}]`);
+        Message.show(`Type #${id} has been deleted`);
         this.getData();
         return 1;
       })
@@ -131,6 +131,18 @@ export default class EventTypeContainer extends Component {
     return (
       <div>
         <PageCaption text="Types" />
+
+        <div
+          className="bp5-callout"
+          style={{
+            fontSize: '80%',
+            marginTop: '1em',
+            background: '#ff00002b'
+          }}
+        >
+          Редактирование записей в разработке.
+          Вы можете изменить название Category, Type и Description в разделе Translations.
+        </div>
 
         <EventTypeTable
           ref={(table) => {

@@ -59,7 +59,7 @@ function EventTypeForm(
     category_name: '',
     category_color: '#808080',
   });
-  console.log(sections);
+  // console.log(sections);
 
   if (eventType !== null) {
     setState({
@@ -213,7 +213,7 @@ function EventTypeForm(
     categoryCreateCallback(category_name, category_color);
   };
 
-  console.log(sections);
+  // console.log(sections);
   return (
     <>
       <Callout className={styles.smaller}>

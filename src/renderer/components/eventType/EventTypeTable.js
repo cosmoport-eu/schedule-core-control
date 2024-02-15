@@ -89,8 +89,8 @@ export default class EventTypeTable extends PureComponent {
     console.log(typeData);
   }
 
-  handleDelete = (id, name) => {
-    this.props.onDelete(id, name);
+  handleDelete = (id) => {
+    this.props.onDelete(id);
   };
 
   handleNewCategory = (name, color) => {
@@ -183,6 +183,7 @@ export default class EventTypeTable extends PureComponent {
             headers={headers}
             rows={rows_data}
             fieldNames={['id', 'category_name', 'type_name', 'description']}
+            is_editable={false} // todo: пока не доделано редактирование
             onRemoveClick={this.handleRemoveClick}
             onEditClick={this.handleEditModalOpen}
           />
