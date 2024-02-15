@@ -28,6 +28,8 @@ export default class TranslationContainer extends Component {
       currentCategory: {
         id: 0,
         name: 'unknown',
+        is_deletable: true,
+        is_creatable: true,
         apiUrl: {
           get: 'unknown',
           create: 'unknown',
@@ -38,42 +40,53 @@ export default class TranslationContainer extends Component {
       buttonLinks: [
         {
           id: 1,
+          is_deletable: false,
+          is_creatable: false,
           apiUrl: {
             get: '/dictionary/states',
-            create: 'create',
-            delete: '/t_events/states', // пока нет апи
+            create: '',
+            delete: '/t_events/states',
           },
           name: 'States'
         },
         {
           id: 2,
+          is_deletable: false,
+          is_creatable: false,
           apiUrl: {
             get: '/dictionary/statuses',
-            create: 'create',
-            delete: '/t_events/statuses', // пока нет апи
+            create: '',
+            delete: '/t_events/statuses',
           },
           name: 'Statuses'
         },
         {
           id: 3,
+          is_deletable: true,
+          is_creatable: true,
           apiUrl: {
             get: '/dictionary/categories',
-            create: 'create',
-            delete: '/t_events/categories', // пока нет апи
+            create: '',
+            delete: '/t_events/categories',
           },
           name: 'Categories'
         },
         {
           id: 4,
+          is_deletable: false,
+          is_creatable: false,
           apiUrl: {
             get: '/dictionary/types',
-            create: 'create', // создание типов в отдельном разделе, слишком много полей для этого раздела
-            delete: '/t_events/types', // пока нет апи
+            // работа с типами в отдельном разделе
+            create: '',
+            delete: '',
           },
           name: 'Types'
         },
         {
           id: 5,
+          is_deletable: true,
+          is_creatable: true,
           apiUrl: {
             get: '/facility/all',
             create: '/facility?localeId=1',
@@ -83,12 +96,36 @@ export default class TranslationContainer extends Component {
         },
         {
           id: 6,
+          is_deletable: true,
+          is_creatable: true,
           apiUrl: {
             get: '/material/all',
             create: '/material?localeId=1',
             delete: '/material',
           },
           name: 'Materials'
+        },
+        {
+          id: 7,
+          is_deletable: true,
+          is_creatable: true,
+          apiUrl: {
+            get: '/gates',
+            create: '/gates',
+            delete: '/gates',
+          },
+          name: 'Gates'
+        },
+        {
+          id: 8,
+          is_deletable: false,
+          is_creatable: false,
+          apiUrl: {
+            get: '/translations/external',
+            create: '',
+            delete: '',
+          },
+          name: 'UI elements'
         },
       ],
       headers: [],
@@ -119,7 +156,10 @@ export default class TranslationContainer extends Component {
   };
 
   handleRefresh = () => {
-    console.log('handleRefresh');
+    if (this.state.currentCategory.id !== 0) {
+      this.handleCategorySelect(this.state.currentCategory);
+    }
+    this.props.onRefresh();
   }
 
   handleCategorySelect = (category) => {
@@ -135,25 +175,26 @@ export default class TranslationContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleTextChange = (id, value, okCallback, notOkCallback) => {
-    const valueObject = { text: value };
+  handleTextChange = (id, value, apiUrl, okCallback, notOkCallback) => {
+    const valueObject = apiUrl === '/translations/external' ? { id, text: value } : { text: value };
 
-    this.props.api
-      .updateTranslationTextForId(id, valueObject)
+    const apiCall = apiUrl === '/translations/external' ?
+      this.props.api.post(apiUrl, valueObject) :
+      this.props.api.updateTranslationTextForId(id, valueObject);
+  
+    apiCall
       .then(() => {
         Message.show('Translation updated');
         this.getData();
+        if (okCallback) okCallback();
       })
       .catch((error) => {
         ApiError(error);
+        if (notOkCallback) notOkCallback();
       });
   };
   
   handleCreateRecord = (apiUrlCreate, data) => {
-    console.log('[handleCreateRecord]');
-    console.log(`apiUrlCreate: ${apiUrlCreate}`);
-    console.log(data);
-
     this.props.api
       .post(apiUrlCreate, data)
       .then((response) => {
@@ -168,10 +209,6 @@ export default class TranslationContainer extends Component {
   };
   
   handleDeleteRecord = (apiUrlDelete, data) => {
-    console.log('[handleDeleteRecord]');
-    console.log(`apiUrlDelete: ${apiUrlDelete}`);
-    console.log(data);
-
     this.props.api
       .delete(`${apiUrlDelete}/${data.id}`)
       .then((result) => {
@@ -211,6 +248,27 @@ export default class TranslationContainer extends Component {
           }
         ])
       );
+    } else if (currentCategory.apiUrl.get.includes('external')) {
+      const groupByCode = (data) => {
+        return Object.values(
+          data.reduce((acc, item) => {
+            acc[item.code] = acc[item.code] || {
+              field_name: item.code,
+              translations: [],
+            };
+      
+            acc[item.code].translations.push({
+              id: item.id,
+              localeId: item.localeId,
+              text: item.text,
+            });
+      
+            return acc;
+          }, {})
+        );
+      };
+
+      tableData = groupByCode(currentCategoryData);
     } else {
       tableData = currentCategoryData.map((category) => {
         return {
@@ -253,6 +311,8 @@ export default class TranslationContainer extends Component {
               key={currentCategory.id}
               headers={headers}
               data={tableData}
+              is_deletable={currentCategory.is_deletable}
+              is_creatable={currentCategory.is_creatable}
               pageCaption={currentCategory.name}
               apiUrl={currentCategory.apiUrl}
               onDelete={this.handleDeleteRecord}

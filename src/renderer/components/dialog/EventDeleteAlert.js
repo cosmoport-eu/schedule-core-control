@@ -15,19 +15,35 @@ export default class EventDeleteAlert extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { id: 0, isOpen: false };
+    this.state = {
+      id: 0,
+      isOpen: false,
+      object_type: 'unknown'
+    };
   }
 
   open = (idd) => {
-    this.setState({ id: idd, isOpen: !this.state.isOpen });
+    this.setState({
+      id: idd,
+      isOpen: !this.state.isOpen,
+      object_type: this.props.object_type
+    });
   };
 
   handleConfirm = () => {
     this.props.onConfirm(this.state.id);
-    this.setState({ id: 0, isOpen: false });
+    this.setState({
+      id: 0,
+      isOpen: false,
+      object_type: 'unknown'
+    });
   };
 
-  handleClose = () => this.setState({ id: 0, isOpen: false });
+  handleClose = () => this.setState({
+    id: 0,
+    isOpen: false,
+    object_type: 'unknown'
+  });
 
   render() {
     return (
@@ -40,7 +56,7 @@ export default class EventDeleteAlert extends Component {
         onCancel={this.handleClose}
       >
         <p>
-          Are you sure you want to delete selected <b>event</b>? You will not be
+          Are you sure you want to delete selected <b>{this.state.object_type}</b>? You will not be
           able to restore it.
         </p>
       </Alert>

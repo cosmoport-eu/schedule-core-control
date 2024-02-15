@@ -12,6 +12,8 @@ import TextFieldGroup from '../form/group/TextFieldGroup';
 export default function TranslationCategoryTable ({
   data = {},
   headers = [],
+  is_deletable = true,
+  is_creatable = true,
   apiUrl = {
     get: 'unknown',
     create: 'unknown',
@@ -53,14 +55,19 @@ export default function TranslationCategoryTable ({
       return;
     }
     
-    onTextChange(id, value);
+    onTextChange(id, value, apiUrl.get);
   };
 
   const handleCreate = () => {
-    onCreate(apiUrl.create, {
-      name: name,
-      color: color
-    });
+    const data = {
+      name: name
+    };
+
+    // todo: проверка так себе, конечно
+    if (pageCaption === 'Categories') {
+      data.color = color;
+    }
+    onCreate(apiUrl.create, data);
   };
 
   const onRemoveClick = (record) => {
@@ -89,13 +96,18 @@ export default function TranslationCategoryTable ({
       ))}
 
       <td>
-        <Button
-            minimal
-            icon="remove"
-            data-id={record.id}
-            data-name={record.field_name || '-'}
-            onClick={() => onRemoveClick(record)}
-        />
+        {
+          is_deletable ?
+          <Button
+              minimal
+              icon="remove"
+              data-id={record.id}
+              data-name={record.field_name || '-'}
+              onClick={() => onRemoveClick(record)}
+          />
+          :
+          <></>
+        }
       </td>
     </tr>
   ));
@@ -106,91 +118,93 @@ export default function TranslationCategoryTable ({
 
         <div>
           {
+            is_creatable ?
+            <Popover
+              interactionKind="click"
+              popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+              placement="left-start"
+              content={
+                <>
+                  <div style={{ fontWeight: 'bold' }}>Create new record for {pageCaption}</div>
+                  <br />
+                  <TextFieldGroup
+                    name="name"
+                    caption="Name"
+                    value={name}
+                    validator={validators.name()}
+                    onChange={handleChange}
+                    inline
+                    fill
+                  />
+                  {
+                    pageCaption === 'Categories' ? 
+                    <TextFieldGroup
+                      name="color"
+                      caption="Color"
+                      value={color}
+                      validator={validators.color()}
+                      onChange={handleChange}
+                      inline
+                      fill
+                    />
+                    : <></>
+                  }
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'end',
+                      gap: '10px',
+                    }}
+                  >
+                    <Button
+                      text="Create"
+                      onClick={handleCreate}
+                      disabled={validators.name() !== ''}
+                    />
+                    <Button
+                      className={Classes.POPOVER_DISMISS}
+                      text="Cancel"
+                    />
+                  </div>
+                </>
+                }
+              renderTarget={({ isOpen, ...targetProps }) => (
+                <Button {...targetProps} icon="add" minimal />
+              )}
+            />
+            :
+            <></>
+          }
+          <Button
+            style={{ marginLeft: '2em' }}
+            minimal
+            icon="refresh"
+            onClick={() => onRefresh()}
+          />
+        </div>
+        <div>
+          {
             !data || data.length === 0 ?
             <NonIdealState
               title="Nothing here"
               icon="offline"
               description={
-                'Reload data from the server.'
+                'Reload data from the server or create new record.'
               }
             />
             :
-            <div>
-              <div>
-                <Popover
-                  interactionKind="click"
-                  popoverClassName={Classes.POPOVER_CONTENT_SIZING}
-                  placement="left-start"
-                  content={
-                      <>
-                        <div style={{ fontWeight: 'bold' }}>Create new record for {pageCaption}</div>
-                        <br />
-                        <TextFieldGroup
-                          name="name"
-                          caption="Name"
-                          value={name}
-                          validator={validators.name()}
-                          onChange={handleChange}
-                          inline
-                          fill
-                        />
-                        {
-                          pageCaption === 'Categories' ? 
-                          <TextFieldGroup
-                            name="color"
-                            caption="Color"
-                            value={color}
-                            validator={validators.color()}
-                            onChange={handleChange}
-                            inline
-                            fill
-                          />
-                          : <></>
-                        }
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'end',
-                            gap: '10px',
-                          }}
-                        >
-                          <Button
-                            text="Create"
-                            onClick={handleCreate}
-                            disabled={validators.name() !== ''}
-                          />
-                          <Button
-                            className={Classes.POPOVER_DISMISS}
-                            text="Cancel"
-                          />
-                        </div>
-                      </>
-                      }
-                  renderTarget={({ isOpen, ...targetProps }) => (
-                    <Button {...targetProps} icon="add" minimal />
-                  )}
+            <div style={{ marginTop: '1em' }}>
+              <HTMLTable compact striped className={styles.eventTable}>
+                <TableSection
+                    data={headers}
+                    isHeader={true}
                 />
-                <Button
-                  style={{ marginLeft: '2em' }}
-                  minimal
-                  icon="refresh"
-                  onClick={() => onRefresh()}
+                <TableSection
+                    data={headers}
+                    isHeader={false}
                 />
-              </div>
-
-              <div style={{ marginTop: '1em' }}>
-                <HTMLTable compact striped className={styles.eventTable}>
-                  <TableSection
-                      data={headers}
-                      isHeader={true}
-                  />
-                  <TableSection
-                      data={headers}
-                      isHeader={false}
-                  />
-                  <tbody>{records}</tbody>
-                </HTMLTable>
-              </div>
+                <tbody>{records}</tbody>
+              </HTMLTable>
             </div>
           }
         </div>
