@@ -17,6 +17,8 @@ export default function EventTypeEditDialog({
   categoryCreateCallback,
   etDisplay,
   categories,
+  facilities,
+  materials,
   isOpen,
   toggle,
   eventType
@@ -47,6 +49,8 @@ export default function EventTypeEditDialog({
         <EventTypeForm
           eventType={eventType}
           categories={cats}
+          facilities={facilities}
+          materials={materials}
           ref={ref}
           categoryCreateCallback={handleNewCategory}
         />

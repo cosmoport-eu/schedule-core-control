@@ -35,6 +35,8 @@ export default class EventTypeContainer extends Component {
   state = {
     hasData: false,
     locale: {},
+    facilities: {},
+    materials: {},
     refs: {}
   };
 
@@ -45,13 +47,17 @@ export default class EventTypeContainer extends Component {
   getData = () => {
     Promise.all([
       this.props.api.fetchReferenceData(),
-      this.props.api.fetchTranslations()
+      this.props.api.fetchTranslations(),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1')
     ])
       .then((data) =>
         this.setState({
           hasData: true,
           refs: data[0],
-          locale: data[1].en
+          locale: data[1].en,
+          facilities: data[2],
+          materials: data[3],
         }),
       )
       .catch((error) => ApiError(error));
@@ -126,7 +132,7 @@ export default class EventTypeContainer extends Component {
       return <span>Loading...</span>;
     }
 
-    const { refs, locale } = this.state;
+    const { refs, locale, facilities, materials } = this.state;
 
     return (
       <div>
@@ -151,6 +157,8 @@ export default class EventTypeContainer extends Component {
           refs={refs}
           locale={locale}
           types={refs.types}
+          facilities={facilities}
+          materials={materials}
           onCreate={this.handleCreate}
           onCreateCategory={this.handleCreateCategory}
           onEdit={this.handleEdit}

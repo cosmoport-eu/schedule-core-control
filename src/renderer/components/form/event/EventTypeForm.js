@@ -18,6 +18,7 @@ import ListFieldGroup from '../group/ListFieldGroup';
 import TextAreaGroup from '../group/TextAreaGroup';
 
 import styles from './EventTypeForm.module.css';
+import MultipleListFieldGroup from '../group/MultipleListFieldGroup';
 
 const uuid = () => crypto.randomUUID();
 
@@ -25,6 +26,8 @@ function EventTypeForm(
   {
     eventType = null,
     categories = [],
+    facilities = [],
+    materials = [],
     categoryCreateCallback = (name, color) => {}
   },
   ref,
@@ -53,7 +56,16 @@ function EventTypeForm(
     default_cost: 0,
 
     // the initial 1 section
-    sections: { [uuid()]: { pos: 0, name: '', description: '' } },
+    sections: {
+      [uuid()]: {
+        pos: 0,
+        name: '',
+        description: '',
+        facilities: [],
+        materials: [],
+      }
+    },
+
     section_last_pos: 0,
 
     category_name: '',
@@ -88,6 +100,8 @@ function EventTypeForm(
     s && s.name === '' ? "Name shouldn't be empty." : '';
   const validate_section_description = (s) =>
     s && s.description === '' ? "Description shouldn't be empty." : '';
+  const validate_section_facilities = (s) =>
+    s && s.facilities && s.facilities.length === 0 ? "Choose at least one facility" : '';
 
   const validators = {
     name: () =>
@@ -100,6 +114,7 @@ function EventTypeForm(
         .map((section) => [
           validate_section_name(section),
           validate_section_description(section),
+          validate_section_facilities(section),
         ])
         .flat()
         .filter((x) => x !== '')
@@ -148,7 +163,12 @@ function EventTypeForm(
       // transform sections
       const subtypes = Object.values(sections)
         .sort((a, b) => (a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0))
-        .map((x) => ({ name: x.name, description: x.description }));
+        .map((x) => ({
+          name: x.name,
+          description: x.description,
+          facilities: x.facilities,
+          materials: x.materials
+        }));
 
       return {
         ...{
@@ -190,12 +210,22 @@ function EventTypeForm(
     });
   };
 
+  const handleSectionSelectChange = (section_id, elem_name, options) => {
+    const selectedValues = Array.from(options, option => option.value);
+
+    setState((prev) => {
+      const { sections, ...rest } = prev;
+      sections[section_id][elem_name] = selectedValues;
+      return { ...rest, sections };
+    });
+  };
+
   const handleAddEvent = () => {
     setState((prev) => {
       const uid = uuid();
       const { sections, section_last_pos, ...rest } = prev;
       const last_pos = section_last_pos + 1;
-      sections[uid] = { pos: last_pos, name: '', description: '' };
+      sections[uid] = { pos: last_pos, name: '', description: '', facilities: [], materials: [] };
       return { ...rest, sections, section_last_pos: last_pos };
     });
   };
@@ -213,7 +243,21 @@ function EventTypeForm(
     categoryCreateCallback(category_name, category_color);
   };
 
-  // console.log(sections);
+  const facilitiesOptions = facilities.map((facility) => {
+    return {
+      value: facility.id,
+      label: facility.name
+    }
+  });
+
+  const materialsOptions = materials
+    .map((material) => {
+      return {
+        value: material.id,
+        label: material.name
+      }
+    });
+  
   return (
     <>
       <Callout className={styles.smaller}>
@@ -324,6 +368,7 @@ function EventTypeForm(
           const section = sections[sid];
           const isNameValid = validate_section_name(section);
           const isDescriptionValid = validate_section_description(section);
+          const isFacilitiesValid = validate_section_facilities(section);
 
           return (
             <SectionCard key={sid} className={styles.sections}>
@@ -349,6 +394,38 @@ function EventTypeForm(
                     noLabel
                     inline
                   />
+                  <MultipleListFieldGroup
+                    styles={{
+                      menu: base => ({
+                        ...base,
+                        position: 'absolute',
+                        zIndex: 9999,
+                      }),
+                    }}
+                    id={sid}
+                    name="facilities"
+                    caption="Facilities"
+                    validator={isFacilitiesValid}
+                    onChange={handleSectionSelectChange}
+                  >
+                    {facilitiesOptions}
+                  </MultipleListFieldGroup>
+
+                  <MultipleListFieldGroup
+                    styles={{
+                      menu: base => ({
+                        ...base,
+                        position: 'absolute',
+                        zIndex: 9999,
+                      }),
+                    }}
+                    id={sid}
+                    name="materials"
+                    caption="Materials"
+                    onChange={handleSectionSelectChange}
+                  >
+                    {materialsOptions}
+                  </MultipleListFieldGroup>
                 </div>
                 <Button
                   minimal
