@@ -66,8 +66,8 @@ export default class TranslationContainer extends Component {
           is_creatable: true,
           apiUrl: {
             get: '/dictionary/categories',
-            create: '',
-            delete: '/t_events/categories',
+            create: '/category',
+            delete: '/category',
           },
           name: 'Categories'
         },
