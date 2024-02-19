@@ -193,7 +193,6 @@ export default class EventTypeTable extends PureComponent {
             headers={headers}
             rows={rows_data}
             fieldNames={['id', 'category_name', 'type_name', 'description']}
-            is_editable={false} // todo: пока не доделано редактирование
             onRemoveClick={this.handleRemoveClick}
             onEditClick={this.handleEditModalOpen}
           />
