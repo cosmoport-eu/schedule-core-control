@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Button, HTMLTable, NonIdealState } from '@blueprintjs/core';
 
 import RefsPropType from '../../props/RefsPropType';
-import LocalePropType from '../../props/LocalePropType';
 import EventPropType from '../../props/EventPropType';
 
 import EventTypePropType from '../../props/EventTypePropType';
@@ -22,7 +21,7 @@ export default class EventTypeTable extends PureComponent {
     callback: PropTypes.func,
     auth: PropTypes.bool,
     refs: RefsPropType.isRequired,
-    locale: LocalePropType.isRequired,
+    locale: PropTypes.objectOf(PropTypes.string).isRequired,
     types: PropTypes.arrayOf(EventTypePropType),
   };
   
@@ -55,6 +54,7 @@ export default class EventTypeTable extends PureComponent {
   };
 
 
+  // todo
   // обработка клика на кнопку в таблице
   // открыть модальное окно
   handleEditClick = (row) => {
@@ -62,6 +62,7 @@ export default class EventTypeTable extends PureComponent {
     console.log(row)
   }
   
+  // todo
   // обработка клика на кнопку в таблице
   // открыть окно с предупреждением
   handleRemoveClick = (row_id) => {

@@ -9,6 +9,7 @@ import styles from './eventAddons.module.css';
 
 export default function EventAddonTable({
   data = {},
+  headers = [],
   apiUrl = '',
   pageCaption = 'Unknown Table',
   onRefresh = (apiUrl) => {},
@@ -21,12 +22,6 @@ export default function EventAddonTable({
   ] = useState({
     name: '',
   });
-
-  const headers = [
-    'ID',
-    'Name',
-    'Actions'
-  ];
   
   const validators = {
     name: () => (name === '' ? "It shouldn't be empty" : ''),
@@ -36,6 +31,7 @@ export default function EventAddonTable({
     onDeleteCallback(apiUrl, id, name);
   };
   
+  // todo
   const handleEditClick = (item) => {
     console.log(item);
   };

@@ -9,6 +9,9 @@ export default function Table({
     headers = [],
     rows = {},
     fieldNames = [],
+    is_editable = true,
+    is_deletable = true,
+    has_actions = true,
     onRemoveClick = () => {},
     onEditClick = () => {}
 }) {
@@ -33,6 +36,9 @@ export default function Table({
             <TableBody
                 rows={rows}
                 fieldNames={fieldNames}
+                is_editable={is_editable}
+                is_deletable={is_deletable}
+                has_actions={has_actions}
                 onRemoveClick={handleRemoveClick}
                 onEditClick={handleEditClick}
             />
@@ -43,6 +49,6 @@ export default function Table({
 Table.propTypes = {
     headers: PropTypes.array.isRequired,
     // rows: PropTypes.arrayOf(PropTypes.array).isRequired,
-    onRemoveClick: PropTypes.func.isRequired,
-    onEditClick: PropTypes.func.isRequired
+    onRemoveClick: PropTypes.func,
+    onEditClick: PropTypes.func
 }

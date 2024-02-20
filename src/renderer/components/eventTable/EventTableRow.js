@@ -5,6 +5,7 @@ import EventPropType from '../../props/EventPropType';
 import RefsPropType from '../../props/RefsPropType';
 
 import _date from '../date/_date';
+import RefsData from '../references/RefsData';
 import L18n from '../l18n/L18n';
 
 /*
@@ -16,44 +17,19 @@ export default function EventTableRow({
   event,
   callback,
   editCallback,
-  l18n,
+  locale,
   auth,
   refs,
   et,
 }) {
-  /**
-   * Passes on click event the row id to the parent using its callback.
-   */
   const handleRemoveClick = () => callback(event.id);
 
   const handleEditClick = () => editCallback(event);
 
-  const renderL18nCell = (id, translations, custom) => {
-    const l18nRecords = translations || [];
-    const l18nId = l18nRecords.find((record) => record.id === id);
-
-    if (l18nId) {
-      return custom(l18nId, l18n);
-    }
-
-    return id > 0 ? id : '';
+  const renderTypeCol = (id) => {
+    const typeData = refsData.findTypeById(id);
+    return et.getFullName(typeData);
   };
-
-  const renderTypeCol = (id, refs, et) => {
-    const type = refs.types.find((t) => t.id === id);
-    return et.getFullName(type);
-  };
-
-  /**
-   * Renders the status column.
-   *
-   * @param {number} id
-   * @param {Array} statuses
-   */
-  const renderStatusCol = (id, statuses) =>
-    renderL18nCell(id, statuses, (l18nId, l18n) =>
-      l18n.findTranslationById(l18nId, 'i18nStatus'),
-    );
 
   const renderState = (state) =>
     state === 2 && (
@@ -63,18 +39,32 @@ export default function EventTableRow({
       />
     );
 
-  if (event === undefined || refs === undefined) {
+  const getTranslation = (id, category) => {
+    const refData = refsData.findById(id, category);
+    const codeField = typeof refData.code !== 'undefined' ? refData.code : refData.nameCode;
+    const text = translation.findByCode(codeField);
+    
+    return text;
+  };
+
+  if (event === undefined || locale === undefined) {
     return null;
   }
+  const refsData = new RefsData(refs);
+  const translation = new L18n(locale);
 
-  const name = event.status === 'inactive' ? 'canceled' : '';
-  const gate1 =
-    `${event.gateId}`.length === 1 ? `0${event.gateId}` : event.gateId;
-  const gate2 =
-    `${event.gate2Id}`.length === 1 ? `0${event.gate2Id}` : event.gate2Id;
+  const className = event.status === 'inactive' ? 'canceled' : '';
+
+  const gate1 = event.gateId;
+  const gate2 = event.gate2Id;
+  const gatesText = gate1 + (gate1 !== gate2 && `→${gate2}`);
+
+  const state = getTranslation(event.eventStateId, 'states');
+  const status = getTranslation(event.eventStatusId, 'statuses');
+  const statusText = state + (typeof status === 'undefined' ? '' : ` / ${status}`);
 
   return (
-    <tr className={name}>
+    <tr className={className}>
       <td>{event.id}</td>
       <td>
         <div style={{ fontSize: '80%', marginBottom: '0.3em' }}>
@@ -85,16 +75,12 @@ export default function EventTableRow({
       <td>{_date.minutesToHm(event.durationTime)}</td>
       <td>
         <span className="type-name">
-          {renderTypeCol(event.eventTypeId, refs, et)}
+          {renderTypeCol(event.eventTypeId)}
         </span>
-        {event.type}
       </td>
-      <td>
-        {gate1}
-        {gate1 !== gate2 && `→${gate2}`}
-      </td>
+      <td>{gatesText}</td>
       <td>{`${event.cost} €`}</td>
-      <td>{renderStatusCol(event.eventStatusId, refs.statuses)}</td>
+      <td>{statusText}</td>
       <td>
         {`${event.contestants}/${event.peopleLimit} `}
         {renderState(event.eventStateId)}
@@ -113,7 +99,6 @@ EventTableRow.propTypes = {
   editCallback: PropTypes.func,
   event: EventPropType,
   refs: RefsPropType.isRequired,
-  l18n: PropTypes.instanceOf(L18n),
 };
 
 EventTableRow.defaultProps = {
@@ -121,5 +106,4 @@ EventTableRow.defaultProps = {
   callback: () => {},
   editCallback: () => {},
   event: {},
-  l18n: {},
 };

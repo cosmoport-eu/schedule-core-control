@@ -11,7 +11,6 @@ import {
   EventType,
   EventFormDataType,
   GateType,
-  LocaleType,
   RefsType,
 } from '../../types/Types';
 import Message from '../messages/Message';
@@ -22,7 +21,7 @@ type Props = {
   auth?: boolean;
   events?: EventType[];
   gates?: GateType[];
-  locale: LocaleType;
+  locale: object;
   onCreate?: (data: EventFormDataType, suggest: (time: number) => void) => void;
   onDateRangeChange?: (range: DateRange) => void;
   onDateRangeClear?: () => void;
