@@ -39,7 +39,6 @@ export default class SettingsContainer extends Component {
 
     this.state = {
       hasData: false,
-      refs: {},
       locales: [],
       trans: {},
       settings: []
@@ -52,7 +51,6 @@ export default class SettingsContainer extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
       this.props.api.fetchLocales(),
       this.props.api.fetchTranslations(),
       this.props.api.fetchSettings(),
@@ -60,10 +58,9 @@ export default class SettingsContainer extends Component {
       .then((data) =>
         this.setState({
           hasData: true,
-          refs: data[0],
-          locales: data[1],
-          trans: data[2].en,
-          settings: data[3],
+          locales: data[0],
+          trans: data[1].en,
+          settings: data[2],
         }),
       )
       .catch((error) => ApiError(error));
@@ -156,7 +153,6 @@ export default class SettingsContainer extends Component {
     const {
       hasData,
       locales,
-      refs,
       settings,
       trans
     } = this.state;
