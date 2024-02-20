@@ -33,7 +33,7 @@ export default function EventTypeEditDialog({
 
   // build root cats
   const cats = categories
-    .filter((c) => c.parent === 0)
+    .filter((c) => c.parent === 0 || c.parent === null)
     .map((c) => ({ id: c.id, name: etDisplay.getCategory(c) }));
 
   return (

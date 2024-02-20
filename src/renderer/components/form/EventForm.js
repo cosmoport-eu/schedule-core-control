@@ -324,7 +324,7 @@ export default class EventForm extends Component {
       </option>
     ));
     const categoryOptions = typeCategories
-      .filter((t) => t.parent === 0)
+      .filter((c) => c.parent === 0 || c.parent === null)
       .map((op) => (
         <option key={op.id} value={op.id}>
           {l18n.findByCode(op.code)}
@@ -374,7 +374,7 @@ export default class EventForm extends Component {
 
     const gateOptions = this.props.gates.map((gate_) => (
       <option key={gate_.id} value={gate_.id}>
-        {gate_.id} - {gate_.number} {gate_.gateName}
+        {l18n.findByCode(gate_.code)}
       </option>
     ));
 
