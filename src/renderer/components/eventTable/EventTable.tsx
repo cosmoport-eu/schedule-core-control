@@ -1,25 +1,22 @@
-import { Button, HTMLTable, NonIdealState, Icon } from '@blueprintjs/core';
-
-import EventType from '../eventType/EventType';
-import L18n from '../l18n/L18n';
+import { HTMLTable, NonIdealState } from '@blueprintjs/core';
 import {
-  EventI18nRecordType,
-  EventStatusType,
   EventType as EvType,
-  LocaleType,
   RefsType,
 } from '../../types/Types';
 import _date from '../date/_date';
+import EventType from '../eventType/EventType';
 
 import styles from './EventTable.module.css';
+import TableSection from '../tableStructure/TableSection';
+import EventTableRow from './EventTableRow';
 
 type Props = {
   auth?: boolean;
   callback?: (id: number) => void;
   editCallback?: (event: EvType) => void;
   events?: EvType[];
-  locale: LocaleType;
   refs: RefsType;
+  locale: object;
 };
 
 export default function EventTable({
@@ -30,8 +27,6 @@ export default function EventTable({
   locale,
   refs,
 }: Props) {
-  const l18n = new L18n(locale, refs);
-
   const et = EventType({
     categories: refs.typeCategories,
     translation: locale,
@@ -49,42 +44,36 @@ export default function EventTable({
     );
   }
 
+  const headers = [
+    '#',
+    'Departure',
+    'Duration',
+    'Type',
+    'Gates',
+    'Cost',
+    'Status',
+    'Tickets',
+    'Actions'
+  ];
+
   return (
     <div className={styles.eventTableContainer}>
       <HTMLTable compact striped className={styles.eventTable}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Departure</th>
-            <th>Duration</th>
-            <th>Type</th>
-            <th>Gates</th>
-            <th>Cost&nbsp;(€)</th>
-            <th>Status</th>
-            <th>Tickets</th>
-            <th title="It is `operations`">Ops</th>
-          </tr>
-        </thead>
-        <tfoot>
-          <tr>
-            <th>#</th>
-            <th>Departure</th>
-            <th>Duration</th>
-            <th>Type</th>
-            <th>Gates</th>
-            <th>Cost&nbsp;(€)</th>
-            <th>Status</th>
-            <th>Tickets</th>
-            <th title="It is `operations`">Ops</th>
-          </tr>
-        </tfoot>
+        <TableSection
+            data={headers}
+            isHeader={true}
+        />
+        <TableSection
+            data={headers}
+            isHeader={false}
+        />
         <tbody>
           {events.map((event) => (
             <EventTableRow
               key={event.id}
               event={event}
               refs={refs}
-              l18n={l18n}
+              locale={locale}
               et={et}
               editCallback={editCallback}
               callback={callback}
@@ -94,92 +83,5 @@ export default function EventTable({
         </tbody>
       </HTMLTable>
     </div>
-  );
-}
-
-type RowProps = {
-  auth?: boolean;
-  callback?: (id: number) => void;
-  editCallback?: (event: EvType) => void;
-  et: ReturnType<typeof EventType>;
-  event: EvType;
-  refs: RefsType;
-  l18n: L18n;
-};
-
-function EventTableRow({
-  auth = false,
-  callback = () => {},
-  editCallback = () => {},
-  et,
-  event,
-  refs,
-  l18n,
-}: RowProps) {
-  const handleRemoveClick = () => callback(event.id);
-  const handleEditClick = () => editCallback(event);
-
-  const renderL18nCell = (
-    id: number,
-    translations: EventI18nRecordType[],
-    custom: (ref: EventI18nRecordType, l18n: L18n) => string,
-  ) => {
-    const l18nRecords = translations || [];
-    const l18nId = l18nRecords.find((record) => record.id === id);
-
-    if (l18nId) {
-      return custom(l18nId, l18n);
-    }
-
-    return id > 0 ? id : '';
-  };
-
-  const renderTypeCol = (
-    id: number,
-    refs: RefsType,
-    et: ReturnType<typeof EventType>,
-  ) => {
-    const type = refs.types.find((t) => t.id === id);
-    return type ? et.getFullName(type) : '???';
-  };
-
-  const renderStatusCol = (id: number, statuses: EventStatusType[]) =>
-    renderL18nCell(id, statuses, (l18nId, l18n) =>
-      l18n.findTranslationById(l18nId, 'i18nStatus'),
-    );
-
-  const renderState = (state: number) =>
-    state === 2 && <Icon icon="lock" size={16} style={{ color: '#5c7080' }} />;
-
-  if (event === undefined || refs === undefined) {
-    return null;
-  }
-
-  const gate1 = `${event.gateId}`.padStart(2, '0');
-  const gate2 = `${event.gate2Id}`.padStart(2, '0');
-
-  return (
-    <tr>
-      <td>{event.id}</td>
-      <td>
-        <div className={styles.dateCol}>
-          {_date.format(event.eventDate, 'D MMM')}
-        </div>
-        {_date.minutesToHm(event.startTime)}
-      </td>
-      <td>{_date.minutesToHm(event.durationTime)}</td>
-      <td>{renderTypeCol(event.eventTypeId, refs, et)}</td>
-      <td>{`${gate1}${event.gateId !== event.gate2Id ? `→${gate2}` : ''}`}</td>
-      <td>{event.cost}</td>
-      <td>{renderStatusCol(event.eventStatusId, refs.statuses)}</td>
-      <td>
-        {`${event.contestants}/${event.peopleLimit} `}
-        {renderState(event.eventStateId)}
-      </td>
-      <td>
-        <Button minimal icon={'edit'} onClick={handleEditClick} />
-        {auth && <Button minimal icon={'remove'} onClick={handleRemoveClick} />}
-      </td>
-    </tr>
   );
 }

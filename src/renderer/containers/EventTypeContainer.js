@@ -99,7 +99,7 @@ export default class EventTypeContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  // api ещё нет
+  // todo
   handleEdit = (formData) => {
     console.log('EDIT');
   };

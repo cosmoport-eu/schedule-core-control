@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Dialog, DialogBody, DialogFooter, Button } from '@blueprintjs/core';
 
 import RefsPropType from '../../props/RefsPropType';
-import LocalePropType from '../../props/LocalePropType';
 import GatePropType from '../../props/GatePropType';
 import EventForm from '../form/EventForm';
 import EventMapper from '../../components/mapper/EventMapper';
@@ -18,7 +17,7 @@ export default class EventEditDialog extends PureComponent {
   static propTypes = {
     callback: PropTypes.func.isRequired,
     refs: RefsPropType.isRequired,
-    locale: LocalePropType.isRequired,
+    locale: PropTypes.objectOf(PropTypes.string).isRequired,
     gates: PropTypes.arrayOf(GatePropType),
   };
 
