@@ -37,7 +37,10 @@ export default class TableContainer extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
+      this.props.api.get('/t_events/types'),
+      this.props.api.get('/category?localeId=1'),
+      this.props.api.get('/t_events/statuses'),
+      this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations(),
       this.apiGetEventInRange(this.state.range),
       this.props.api.fetchGates(),
@@ -45,10 +48,15 @@ export default class TableContainer extends Component {
       .then((data) =>
         this.setState({
           hasData: true,
-          refs: data[0],
-          locale: data[1].en,
-          events: data[2],
-          gates: data[3],
+          refs: {
+            types: data[0],
+            typeCategories: data[1],
+            statuses: data[2],
+            states: data[3],
+          },
+          locale: data[4].en,
+          events: data[5],
+          gates: data[6],
         }),
       )
       .catch((error) => ApiError(error));
@@ -110,7 +118,7 @@ export default class TableContainer extends Component {
 
     return (
       <>
-        <PageCaption text="03 Timetable" />
+        <PageCaption text="Timetable" />
         <Table
           events={events}
           refs={refs}
