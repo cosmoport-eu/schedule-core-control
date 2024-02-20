@@ -47,19 +47,27 @@ export default class MainPage extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
+      this.props.api.get('/t_events/types'),
+      this.props.api.get('/category?localeId=1'),
+      this.props.api.get('/t_events/statuses'),
+      this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations(),
       // Fetch all the events between the current calendar view range
       this.props.api.fetchEventsInRange(this.state.start, this.state.end),
       this.props.api.fetchGates(),
     ])
-      .then(([r, l, e, g]) =>
+      .then((data) =>
         this.setState({
           hasData: true,
-          refs: r,
-          locale: l.en,
-          events: e,
-          gates: g,
+          refs: {
+            types: data[0],
+            typeCategories: data[1],
+            statuses: data[2],
+            states: data[3],
+          },
+          locale: data[4].en,
+          events: data[5],
+          gates: data[6],
         }),
       )
       .catch((error) => ApiError(error));
@@ -174,7 +182,7 @@ export default class MainPage extends Component {
 
     return (
       <div>
-        <PageCaption text="01 Calendar" />
+        <PageCaption text="Calendar" />
         <EventTicketBuyDialog
           ref={(dialog) => {
             this.eventTicketsDialog = dialog;

@@ -12,18 +12,14 @@ import EventTypeForm from '../form/event/EventTypeForm';
 import EventTypeCategoryPropType from '../../props/EventTypeCategoryPropType';
 import EventType from '../eventType/EventType';
 
-/**
- * The class for event type add dialog.
- *
- * @since 0.1.0
- */
-export default function EventTypeAddDialog({
+export default function EventTypeEditDialog({
   callback,
   categoryCreateCallback,
   etDisplay,
   categories,
   isOpen,
   toggle,
+  eventType
 }) {
   const ref = useRef();
 
@@ -45,10 +41,11 @@ export default function EventTypeAddDialog({
       isOpen={isOpen}
       onClose={toggle}
       canOutsideClickClose={false}
-      title="Create new event type"
+      title="Edit event type"
     >
       <DialogBody>
         <EventTypeForm
+          eventType={eventType}
           categories={cats}
           ref={ref}
           categoryCreateCallback={handleNewCategory}
@@ -57,14 +54,14 @@ export default function EventTypeAddDialog({
       <DialogFooter
         minimal
         actions={
-          <Button intent={Intent.PRIMARY} onClick={passState} text="Create" />
+          <Button intent={Intent.PRIMARY} onClick={passState} text="Update" />
         }
       />
     </Dialog>
   );
 }
 
-EventTypeAddDialog.propTypes = {
+EventTypeEditDialog.propTypes = {
   etDisplay: PropTypes.objectOf(EventType).isRequired,
   callback: PropTypes.func.isRequired,
   categoryCreateCallback: PropTypes.func,
@@ -73,7 +70,8 @@ EventTypeAddDialog.propTypes = {
   toggle: PropTypes.func,
 };
 
-EventTypeAddDialog.defaultProps = {
+EventTypeEditDialog.defaultProps = {
+  eventType: null,
   categories: [],
   isOpen: false,
   toggle: () => {},

@@ -14,6 +14,7 @@ import EventDeleteAlert from '../dialog/EventDeleteAlert';
 
 import tableStyles from '../eventTable/EventTable.module.css';
 import Table from '../tableStructure/Table';
+import EventTypeEditDialog from '../dialog/EventTypeEditDialog';
 
 export default class EventTypeTable extends PureComponent {
   static propTypes = {
@@ -37,6 +38,7 @@ export default class EventTypeTable extends PureComponent {
 
     this.state = {
       eventTypeAddDialogIsOpen: false,
+      eventTypeEditDialogIsOpen: false,
       types: []
     };
   }
@@ -49,18 +51,21 @@ export default class EventTypeTable extends PureComponent {
       eventTypeAddDialogIsOpen: !this.state.eventTypeAddDialogIsOpen,
     });
 
+  onEventTypeEditDialogToggle = (row) => {
+    console.log(row);
+    this.setState({
+      eventTypeEditDialogIsOpen: !this.state.eventTypeEditDialogIsOpen,
+      eventType: row
+    });
+  }
+
   handleAddModalOpen = () => {
     this.onEventTypeAddDialogToggle();
   };
 
-
-  // todo
-  // обработка клика на кнопку в таблице
-  // открыть модальное окно
-  handleEditClick = (row) => {
-    console.log('handleEditClick');
-    console.log(row)
-  }
+  handleEditModalOpen = (row) => {
+    this.onEventTypeEditDialogToggle(row.typeData);
+  };
   
   // todo
   // обработка клика на кнопку в таблице
@@ -79,8 +84,13 @@ export default class EventTypeTable extends PureComponent {
     this.props.onCreate(formData);
   };
 
-  handleDelete = (id, name) => {
-    this.props.onDelete(id, name);
+  handleUpdate = (typeData) => {
+    console.log('handleUpdate');
+    console.log(typeData);
+  }
+
+  handleDelete = (id) => {
+    this.props.onDelete(id);
   };
 
   handleNewCategory = (name, color) => {
@@ -111,20 +121,20 @@ export default class EventTypeTable extends PureComponent {
       'ID',
       'Category',
       'Type',
-      'Subtype',
       'Description',
       'Actions'
     ];
 
     const rows_data = types.map((type) => {
       const category = et.getCategories(type);
+      const type_name = et.getName(type);
 
       return {
         id: type.id,
-        subtype_name: et.getName(type),
-        description: et.getDescription(type),
         category_name: category[0],
-        type_name: category[1] ?? '-'
+        type_name: category[1] ?? type_name,
+        description: et.getDescription(type),
+        typeData: type
       }
     });
     
@@ -136,6 +146,15 @@ export default class EventTypeTable extends PureComponent {
           isOpen={this.state.eventTypeAddDialogIsOpen}
           toggle={this.onEventTypeAddDialogToggle}
           callback={this.handleCreate}
+          categoryCreateCallback={this.handleNewCategory}
+        />
+        <EventTypeEditDialog
+          categories={refs.typeCategories}
+          eventType={this.state.eventType}
+          etDisplay={et}
+          isOpen={this.state.eventTypeEditDialogIsOpen}
+          toggle={this.onEventTypeEditDialogToggle}
+          callback={this.handleUpdate}
           categoryCreateCallback={this.handleNewCategory}
         />
         <EventDeleteAlert
@@ -164,9 +183,10 @@ export default class EventTypeTable extends PureComponent {
           <Table
             headers={headers}
             rows={rows_data}
-            fieldNames={['id', 'subtype_name', 'description', 'category_name', 'type_name']}
+            fieldNames={['id', 'category_name', 'type_name', 'description']}
+            is_editable={false} // todo: пока не доделано редактирование
             onRemoveClick={this.handleRemoveClick}
-            onEditClick={this.handleEditClick}
+            onEditClick={this.handleEditModalOpen}
           />
         </div>
       </div>

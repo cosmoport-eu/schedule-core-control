@@ -44,14 +44,22 @@ export default class EventTypeContainer extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
+      this.props.api.get('/t_events/types'),
+      this.props.api.get('/category?localeId=1'),
+      this.props.api.get('/t_events/statuses'),
+      this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations()
     ])
       .then((data) =>
         this.setState({
           hasData: true,
-          refs: data[0],
-          locale: data[1].en
+          refs: {
+            types: data[0],
+            typeCategories: data[1],
+            statuses: data[2],
+            states: data[3],
+          },
+          locale: data[4].en
         }),
       )
       .catch((error) => ApiError(error));
@@ -64,7 +72,7 @@ export default class EventTypeContainer extends Component {
     }
 
     this.props.api
-      .createEventType(mapEvent(formData))
+      .post('/t_events/type', mapEvent(formData))
       .then((result) => {
         const id = result.eventTypes[0].id;
         Message.show(`Event type has been created [${id}].`);
@@ -88,7 +96,7 @@ export default class EventTypeContainer extends Component {
     }
 
     this.props.api
-      .createEventTypeCategory({
+      .post('/category', {
         name: name,
         color: color
       })
@@ -102,13 +110,14 @@ export default class EventTypeContainer extends Component {
   // todo
   handleEdit = (formData) => {
     console.log('EDIT');
+    console.log(formData);
   };
 
-  handleDelete = (data) => {
+  handleDelete = (id) => {
     this.props.api
-      .deleteEventType(data.id)
+      .delete(`/t_events/type/${id}`)
       .then((result) => {
-        Message.show(`Subtype ${data.name} has been deleted [:${result.deleted}]`);
+        Message.show(`Type #${id} has been deleted`);
         this.getData();
         return 1;
       })
@@ -129,7 +138,19 @@ export default class EventTypeContainer extends Component {
 
     return (
       <div>
-        <PageCaption text="04 Types" />
+        <PageCaption text="Types" />
+
+        <div
+          className="bp5-callout"
+          style={{
+            fontSize: '80%',
+            marginTop: '1em',
+            background: '#ff00002b'
+          }}
+        >
+          Редактирование записей в разработке.
+          Вы можете изменить название Category, Type и Description в разделе Translations.
+        </div>
 
         <EventTypeTable
           ref={(table) => {
