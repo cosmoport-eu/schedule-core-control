@@ -127,11 +127,12 @@ export default class EventTypeTable extends PureComponent {
 
     const rows_data = types.map((type) => {
       const category = et.getCategories(type);
+      const type_name = et.getName(type);
 
       return {
         id: type.id,
         category_name: category[0],
-        type_name: category[1] ?? '-',
+        type_name: category[1] ?? type_name,
         description: et.getDescription(type),
         typeData: type
       }
