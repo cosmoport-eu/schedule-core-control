@@ -11,12 +11,17 @@ import {
 import EventTypeForm from '../form/event/EventTypeForm';
 import EventTypeCategoryPropType from '../../props/EventTypeCategoryPropType';
 import EventType from '../eventType/EventType';
+import EventTypePropType from '../../props/EventTypePropType';
 
 export default function EventTypeEditDialog({
   callback,
   categoryCreateCallback,
+  onTextChange,
+  onDelete,
   etDisplay,
   categories,
+  types,
+  subtypes,
   isOpen,
   toggle,
   eventType
@@ -31,9 +36,15 @@ export default function EventTypeEditDialog({
     categoryCreateCallback(name, color);
   };
 
-  // build root cats
+  const handleTextChange = (id, data) => {
+    onTextChange(id, data);
+  };
+
+  const deleteCallback = (id) => {
+    onDelete(id);
+  };
+
   const cats = categories
-    .filter((c) => c.parent === 0 || c.parent === null)
     .map((c) => ({ id: c.id, name: etDisplay.getCategory(c) }));
 
   return (
@@ -47,8 +58,13 @@ export default function EventTypeEditDialog({
         <EventTypeForm
           eventType={eventType}
           categories={cats}
+          types={types}
+          subtypes={subtypes}
           ref={ref}
+          etDisplay={etDisplay}
           categoryCreateCallback={handleNewCategory}
+          onTextChange={handleTextChange}
+          onDelete={deleteCallback}
         />
       </DialogBody>
       <DialogFooter
@@ -65,7 +81,11 @@ EventTypeEditDialog.propTypes = {
   etDisplay: PropTypes.objectOf(EventType).isRequired,
   callback: PropTypes.func.isRequired,
   categoryCreateCallback: PropTypes.func,
+  onTextChange: PropTypes.func,
+  onDelete: PropTypes.func,
   categories: PropTypes.arrayOf(EventTypeCategoryPropType),
+  types: PropTypes.arrayOf(EventTypePropType),
+  subtypes: PropTypes.arrayOf(EventTypePropType),
   isOpen: PropTypes.bool,
   toggle: PropTypes.func,
 };
@@ -73,7 +93,11 @@ EventTypeEditDialog.propTypes = {
 EventTypeEditDialog.defaultProps = {
   eventType: null,
   categories: [],
+  types: [],
+  subtypes: [],
   isOpen: false,
   toggle: () => {},
   categoryCreateCallback: () => {},
+  onTextChange: () => {},
+  onDelete: () => {},
 };

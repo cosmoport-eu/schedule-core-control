@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { Button, HTMLTable, NonIdealState } from '@blueprintjs/core';
 
-import RefsPropType from '../../props/RefsPropType';
 import EventPropType from '../../props/EventPropType';
 
 import EventTypePropType from '../../props/EventTypePropType';
@@ -15,22 +14,29 @@ import EventDeleteAlert from '../dialog/EventDeleteAlert';
 import tableStyles from '../eventTable/EventTable.module.css';
 import Table from '../tableStructure/Table';
 import EventTypeEditDialog from '../dialog/EventTypeEditDialog';
+import EventTypeCategoryPropType from '../../props/EventTypeCategoryPropType';
 
 export default class EventTypeTable extends PureComponent {
   static propTypes = {
+    onTextChange: PropTypes.func,
+    onDelete: PropTypes.func,
     editCallback: PropTypes.func,
     callback: PropTypes.func,
     auth: PropTypes.bool,
-    refs: RefsPropType.isRequired,
     locale: PropTypes.objectOf(PropTypes.string).isRequired,
+    categories: PropTypes.arrayOf(EventTypeCategoryPropType),
     types: PropTypes.arrayOf(EventTypePropType),
+    subtypes: PropTypes.arrayOf(EventTypePropType),
   };
   
   static defaultProps = {
     editCallback: () => {},
+    onDelete: () => {},
     callback: () => {},
     auth: false,
+    categories: [],
     types: [],
+    subtypes: [],
   };
 
   constructor(props) {
@@ -39,12 +45,19 @@ export default class EventTypeTable extends PureComponent {
     this.state = {
       eventTypeAddDialogIsOpen: false,
       eventTypeEditDialogIsOpen: false,
-      types: []
+      categories: [],
+      types: [],
+      subtypes: [],
     };
   }
 
   handleEdit = (type) => this.props.editCallback(type);
   handleRefresh = () => this.props.onRefresh();
+
+  // name & desciption fields for Type / Subtypes
+  handleTextChange = (id, data) => {
+    this.props.onTextChange(id, data);
+  };
 
   onEventTypeAddDialogToggle = () =>
     this.setState({
@@ -52,7 +65,6 @@ export default class EventTypeTable extends PureComponent {
     });
 
   onEventTypeEditDialogToggle = (row) => {
-    console.log(row);
     this.setState({
       eventTypeEditDialogIsOpen: !this.state.eventTypeEditDialogIsOpen,
       eventType: row
@@ -66,14 +78,6 @@ export default class EventTypeTable extends PureComponent {
   handleEditModalOpen = (row) => {
     this.onEventTypeEditDialogToggle(row.typeData);
   };
-  
-  // todo
-  // обработка клика на кнопку в таблице
-  // открыть окно с предупреждением
-  handleRemoveClick = (row_id) => {
-    console.log('handleRemoveClick');
-    this.eventDeleteAlert.open(row_id);
-  }
 
   handleCreate = (formData, valid) => {
     if (!valid) {
@@ -84,9 +88,8 @@ export default class EventTypeTable extends PureComponent {
     this.props.onCreate(formData);
   };
 
-  handleUpdate = (typeData) => {
-    console.log('handleUpdate');
-    console.log(typeData);
+  handleUpdate = (formData) => {
+    this.props.onUpdate(formData);
   }
 
   handleDelete = (id) => {
@@ -98,10 +101,10 @@ export default class EventTypeTable extends PureComponent {
   };
 
   render() {
-    const { locale, refs, types } = this.props;
+    const { locale, categories, types, subtypes } = this.props;
 
     const et = EventType({
-      categories: refs.typeCategories,
+      categories: categories,
       translation: locale,
     });
 
@@ -126,13 +129,12 @@ export default class EventTypeTable extends PureComponent {
     ];
 
     const rows_data = types.map((type) => {
-      const category = et.getCategories(type);
-      const type_name = et.getName(type);
+      const category = et.getCategoryById(type);
 
       return {
         id: type.id,
-        category_name: category[0],
-        type_name: category[1] ?? type_name,
+        category_name: category.name,
+        type_name: et.getName(type),
         description: et.getDescription(type),
         typeData: type
       }
@@ -141,7 +143,9 @@ export default class EventTypeTable extends PureComponent {
     return (
       <div style={{ marginTop: '2em' }}>
         <EventTypeAddDialog
-          categories={refs.typeCategories}
+          categories={categories}
+          types={types}
+          subtypes={subtypes}
           etDisplay={et}
           isOpen={this.state.eventTypeAddDialogIsOpen}
           toggle={this.onEventTypeAddDialogToggle}
@@ -149,13 +153,17 @@ export default class EventTypeTable extends PureComponent {
           categoryCreateCallback={this.handleNewCategory}
         />
         <EventTypeEditDialog
-          categories={refs.typeCategories}
+          categories={categories}
+          types={types}
+          subtypes={subtypes}
           eventType={this.state.eventType}
           etDisplay={et}
           isOpen={this.state.eventTypeEditDialogIsOpen}
           toggle={this.onEventTypeEditDialogToggle}
+          onTextChange={this.handleTextChange}
           callback={this.handleUpdate}
           categoryCreateCallback={this.handleNewCategory}
+          onDelete={this.handleDelete}
         />
         <EventDeleteAlert
           ref={(alert) => {
@@ -184,9 +192,9 @@ export default class EventTypeTable extends PureComponent {
             headers={headers}
             rows={rows_data}
             fieldNames={['id', 'category_name', 'type_name', 'description']}
-            is_editable={false} // todo: пока не доделано редактирование
             onRemoveClick={this.handleRemoveClick}
             onEditClick={this.handleEditModalOpen}
+            onRemoveClick={this.handleDelete}
           />
         </div>
       </div>

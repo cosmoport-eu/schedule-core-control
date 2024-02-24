@@ -52,10 +52,15 @@ export default function EventType({ categories, translation }: EventTypeDef) {
 		categorize(type.categoryId, categories, tr, false);
 	const getName = (type: Type) =>
 		tr.findByCode(type.nameCode)
+	
+	const getCategoryById = (type: Type) => {
+		return findCategory(type.categoryId, categories);
+	}
 
 	return {
 		getCategories,
 		getName,
+		getCategoryById,
 		getDescription: (type: Type) =>
 			tr.findByCode(type.descCode),
 		getCategory: (cat: Category) => tr.findByCode(cat.code),
