@@ -197,9 +197,8 @@ export default class App extends Component {
     this.state.api
       .updateEvent(modifiedEvent)
       .then((result) =>
-        Message.show(`Event status has been updated [${result.id}].`),
+        Message.show(`Event status has been updated.`),
       )
-      // .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
 

@@ -65,7 +65,7 @@ export default class TableContainer extends Component {
   handleCreate = (formData, suggester) => {
     this.props.api
       .createEvent(formData)
-      .then((result) => Message.show(`Event has been created [${result.id}].`))
+      .then((result) => Message.show(`Event has been created.`))
       .then(() => suggester && suggester(this.props.pre))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
@@ -74,7 +74,7 @@ export default class TableContainer extends Component {
   handleEdit = (formData) => {
     this.props.api
       .updateEvent(formData)
-      .then((result) => Message.show(`Event has been updated [${result.id}].`))
+      .then((result) => Message.show(`Event has been updated.`))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
@@ -82,7 +82,7 @@ export default class TableContainer extends Component {
   handleDelete = (id) => {
     this.props.api
       .deleteEvent(id)
-      .then((result) => Message.show(`Deleted ${result.deleted}.`))
+      .then((result) => Message.show(`Deleted.`))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };

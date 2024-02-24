@@ -13,17 +13,6 @@ function TableFooter({ footers }) {
       </tr>
     </SectionTag>
   );
-
-
-  // return (
-  //   <tfoot>
-  //     <tr>
-  //       {footers.map((footer, index) => (
-  //         <th key={index}>{footer}</th>
-  //       ))}
-  //     </tr>
-  //   </tfoot>
-  // );
 }
 
 TableFooter.propTypes = {
