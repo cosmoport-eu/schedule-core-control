@@ -17,6 +17,7 @@ const mapEvent = (data) => ({
   description: data.description,
   name: data.name,
   subTypes: data.subtypes,
+  parentId: data.parentId,
 });
 
 export default class EventTypeContainer extends Component {
@@ -112,7 +113,7 @@ export default class EventTypeContainer extends Component {
   };
 
   handleEdit = (formData) => {
-    const subtypes = formData.subtypes;
+    const subtypes = formData.subTypes;
   
     this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully')
       .then(() => {
@@ -148,9 +149,6 @@ export default class EventTypeContainer extends Component {
         return result;
       });
   };
-
-
-
 
   handleDelete = (id) => {
     this.props.api
