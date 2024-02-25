@@ -7,5 +7,6 @@ export default PropTypes.shape({
   defaultRepeatInterval: PropTypes.number,
   descCode: PropTypes.string,
   id: PropTypes.number,
-  nameCode: PropTypes.string
+  nameCode: PropTypes.string,
+  parent: PropTypes.number
 });
