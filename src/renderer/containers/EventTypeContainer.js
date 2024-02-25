@@ -16,7 +16,8 @@ const mapEvent = (data) => ({
   defaultCost: data.default_cost,
   description: data.description,
   name: data.name,
-  subtypes: data.subtypes,
+  subTypes: data.subtypes,
+  parentId: data.parentId,
 });
 
 export default class EventTypeContainer extends Component {
@@ -65,25 +66,6 @@ export default class EventTypeContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleCreate = (formData) => {
-    if (!formData.valid) {
-      Message.show('Please check the form data.', 'error');
-      return;
-    }
-
-    this.props.api
-      .post('/t_events/type', mapEvent(formData))
-      .then((result) => {
-        const id = result.eventTypes[0].id;
-        Message.show(`Event type has been created [${id}].`);
-        this.getData();
-
-        return 1;
-      })
-      .then(() => this.handleRefresh())
-      .catch((error) => ApiError(error));
-  };
-
   handleCreateCategory = (name, color) => {
     if (name === '') {
       Message.show('Fill the Category name field.', 'error');
@@ -101,23 +83,78 @@ export default class EventTypeContainer extends Component {
         color: color
       })
       .then((result) => {
-        Message.show(`Event type category has been created [${result.id}].`);
+        Message.show(`Event type category has been created.`);
         this.getData();
       })
       .catch((error) => ApiError(error));
   };
 
-  // todo
+  // name & desciption fields for Type / Subtypes
+  handleTextChange = (id, data) => {
+    this.props.api.post(`/t_events/type/text/${id}`, data)
+      .then(() => {})
+      .catch((error) => {
+        ApiError(error);
+      });
+  };
+
+  handleCreate = (formData) => {
+    if (!formData.valid) {
+      Message.show('Please check the form data.', 'error');
+      return;
+    }
+  
+    this.postEventData('/t_events/type', formData, 'Event type has been created.')
+      .then(() => {
+        this.getData();
+        this.handleRefresh();
+      })
+      .catch((error) => ApiError(error));
+  };
+
   handleEdit = (formData) => {
-    console.log('EDIT');
-    console.log(formData);
+    const subtypes = formData.subTypes;
+  
+    this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully')
+      .then(() => {
+        subtypes.forEach((s) => {
+          const updatedData = {
+            ...formData,
+            name: s.name,
+            description: s.description,
+            parentId: formData.id,
+            subTypes: [],
+            valid: true,
+          };
+  
+          if (s.id === 0) {
+            this.handleCreate(updatedData);
+          } else {
+            this.postEventData(`/t_events/type/${s.id}`, updatedData)
+              .then(() => 1)
+              .catch((error) => ApiError(error));
+          }
+        });
+  
+        this.getData();
+      })
+      .catch((error) => ApiError(error));
+  };
+
+  postEventData = (url, formData, successMessage) => {
+    return this.props.api
+      .post(url, mapEvent(formData))
+      .then((result) => {
+        Message.show(successMessage);
+        return result;
+      });
   };
 
   handleDelete = (id) => {
     this.props.api
       .delete(`/t_events/type/${id}`)
       .then((result) => {
-        Message.show(`Type #${id} has been deleted`);
+        Message.show('record deleted successfully');
         this.getData();
         return 1;
       })
@@ -136,32 +173,28 @@ export default class EventTypeContainer extends Component {
 
     const { refs, locale } = this.state;
 
+    const types = refs.types
+      .filter((t) => t.parentId === 0 || t.parentId === null);
+
+    const subtypes = refs.types
+      .filter((t) => t.parentId !== 0 && t.parentId !== null);
+
     return (
       <div>
         <PageCaption text="Types" />
-
-        <div
-          className="bp5-callout"
-          style={{
-            fontSize: '80%',
-            marginTop: '1em',
-            background: '#ff00002b'
-          }}
-        >
-          Редактирование записей в разработке.
-          Вы можете изменить название Category, Type и Description в разделе Translations.
-        </div>
 
         <EventTypeTable
           ref={(table) => {
             this.table = table;
           }}
-          refs={refs}
           locale={locale}
-          types={refs.types}
+          categories={refs.typeCategories}
+          types={types}
+          subtypes={subtypes}
           onCreate={this.handleCreate}
           onCreateCategory={this.handleCreateCategory}
-          onEdit={this.handleEdit}
+          onTextChange={this.handleTextChange}
+          onUpdate={this.handleEdit}
           onDelete={this.handleDelete}
           onRefresh={this.handleRefresh}
           auth={this.props.auth}

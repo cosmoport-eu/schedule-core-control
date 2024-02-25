@@ -35,9 +35,7 @@ export default function EventTypeAddDialog({
     categoryCreateCallback(name, color);
   };
 
-  // build root cats
   const cats = categories
-    .filter((c) => c.parent === 0 || c.parent === null)
     .map((c) => ({ id: c.id, name: etDisplay.getCategory(c) }));
 
   return (
@@ -50,6 +48,7 @@ export default function EventTypeAddDialog({
       <DialogBody>
         <EventTypeForm
           categories={cats}
+          etDisplay={etDisplay}
           ref={ref}
           categoryCreateCallback={handleNewCategory}
         />

@@ -122,7 +122,7 @@ export default class MainPage extends Component {
 
     this.props.api
       .createEvent(formData)
-      .then((result) => Message.show(`Event has been created [${result.id}].`))
+      .then((result) => Message.show(`Event has been created.`))
       .then(() => this.eventAddDialog.suggestNext(this.props.pre))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
