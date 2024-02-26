@@ -116,7 +116,7 @@ export default class EventTypeForm extends Component {
       .map((x) => ({ id: x.id, name: x.name, description: x.description }));
 
     const data = Object.assign(this.state, {
-      subtypes: subtypes,
+      subTypes: subtypes,
       valid: this.isValid(),
     });
 
