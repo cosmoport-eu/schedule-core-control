@@ -34,8 +34,8 @@ export default class EventForm extends Component {
       limit: 0,
       bought: 0,
       category: 0,
-      subcategory: 0,
-      tree: false,
+      subtype: 0,
+      has_subtypes: false,
       type: 0,
       gate: 0,
       gate2: 0,
@@ -66,9 +66,9 @@ export default class EventForm extends Component {
       type: () => (this.state.type === 0 ? 'Type is not selected.' : ''),
       category: () =>
         this.state.category === 0 ? 'Category is not selected.' : '',
-      subcategory: () =>
-        this.state.tree && this.state.subcategory === 0
-          ? 'Subcategory is not selected.'
+      subtype: () =>
+        this.state.has_subtypes && this.state.subtype === 0
+          ? 'Subtype (Lesson) is not selected.'
           : '',
       gate: () =>
         this.state.gate === 0 ? 'Gate for departion is not selected.' : '',
@@ -131,8 +131,8 @@ export default class EventForm extends Component {
       valid: this.isValid(),
     });
 
-    if (this.state.subcategory) {
-      data.type = this.state.subcategory;
+    if (this.state.subtype) {
+      data.type = this.state.subtype;
     }
 
     return data;
@@ -146,19 +146,15 @@ export default class EventForm extends Component {
   fillState = (event) => {
     if (!event) return;
 
-    const { categoryId, defaultDuration, defaultRepeatInterval, defaultCost } =
+    const { categoryId, defaultDuration, defaultRepeatInterval, defaultCost, parentId } =
       this.findEventTypeData(event.eventTypeId);
+    
+    let [type, subtype, has_subtypes] = [event.eventTypeId, 0, false];
 
-    // build the category tree
-    let category = categoryId;
-    const cat = this.findEventTypeCategory(category);
-
-    let [type, subcategory, tree] = [event.eventTypeId, 0, false];
-    if (cat.parent) {
-      subcategory = type;
-      type = category;
-      category = cat.parent;
-      tree = true;
+    if (parentId !== null && parentId !== 0) {
+      subtype = type;
+      type = parentId;
+      has_subtypes = true;
     }
 
     this.state = {
@@ -168,9 +164,9 @@ export default class EventForm extends Component {
       duration: event.durationTime,
       limit: event.peopleLimit,
       bought: event.contestants,
-      category: category,
-      subcategory: subcategory,
-      tree: tree,
+      category: categoryId,
+      subtype: subtype,
+      has_subtypes: has_subtypes,
       type: type,
       gate: event.gateId,
       gate2: event.gate2Id,
@@ -216,26 +212,25 @@ export default class EventForm extends Component {
    * @since 0.1.0
    */
   handleTypeChange = (name, value, event) => {
-    // is it a tree
-    let tree = false;
+    let has_subtypes = false;
     const opts = event.currentTarget.selectedOptions || [];
     if (opts.length > 0) {
-      tree = opts[0].dataset.tree || false;
+      has_subtypes = opts[0].dataset.has_subtypes || false;
     }
 
-    this.setState({ subcategory: 0, tree: tree });
+    this.setState({ subtype: 0, has_subtypes: has_subtypes });
     this.handleChange(name, value);
 
     this.defaults_fill(value);
   };
 
   handleCategoryChange = (name, value) => {
-    this.setState({ type: 0, subcategory: 0, tree: false });
+    this.setState({ type: 0, subtype: 0, has_subtypes: false });
     this.handleChange(name, value);
     this.defaults_reset();
   };
 
-  handleSubCategoryChange = (name, value) => {
+  handleSubTypeChange = (name, value) => {
     this.handleChange(name, value);
     this.defaults_fill(value);
   };
@@ -306,7 +301,7 @@ export default class EventForm extends Component {
       time,
       type,
       category,
-      subcategory,
+      subtype,
       gate,
       gate2,
       bought,
@@ -324,7 +319,6 @@ export default class EventForm extends Component {
       </option>
     ));
     const categoryOptions = typeCategories
-      .filter((c) => c.parent === 0 || c.parent === null)
       .map((op) => (
         <option key={op.id} value={op.id}>
           {l18n.findByCode(op.code)}
@@ -334,26 +328,22 @@ export default class EventForm extends Component {
     let typeOptions = [];
     if (this.state.category) {
       typeOptions = types
-        .filter((t) => t.categoryId === this.state.category)
+        .filter((t) => t.categoryId === this.state.category && t.parentId === null)
+        .map((op) => ({
+          ...op,
+          has_subtypes: types.some((t) => t.parentId === op.id),
+        }))
         .map((op) => (
-          <option key={op.id} value={op.id}>
+          <option key={op.id} value={op.id} data-has_subtypes={op.has_subtypes}>
             {l18n.findByCode(op.nameCode)}
           </option>
         ));
-      const typeSubOptions = typeCategories
-        .filter((t) => t.parent === this.state.category)
-        .map((op) => (
-          <option key={op.id} value={op.id} data-tree={true}>
-            {l18n.findByCode(op.code)}
-          </option>
-        ));
-      typeOptions.push(typeSubOptions);
     }
 
     let subTypeOptions = [];
-    if (this.state.type && this.state.category) {
+    if (this.state.category && this.state.type) {
       subTypeOptions = types
-        .filter((t) => t.categoryId === this.state.type)
+        .filter((t) => t.parentId === this.state.type)
         .map((op) => (
           <option key={op.id} value={op.id}>
             {l18n.findByCode(op.nameCode)}
@@ -361,15 +351,22 @@ export default class EventForm extends Component {
         ));
     }
 
-    let subTypeDescription = '';
-    if (this.state.subcategory) {
+    const getDescriptionById = (id) => {
       const desc = types
-        .filter((t) => t.id === this.state.subcategory)
+        .filter((t) => t.id === id)
         .map((op) => l18n.findByCode(op.descCode));
-
-      if (desc.length > 0) {
-        subTypeDescription = desc[0];
-      }
+    
+      return desc.length > 0 ? desc[0] : '';
+    };
+    
+    let description = '';
+    
+    if (this.state.type) {
+      description = getDescriptionById(this.state.type);
+    }
+    
+    if (this.state.subtype) {
+      description = getDescriptionById(this.state.subtype);
     }
 
     const gateOptions = this.props.gates.map((gate_) => (
@@ -413,21 +410,21 @@ export default class EventForm extends Component {
         >
           {typeOptions}
         </ListFieldGroup>
-        {this.state.tree && (
+        {subTypeOptions.length > 0 && (
           <ListFieldGroup
-            name="subcategory"
+            name="subtype"
             caption="Subtype"
-            index={this.state.subcategory}
-            validator={subcategory()}
-            onChange={this.handleSubCategoryChange}
+            index={this.state.subtype}
+            validator={subtype()}
+            onChange={this.handleSubTypeChange}
           >
             {subTypeOptions}
           </ListFieldGroup>
         )}
-        {this.state.tree && (
+        {description !== '' && (
           <TextAreaGroup
             name="description"
-            value={subTypeDescription}
+            value={description}
             inline
             disabled
           />
