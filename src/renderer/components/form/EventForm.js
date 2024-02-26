@@ -215,7 +215,7 @@ export default class EventForm extends Component {
     let has_subtypes = false;
     const opts = event.currentTarget.selectedOptions || [];
     if (opts.length > 0) {
-      has_subtypes = opts[0].dataset.has_subtypes || false;
+      has_subtypes = opts[0].dataset.has_subtypes === "true";
     }
 
     this.setState({ subtype: 0, has_subtypes: has_subtypes });
@@ -239,7 +239,7 @@ export default class EventForm extends Component {
     this.props.refs.types.find((type) => type.id === value);
 
   findEventTypeCategory = (value) =>
-    this.props.refs.typeCategories.find((type) => type.id === value);
+    this.props.refs.typeCategories.find((category) => category.id === value);
 
   /**
    * Handles the change event on an input field of <day> type.
@@ -306,6 +306,7 @@ export default class EventForm extends Component {
       gate2,
       bought,
     } = this.validators;
+
     const l18n = new L18n(this.props.locale);
 
     const statusOptions = statuses.map((op) => (
@@ -313,22 +314,34 @@ export default class EventForm extends Component {
         {l18n.findByCode(op.code)}
       </option>
     ));
+
     const stateOptions = states.map((op) => (
       <option key={op.id} value={op.id}>
         {l18n.findByCode(op.code)}
       </option>
     ));
+
     const categoryOptions = typeCategories
+      .filter((t) => t.isDisabled === false)
       .map((op) => (
         <option key={op.id} value={op.id}>
           {l18n.findByCode(op.code)}
         </option>
       ));
 
+    const currentCategoryData = this.findEventTypeCategory(this.state.category);
+    if (currentCategoryData.isDisabled) {
+      categoryOptions.push(
+        <option key={currentCategoryData.id} value={currentCategoryData.id}>
+          {l18n.findByCode(currentCategoryData.code)}
+        </option>
+      );
+    }
+
     let typeOptions = [];
     if (this.state.category) {
       typeOptions = types
-        .filter((t) => t.categoryId === this.state.category && t.parentId === null)
+        .filter((t) =>t.categoryId === this.state.category && t.parentId === null && t.isDisabled === false)
         .map((op) => ({
           ...op,
           has_subtypes: types.some((t) => t.parentId === op.id),
@@ -338,22 +351,46 @@ export default class EventForm extends Component {
             {l18n.findByCode(op.nameCode)}
           </option>
         ));
+
+      const currentTypeData = this.findEventTypeData(this.state.type);
+      if (currentTypeData.isDisabled) {
+        typeOptions.push(
+          <option
+            key={currentTypeData.id}
+            value={currentTypeData.id}
+            data-has_subtypes={types.some((t) => t.parentId === currentTypeData.id)}
+          >
+            {l18n.findByCode(currentTypeData.nameCode)}
+          </option>
+        );
+      }
     }
 
     let subTypeOptions = [];
     if (this.state.category && this.state.type) {
       subTypeOptions = types
-        .filter((t) => t.parentId === this.state.type)
+        .filter((t) => t.parentId === this.state.type && t.isDisabled === false)
         .map((op) => (
           <option key={op.id} value={op.id}>
             {l18n.findByCode(op.nameCode)}
           </option>
         ));
+
+      if (this.state.subtype !== 0) {
+        const currentSubTypeData = this.findEventTypeData(this.state.subtype);
+        if (currentSubTypeData.isDisabled) {
+          subTypeOptions.push(
+            <option key={currentSubTypeData.id} value={currentSubTypeData.id} >
+              {l18n.findByCode(currentSubTypeData.nameCode)}
+            </option>
+          );
+        }
+      }
     }
 
     const getDescriptionById = (id) => {
       const desc = types
-        .filter((t) => t.id === id)
+        .filter((t) => t.id === id && t.isDisabled === false)
         .map((op) => l18n.findByCode(op.descCode));
     
       return desc.length > 0 ? desc[0] : '';
@@ -369,11 +406,43 @@ export default class EventForm extends Component {
       description = getDescriptionById(this.state.subtype);
     }
 
-    const gateOptions = this.props.gates.map((gate_) => (
-      <option key={gate_.id} value={gate_.id}>
-        {l18n.findByCode(gate_.code)}
-      </option>
-    ));
+    const departionGateOptions = this.props.gates
+      .filter((g) => g.isDisabled === false)
+      .map((gate_) => (
+        <option key={gate_.id} value={gate_.id}>
+          {l18n.findByCode(gate_.code)}
+        </option>
+      ));
+    
+    const returnGateOptions = this.props.gates
+      .filter((g) => g.isDisabled === false)
+      .map((gate_) => (
+        <option key={gate_.id} value={gate_.id}>
+          {l18n.findByCode(gate_.code)}
+        </option>
+      ));
+
+    const departionGateData = this.props.gates
+      .filter((g) => g.id === this.state.gate)[0];
+
+    if (departionGateData.isDisabled) {
+      departionGateOptions.push(
+        <option key={departionGateData.id} value={departionGateData.id}>
+          {l18n.findByCode(departionGateData.code)}
+        </option>
+      );
+    }
+
+    const returnGateData = this.props.gates
+      .filter((g) => g.id === this.state.gate2)[0];
+
+    if (returnGateData.isDisabled) {
+      returnGateOptions.push(
+        <option key={returnGateData.id} value={returnGateData.id}>
+          {l18n.findByCode(returnGateData.code)}
+        </option>
+      );
+    }
 
     const { date } = this.state;
     const timeRange = this.state.time + this.state.duration;
@@ -484,7 +553,7 @@ export default class EventForm extends Component {
               validator={gate()}
               onChange={this.handleChange}
             >
-              {gateOptions}
+              {departionGateOptions}
             </ListFieldGroup>
 
             <ListFieldGroup
@@ -494,7 +563,7 @@ export default class EventForm extends Component {
               validator={gate2()}
               onChange={this.handleChange}
             >
-              {gateOptions}
+              {returnGateOptions}
             </ListFieldGroup>
           </div>
         </div>

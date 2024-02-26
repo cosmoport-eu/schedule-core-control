@@ -181,7 +181,7 @@ export default class EventTypeForm extends Component {
   };
 
   handleCategoryCreate = () => {
-    categoryCreateCallback(category_name, category_color);
+    this.props.categoryCreateCallback(this.state.category_name, this.state.category_color);
   };
 
   isValid = () => {

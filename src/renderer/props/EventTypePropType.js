@@ -8,5 +8,6 @@ export default PropTypes.shape({
   descCode: PropTypes.string,
   id: PropTypes.number,
   nameCode: PropTypes.string,
-  parent: PropTypes.number
+  parent: PropTypes.number,
+  isDisabled: PropTypes.bool,
 });
