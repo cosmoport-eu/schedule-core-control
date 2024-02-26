@@ -47,8 +47,8 @@ export default class MainPage extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.get('/t_events/types'),
-      this.props.api.get('/category?localeId=1'),
+      this.props.api.get('/t_events/types?isActive=true'),
+      this.props.api.get('/category?localeId=1&isActive=true'),
       this.props.api.get('/t_events/statuses'),
       this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations(),
