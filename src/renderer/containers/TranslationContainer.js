@@ -65,7 +65,7 @@ export default class TranslationContainer extends Component {
           is_deletable: true,
           is_creatable: true,
           apiUrl: {
-            get: '/dictionary/categories',
+            get: '/dictionary/categories?isActive=true',
             create: '/category',
             delete: '/category',
           },
@@ -76,7 +76,7 @@ export default class TranslationContainer extends Component {
           is_deletable: false,
           is_creatable: false,
           apiUrl: {
-            get: '/dictionary/types',
+            get: '/dictionary/types?isActive=true',
             // работа с типами в отдельном разделе
             create: '',
             delete: '',
@@ -88,7 +88,7 @@ export default class TranslationContainer extends Component {
           is_deletable: true,
           is_creatable: true,
           apiUrl: {
-            get: '/facility/all',
+            get: '/facility/all?isActive=true',
             create: '/facility?localeId=1',
             delete: '/facility',
           },
@@ -99,7 +99,7 @@ export default class TranslationContainer extends Component {
           is_deletable: true,
           is_creatable: true,
           apiUrl: {
-            get: '/material/all',
+            get: '/material/all?isActive=true',
             create: '/material?localeId=1',
             delete: '/material',
           },
@@ -110,7 +110,7 @@ export default class TranslationContainer extends Component {
           is_deletable: true,
           is_creatable: true,
           apiUrl: {
-            get: '/gates',
+            get: '/gates?isActive=true',
             create: '/gates',
             delete: '/gates',
           },
@@ -208,17 +208,44 @@ export default class TranslationContainer extends Component {
       .catch((error) => ApiError(error));
   };
   
-  handleDeleteRecord = (apiUrlDelete, data) => {
-    this.props.api
-      .delete(`${apiUrlDelete}/${data.id}`)
-      .then((result) => {
-        Message.show(`Record #${data.id} has been deleted`);
-
-        this.handleRefresh();
-
-        return 1;
-      })
-      .catch((error) => ApiError(error));
+  handleDeleteRecord = async (apiUrlDelete, data) => {
+    try {
+      await this.props.api.delete(`${apiUrlDelete}/${data.id}`);
+      Message.show(`Record #${data.id} has been deleted`);
+  
+      if (apiUrlDelete === '/category') {
+        await this.removeConnectedTypes(data.id);
+      }
+  
+      this.handleRefresh();
+  
+      return 1;
+    } catch (error) {
+      ApiError(error);
+    }
+  };
+  
+  removeConnectedTypes = async (categoryId) => {
+    try {
+      const result = await this.props.api.get('/t_events/types?isActive=true');
+      const typesToDelete = result.filter((t) => t.categoryId === categoryId);
+  
+      for (const typeToDelete of typesToDelete) {
+        await this.removeRecord(`/t_events/type/${typeToDelete.id}`);
+      }
+  
+      Message.show('Connected types put in archive');
+    } catch (error) {
+      ApiError(error);
+    }
+  };
+  
+  removeRecord = async (apiUrl) => {
+    try {
+      await this.props.api.delete(apiUrl);
+    } catch (error) {
+      ApiError(error);
+    }
   };
 
   render() {

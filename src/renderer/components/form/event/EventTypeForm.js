@@ -116,7 +116,7 @@ export default class EventTypeForm extends Component {
       .map((x) => ({ id: x.id, name: x.name, description: x.description }));
 
     const data = Object.assign(this.state, {
-      subtypes: subtypes,
+      subTypes: subtypes,
       valid: this.isValid(),
     });
 
@@ -181,7 +181,7 @@ export default class EventTypeForm extends Component {
   };
 
   handleCategoryCreate = () => {
-    categoryCreateCallback(category_name, category_color);
+    this.props.categoryCreateCallback(this.state.category_name, this.state.category_color);
   };
 
   isValid = () => {
