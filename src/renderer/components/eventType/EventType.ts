@@ -73,11 +73,16 @@ export default function EventType({ categories, translation }: EventTypeDef) {
 
 	const getSubtypes = (category_id: number) =>
 		findSubtypes(category_id, categories, tr);
+	
+	const getCategoryById = (type: Type) => {
+		return findCategory(type.categoryId, categories);
+	}
 
 	return {
 		getCategories,
 		getSubtypes,
 		getName,
+		getCategoryById,
 		getDescription: (type: Type) =>
 			tr.findByCode(type.descCode),
 		getCategory: (cat: Category) => tr.findByCode(cat.code),
