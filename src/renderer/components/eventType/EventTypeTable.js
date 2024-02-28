@@ -19,6 +19,7 @@ import EventTypeCategoryPropType from '../../props/EventTypeCategoryPropType';
 export default class EventTypeTable extends PureComponent {
   static propTypes = {
     onTextChange: PropTypes.func,
+    categoryCreateCallback: PropTypes.func,
     onDelete: PropTypes.func,
     editCallback: PropTypes.func,
     callback: PropTypes.func,

@@ -43,7 +43,7 @@ export default class TableContainer extends Component {
       this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations(),
       this.apiGetEventInRange(this.state.range),
-      this.props.api.fetchGates(),
+      this.props.api.get('/gates'),
     ])
       .then((data) =>
         this.setState({
