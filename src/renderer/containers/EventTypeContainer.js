@@ -51,6 +51,8 @@ export default class EventTypeContainer extends Component {
       this.props.api.get('/category?localeId=1&isActive=true'),
       this.props.api.get('/t_events/statuses'),
       this.props.api.get('/t_events/states'),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
       this.props.api.fetchTranslations()
     ])
       .then((data) =>
@@ -62,7 +64,9 @@ export default class EventTypeContainer extends Component {
             statuses: data[2],
             states: data[3],
           },
-          locale: data[4].en
+          facilities: data[4],
+          materials: data[5],
+          locale: data[6].en,
         }),
       )
       .catch((error) => ApiError(error));
@@ -192,7 +196,7 @@ export default class EventTypeContainer extends Component {
           locale={locale}
           categories={refs.typeCategories}
           types={types}
-          subtypes={subtypestypes}
+          subtypes={subtypes}
           facilities={facilities}
           materials={materials}
           onCreate={this.handleCreate}
