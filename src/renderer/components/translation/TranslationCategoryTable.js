@@ -34,10 +34,10 @@ export default function TranslationCategoryTable ({
   });
   
   const validators = {
-    name: () => (name === '' ? "It shouldn't be empty" : ''),
+    name: () => (name === '' ? "Category name shouldn't be empty" : ''),
     color: () => {
       if (color === '') {
-        return "It shouldn't be empty";
+        return "Category color shouldn't be empty";
       }
 
       const hexColorPattern = /^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{4}){1,2}$/;
