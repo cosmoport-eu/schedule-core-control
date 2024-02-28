@@ -30,7 +30,7 @@ export default class EventTypeTable extends PureComponent {
     categories: PropTypes.arrayOf(EventTypeCategoryPropType),
     types: PropTypes.arrayOf(EventTypePropType),
     facilities: PropTypes.arrayOf(FacilityPropType),
-    materials: PropTypes.arrayOf(MaterialPropType)
+    materials: PropTypes.arrayOf(MaterialPropType),
     subtypes: PropTypes.arrayOf(EventTypePropType),
   };
   
@@ -53,7 +53,7 @@ export default class EventTypeTable extends PureComponent {
       categories: [],
       types: [],
       facilities: [],
-      materials: [],,
+      materials: [],
       subtypes: [],
     };
   }

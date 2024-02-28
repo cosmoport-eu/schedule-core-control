@@ -21,6 +21,9 @@ const validate_section_name = (s) =>
 const validate_section_description = (s) =>
   s && s.description === '' ? "Description shouldn't be empty." : '';
 
+const validate_section_facilities = (s) =>
+  s && s.facilities && s.facilities.length === 0 ? "Choose at least one facility" : '';
+
 export default class EventTypeForm extends Component {
   constructor(props) {
     super(props);
@@ -35,11 +38,22 @@ export default class EventTypeForm extends Component {
       default_cost: 0,
   
       // to initialize 1 section
-      sections: { [uuid()]: { id: 0, pos: 0, name: '', description: '' } },
+      sections: {
+        [uuid()]: {
+          pos: 0,
+          name: '',
+          description: '',
+          facilities: [],
+          materials: [],
+        }
+      },
       section_last_pos: 0,
   
       category_name: '',
       category_color: '#808080',
+
+      facilities: [],
+      materials: [],
     };
 
     // Overrides initial data with passed in parameters
@@ -58,6 +72,11 @@ export default class EventTypeForm extends Component {
             pos: pos,
             name: etDisplay.getName(t),
             description: etDisplay.getDescription(t),
+            // пока нет бэкенда
+            // facilities: t.facilities,
+            // materials: t.materials,
+            facilities: [],
+            materials: [],
           };
           pos ++;
         });
@@ -91,6 +110,7 @@ export default class EventTypeForm extends Component {
           .map((section) => [
             validate_section_name(section),
             validate_section_description(section),
+            validate_section_facilities(section),
           ])
           .flat()
           .filter((x) => x !== '')
@@ -109,12 +129,32 @@ export default class EventTypeForm extends Component {
         return '';
       },
     };
+
+    this.facilitiesOptions = props.facilities.map((facility) => {
+      return {
+        value: facility.id,
+        label: facility.name
+      }
+    });
+    
+    this.materialsOptions = props.materials
+      .map((material) => {
+        return {
+          value: material.id,
+          label: material.name
+        }
+      });
   }
 
   getFormData = () => {
     const subtypes = Object.values(this.state.sections)
       .sort((a, b) => (a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0))
-      .map((x) => ({ id: x.id, name: x.name, description: x.description }));
+      .map((x) => ({
+        name: x.name,
+        description: x.description,
+        facilities: x.facilities,
+        materials: x.materials
+      }));
 
     const data = Object.assign(this.state, {
       subTypes: subtypes,
@@ -160,22 +200,12 @@ export default class EventTypeForm extends Component {
     });
   };
 
-  const handleAddSection = (section_id, elem_name, options) => {
-    const selectedValues = Array.from(options, option => option.value);
-
-    this.setState((prev) => {
-      const { sections, ...rest } = prev;
-      sections[section_id][elem_name] = selectedValues;
-      return { ...rest, sections };
-    });
-  };
-
   handleAddSection = () => {
     this.setState((prev) => {
       const uid = uuid();
       const { sections, section_last_pos, ...rest } = prev;
       const last_pos = section_last_pos + 1;
-      sections[uid] = { id: 0, pos: last_pos, name: '', description: '' };
+      sections[uid] = { id: 0, pos: last_pos, name: '', description: '', facilities: [], materials: [] };
       return { ...rest, sections, section_last_pos: last_pos };
     });
   };
@@ -193,6 +223,16 @@ export default class EventTypeForm extends Component {
 
   handleCategoryCreate = () => {
     this.props.categoryCreateCallback(this.state.category_name, this.state.category_color);
+  };
+
+  handleSectionSelectChange = (section_id, elem_name, options) => {
+    const selectedValues = Array.from(options, option => option.value);
+
+    this.setState((prev) => {
+      const { sections, ...rest } = prev;
+      sections[section_id][elem_name] = selectedValues;
+      return { ...rest, sections };
+    });
   };
 
   isValid = () => {
@@ -312,6 +352,7 @@ export default class EventTypeForm extends Component {
             const section = this.state.sections[sid];
             const isNameValid = validate_section_name(section);
             const isDescriptionValid = validate_section_description(section);
+            const isFacilitiesValid = validate_section_facilities(section);
   
             return (
               <SectionCard key={sid} className={styles.sections}>
@@ -337,6 +378,39 @@ export default class EventTypeForm extends Component {
                       noLabel
                       inline
                     />
+                    <MultipleListFieldGroup
+                      styles={{
+                        menu: base => ({
+                          ...base,
+                          position: 'absolute',
+                          zIndex: 9999,
+                        }),
+                      }}
+                      id={sid}
+                      name="facilities"
+                      caption="Facilities"
+                      validator={isFacilitiesValid}
+                      onChange={this.handleSectionSelectChange}
+                    >
+                      {this.facilitiesOptions}
+                    </MultipleListFieldGroup>
+
+                    <MultipleListFieldGroup
+                      styles={{
+                        menu: base => ({
+                          ...base,
+                          position: 'absolute',
+                          zIndex: 9999,
+                        }),
+                      }}
+                      id={sid}
+                      name="materials"
+                      caption="Materials"
+                      onChange={this.handleSectionSelectChange}
+                    >
+                      {this.materialsOptions}
+                    </MultipleListFieldGroup>
+
                   </div>
                   <Button
                     minimal
