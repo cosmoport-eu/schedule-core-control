@@ -16,7 +16,7 @@ const mapEvent = (data) => ({
   defaultCost: data.default_cost,
   description: data.description,
   name: data.name,
-  subTypes: data.subtypes,
+  subTypes: data.subTypes,
   parentId: data.parentId,
 });
 
@@ -112,33 +112,33 @@ export default class EventTypeContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleEdit = (formData) => {
+  handleEdit = async (formData) => {
     const subtypes = formData.subTypes;
   
-    this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully')
-      .then(() => {
-        subtypes.forEach((s) => {
-          const updatedData = {
-            ...formData,
-            name: s.name,
-            description: s.description,
-            parentId: formData.id,
-            subTypes: [],
-            valid: true,
-          };
+    try {
+      await this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully');
   
-          if (s.id === 0) {
-            this.handleCreate(updatedData);
-          } else {
-            this.postEventData(`/t_events/type/${s.id}`, updatedData)
-              .then(() => 1)
-              .catch((error) => ApiError(error));
-          }
-        });
+      for (const s of subtypes) {
+        const updatedData = {
+          ...formData,
+          name: s.name,
+          description: s.description,
+          parentId: formData.id,
+          subTypes: [],
+          valid: true,
+        };
   
-        this.getData();
-      })
-      .catch((error) => ApiError(error));
+        if (s.id === 0) {
+          await this.handleCreate(updatedData);
+        } else {
+          await this.postEventData(`/t_events/type/${s.id}`, updatedData);
+        }
+      }
+  
+      this.getData();
+    } catch (error) {
+      ApiError(error);
+    }
   };
 
   postEventData = (url, formData, successMessage) => {
