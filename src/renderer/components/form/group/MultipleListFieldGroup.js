@@ -26,9 +26,9 @@ export default class MultipleListFieldGroup extends PureComponent {
 
   handleSelectChange = (event) => {
     this.props.onChange(
-      this.props.id,
       this.props.name,
       event,
+      this.props.id,
     );
   };
 

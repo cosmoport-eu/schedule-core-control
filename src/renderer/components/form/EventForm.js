@@ -14,6 +14,9 @@ import _date from '../date/_date';
 
 import styles from './EventForm.module.css';
 import TextAreaGroup from './group/TextAreaGroup';
+import FacilityPropType from '../../props/FacilityPropType';
+import MaterialPropType from '../../props/MaterialPropType';
+import MultipleListFieldGroup from './group/MultipleListFieldGroup';
 
 /**
  * The class for event properties form.
@@ -46,6 +49,8 @@ export default class EventForm extends Component {
       default_duration: 0,
       default_repeat_interval: 0,
       default_cost: 0,
+      facilityIds: [],
+      materialIds: [],
     };
 
     // Overrides initial data with passed in parameters
@@ -70,6 +75,9 @@ export default class EventForm extends Component {
         this.state.has_subtypes && this.state.subtype === 0
           ? 'Subtype (Lesson) is not selected.'
           : '',
+      facilities: () =>
+        this.state.facilityIds.length === 0
+          ? "Choose at least one facility" : '',
       gate: () =>
         this.state.gate === 0 ? 'Gate for departion is not selected.' : '',
       gate2: () =>
@@ -177,6 +185,8 @@ export default class EventForm extends Component {
       default_duration: defaultDuration,
       default_repeat_interval: defaultRepeatInterval,
       default_cost: defaultCost,
+      facilityIds: event.facilityIds,
+      materialIds: event.materialIds,
     };
   };
 
@@ -233,6 +243,13 @@ export default class EventForm extends Component {
   handleSubTypeChange = (name, value) => {
     this.handleChange(name, value);
     this.defaults_fill(value);
+  };
+
+  handleAdditionalSelectChange = (elem_name, options) => {
+    const selectedValues = Array.from(options, option => option.value);
+
+    this.handleChange(elem_name, selectedValues);
+    this.defaults_fill(selectedValues);
   };
 
   findEventTypeData = (value) =>
@@ -305,6 +322,7 @@ export default class EventForm extends Component {
       gate,
       gate2,
       bought,
+      facilities,
     } = this.validators;
 
     const l18n = new L18n(this.props.locale);
@@ -329,17 +347,17 @@ export default class EventForm extends Component {
         </option>
       ));
 
-    const currentCategoryData = this.findEventTypeCategory(this.state.category);
-    if (currentCategoryData.isDisabled) {
-      categoryOptions.push(
-        <option key={currentCategoryData.id} value={currentCategoryData.id}>
-          {`${l18n.findByCode(currentCategoryData.code)} | archived`}
-        </option>
-      );
-    }
-
     let typeOptions = [];
     if (this.state.category) {
+      const currentCategoryData = this.findEventTypeCategory(this.state.category);
+      if (currentCategoryData.isDisabled) {
+        categoryOptions.push(
+          <option key={currentCategoryData.id} value={currentCategoryData.id}>
+            {`${l18n.findByCode(currentCategoryData.code)} | archived`}
+          </option>
+        );
+      }
+
       typeOptions = types
         .filter((t) =>t.categoryId === this.state.category && t.parentId === null && t.isDisabled === false)
         .map((op) => ({
@@ -351,7 +369,9 @@ export default class EventForm extends Component {
             {l18n.findByCode(op.nameCode)}
           </option>
         ));
+    }
 
+    if (this.state.category && this.state.type) {
       const currentTypeData = this.findEventTypeData(this.state.type);
       if (currentTypeData.isDisabled) {
         typeOptions.push(
@@ -395,15 +415,37 @@ export default class EventForm extends Component {
     
       return desc.length > 0 ? desc[0] : '';
     };
-    
+
     let description = '';
-    
+    let facilitiesOptions = {};
+    let materialsOptions = {};
+
+    const getTypeData = (type) => {
+      if (type) {
+        description = getDescriptionById(type);
+        return this.findEventTypeData(type);
+      }
+      return null;
+    };
+
+    const updateOptions = (typeData) => {
+      facilitiesOptions = this.props.facilities
+        .filter((f) => typeData && typeData.facilityIds.includes(f.id))
+        .map((f) => ({ value: f.id, label: f.name }));
+
+      materialsOptions = this.props.materials
+        .filter((m) => typeData && typeData.materialIds.includes(m.id))
+        .map((m) => ({ value: m.id, label: m.name }));
+    };
+
     if (this.state.type) {
-      description = getDescriptionById(this.state.type);
+      const typeData = getTypeData(this.state.type);
+      updateOptions(typeData);
     }
-    
+
     if (this.state.subtype) {
-      description = getDescriptionById(this.state.subtype);
+      const typeData = getTypeData(this.state.subtype);
+      updateOptions(typeData);
     }
 
     const departionGateOptions = this.props.gates
@@ -425,7 +467,7 @@ export default class EventForm extends Component {
     const departionGateData = this.props.gates
       .filter((g) => g.id === this.state.gate)[0];
 
-    if (departionGateData.isDisabled) {
+    if (departionGateData && departionGateData.isDisabled) {
       departionGateOptions.push(
         <option key={departionGateData.id} value={departionGateData.id}>
           {`${l18n.findByCode(departionGateData.code)} | archived`}
@@ -436,7 +478,7 @@ export default class EventForm extends Component {
     const returnGateData = this.props.gates
       .filter((g) => g.id === this.state.gate2)[0];
 
-    if (returnGateData.isDisabled) {
+    if (returnGateData && returnGateData.isDisabled) {
       returnGateOptions.push(
         <option key={returnGateData.id} value={returnGateData.id}>
           {`${l18n.findByCode(returnGateData.code)} | archived`}
@@ -498,6 +540,44 @@ export default class EventForm extends Component {
             disabled
           />
         )}
+
+        {description !== '' && (
+          <MultipleListFieldGroup
+            styles={{
+              menu: base => ({
+                ...base,
+                position: 'absolute',
+                zIndex: 9999,
+              }),
+            }}
+            name="facilityIds"
+            defaultValue={this.state.facilityIds}
+            caption="Facilities"
+            validator={facilities()}
+            onChange={this.handleAdditionalSelectChange}
+          >
+            {facilitiesOptions}
+          </MultipleListFieldGroup>
+        )}
+
+        {description !== '' && (
+          <MultipleListFieldGroup
+            styles={{
+              menu: base => ({
+                ...base,
+                position: 'absolute',
+                zIndex: 9999,
+              }),
+            }}
+            name="materialIds"
+            defaultValue={this.state.materialIds}
+            caption="Materials"
+            onChange={this.handleAdditionalSelectChange}
+          >
+            {materialsOptions}
+          </MultipleListFieldGroup>
+        )}
+
         <div
           className={`bp5-form-group ${styles.formTimeRangeContainer}${invalidTimeRangeMaybeClass}`}
         >
@@ -610,6 +690,8 @@ EventForm.propTypes = {
   refs: RefsPropType.isRequired,
   locale: PropTypes.objectOf(PropTypes.string).isRequired,
   gates: PropTypes.arrayOf(GatePropType).isRequired,
+  facilities: PropTypes.arrayOf(FacilityPropType).isRequired,
+  materials: PropTypes.arrayOf(MaterialPropType).isRequired,
   date: PropTypes.string,
 };
 
@@ -624,5 +706,7 @@ EventForm.defaultProps = {
   },
   locale: {},
   gates: [],
+  facilities: [],
+  materials: [],
   date: '',
 };

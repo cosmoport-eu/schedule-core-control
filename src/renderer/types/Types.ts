@@ -6,6 +6,18 @@ export type GateType = {
   gateName: string;
 };
 
+export type FacilityType = {
+  id: number;
+  code: string;
+  name: string;
+};
+
+export type MaterialType = {
+  id: number;
+  code: string;
+  name: string;
+};
+
 export type EventStatusType = {
   id: number;
   code: string;
