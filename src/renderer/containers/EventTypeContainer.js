@@ -18,6 +18,8 @@ const mapEvent = (data) => ({
   name: data.name,
   subTypes: data.subTypes,
   parentId: data.parentId,
+  materialIds: data.materialIds,
+  facilityIds: data.facilityIds,
 });
 
 export default class EventTypeContainer extends Component {
@@ -36,6 +38,8 @@ export default class EventTypeContainer extends Component {
   state = {
     hasData: false,
     locale: {},
+    facilities: {},
+    materials: {},
     refs: {}
   };
 
@@ -49,6 +53,8 @@ export default class EventTypeContainer extends Component {
       this.props.api.get('/category?localeId=1&isActive=true'),
       this.props.api.get('/t_events/statuses'),
       this.props.api.get('/t_events/states'),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
       this.props.api.fetchTranslations()
     ])
       .then((data) =>
@@ -60,7 +66,9 @@ export default class EventTypeContainer extends Component {
             statuses: data[2],
             states: data[3],
           },
-          locale: data[4].en
+          facilities: data[4],
+          materials: data[5],
+          locale: data[6].en,
         }),
       )
       .catch((error) => ApiError(error));
@@ -114,7 +122,13 @@ export default class EventTypeContainer extends Component {
 
   handleEdit = async (formData) => {
     const subtypes = formData.subTypes;
-  
+ 
+    if (subtypes.length > 0) {
+      formData.description = '';
+      formData.materialIds = [];
+      formData.facilityIds = [];
+    }
+
     try {
       await this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully');
   
@@ -124,11 +138,13 @@ export default class EventTypeContainer extends Component {
           name: s.name,
           description: s.description,
           parentId: formData.id,
+          materialIds: s.materialIds,
+          facilityIds: s.facilityIds,
           subTypes: [],
           valid: true,
         };
   
-        if (s.id === 0) {
+        if (s.id === 0 || typeof s.id === 'undefined') {
           await this.handleCreate(updatedData);
         } else {
           await this.postEventData(`/t_events/type/${s.id}`, updatedData);
@@ -171,7 +187,7 @@ export default class EventTypeContainer extends Component {
       return <span>Loading...</span>;
     }
 
-    const { refs, locale } = this.state;
+    const { refs, locale, facilities, materials } = this.state;
 
     const types = refs.types
       .filter((t) => t.parentId === 0 || t.parentId === null);
@@ -191,6 +207,8 @@ export default class EventTypeContainer extends Component {
           categories={refs.typeCategories}
           types={types}
           subtypes={subtypes}
+          facilities={facilities}
+          materials={materials}
           onCreate={this.handleCreate}
           onCreateCategory={this.handleCreateCategory}
           onTextChange={this.handleTextChange}

@@ -20,6 +20,8 @@ export default function EventTypeEditDialog({
   onDelete,
   etDisplay,
   categories,
+  facilities,
+  materials,
   types,
   subtypes,
   isOpen,
@@ -58,6 +60,8 @@ export default function EventTypeEditDialog({
         <EventTypeForm
           eventType={eventType}
           categories={cats}
+          facilities={facilities}
+          materials={materials}
           types={types}
           subtypes={subtypes}
           ref={ref}

@@ -14,6 +14,8 @@ import EventDeleteAlert from '../dialog/EventDeleteAlert';
 import tableStyles from '../eventTable/EventTable.module.css';
 import Table from '../tableStructure/Table';
 import EventTypeEditDialog from '../dialog/EventTypeEditDialog';
+import FacilityPropType from '../../props/FacilityPropType';
+import MaterialPropType from '../../props/MaterialPropType';
 import EventTypeCategoryPropType from '../../props/EventTypeCategoryPropType';
 
 export default class EventTypeTable extends PureComponent {
@@ -27,6 +29,8 @@ export default class EventTypeTable extends PureComponent {
     locale: PropTypes.objectOf(PropTypes.string).isRequired,
     categories: PropTypes.arrayOf(EventTypeCategoryPropType),
     types: PropTypes.arrayOf(EventTypePropType),
+    facilities: PropTypes.arrayOf(FacilityPropType),
+    materials: PropTypes.arrayOf(MaterialPropType),
     subtypes: PropTypes.arrayOf(EventTypePropType),
   };
   
@@ -48,6 +52,8 @@ export default class EventTypeTable extends PureComponent {
       eventTypeEditDialogIsOpen: false,
       categories: [],
       types: [],
+      facilities: [],
+      materials: [],
       subtypes: [],
     };
   }
@@ -102,7 +108,7 @@ export default class EventTypeTable extends PureComponent {
   };
 
   render() {
-    const { locale, categories, types, subtypes } = this.props;
+    const { locale, categories, types, facilities, materials, subtypes } = this.props;
 
     const et = EventType({
       categories: categories,
@@ -145,6 +151,8 @@ export default class EventTypeTable extends PureComponent {
       <div style={{ marginTop: '2em' }}>
         <EventTypeAddDialog
           categories={categories}
+          facilities={facilities}
+          materials={materials}
           types={types}
           subtypes={subtypes}
           etDisplay={et}
@@ -155,6 +163,8 @@ export default class EventTypeTable extends PureComponent {
         />
         <EventTypeEditDialog
           categories={categories}
+          facilities={facilities}
+          materials={materials}
           types={types}
           subtypes={subtypes}
           eventType={this.state.eventType}
