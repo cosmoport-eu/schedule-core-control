@@ -27,15 +27,11 @@ function findCategory(id: number, cats: Category[]): undefined | Category {
 }
 
 function findSubtypes(category_id: number, cats: Category[], l18n: L18n): undefined | {} {
-	console.log(category_id);
-	console.log(cats);
 	if (category_id === 0 || cats === undefined || cats.length === 0) return undefined;
 
 	return cats
 		.filter((c) => c.parent === category_id)
 		.map((c) => {
-			console.log(c);
-
 			return {
 				id: c.id,
 				name: l18n.findByCode(c.code) 

@@ -22,7 +22,7 @@ const validate_section_description = (s) =>
   s && s.description === '' ? "Description shouldn't be empty." : '';
 
 const validate_section_facilities = (s) =>
-  s && s.facilities && s.facilities.length === 0 ? "Choose at least one facility" : '';
+  s && s.facilityIds && s.facilityIds.length === 0 ? "Choose at least one facility" : '';
 
 export default class EventTypeForm extends Component {
   constructor(props) {
@@ -43,8 +43,8 @@ export default class EventTypeForm extends Component {
           pos: 0,
           name: '',
           description: '',
-          facilities: [],
-          materials: [],
+          facilityIds: [],
+          materialIds: [],
         }
       },
       section_last_pos: 0,
@@ -52,8 +52,8 @@ export default class EventTypeForm extends Component {
       category_name: '',
       category_color: '#808080',
 
-      facilities: [],
-      materials: [],
+      facilityIds: [],
+      materialIds: [],
     };
 
     // Overrides initial data with passed in parameters
@@ -72,14 +72,12 @@ export default class EventTypeForm extends Component {
             pos: pos,
             name: etDisplay.getName(t),
             description: etDisplay.getDescription(t),
-            // пока нет бэкенда
-            // facilities: t.facilities,
-            // materials: t.materials,
-            facilities: [],
-            materials: [],
+            facilityIds: t.facilityIds,
+            materialIds: t.materialIds,
           };
           pos ++;
         });
+
       const section_last_pos = subtypes.length;
 
       this.state = {
@@ -96,10 +94,16 @@ export default class EventTypeForm extends Component {
 
         category_name: categoryData.name,
         category_color: categoryData.color,
+
+        facilityIds: eventType.facilityIds,
+        materialIds: eventType.materialIds,
       };
     }
 
     this.validators = {
+      facilities: () =>
+        this.state.sections.length > 0 && this.state.facilityIds && this.state.facilityIds.length === 0
+          ? "Choose at least one facility" : '',
       name: () =>
         this.state.name === '' ? "Field name shouldn't be empty." : '',
       category_id: () => (this.state.category_id === 0 ? 'Category is not selected.' : ''),
@@ -150,10 +154,11 @@ export default class EventTypeForm extends Component {
     const subtypes = Object.values(this.state.sections)
       .sort((a, b) => (a.pos < b.pos ? -1 : a.pos > b.pos ? 1 : 0))
       .map((x) => ({
+        id: x.id,
         name: x.name,
         description: x.description,
-        facilities: x.facilities,
-        materials: x.materials
+        facilityIds: x.facilityIds,
+        materialIds: x.materialIds
       }));
 
     const data = Object.assign(this.state, {
@@ -205,7 +210,7 @@ export default class EventTypeForm extends Component {
       const uid = uuid();
       const { sections, section_last_pos, ...rest } = prev;
       const last_pos = section_last_pos + 1;
-      sections[uid] = { id: 0, pos: last_pos, name: '', description: '', facilities: [], materials: [] };
+      sections[uid] = { id: 0, pos: last_pos, name: '', description: '', facilityIds: [], materialIds: [] };
       return { ...rest, sections, section_last_pos: last_pos };
     });
   };
@@ -214,7 +219,10 @@ export default class EventTypeForm extends Component {
     const { id } = event.currentTarget.dataset;
     this.setState((prev) => {
       const { sections, ...rest } = prev;
-      this.props.onDelete(sections[id].id);
+      if (sections[id].id !== 0) {
+        this.props.onDelete(sections[id].id);
+      }
+
       delete sections[id];
 
       return { sections, ...rest };
@@ -233,6 +241,12 @@ export default class EventTypeForm extends Component {
       sections[section_id][elem_name] = selectedValues;
       return { ...rest, sections };
     });
+  };
+
+  handleSelectChange = (section_id, elem_name, options) => {
+    const selectedValues = Array.from(options, option => option.value);
+
+    this.setState({ [elem_name]: selectedValues });
   };
 
   isValid = () => {
@@ -342,6 +356,43 @@ export default class EventTypeForm extends Component {
             inline
           />
         )}
+        {Object.keys(this.state.sections).length === 0  && (
+          <MultipleListFieldGroup
+            styles={{
+              menu: base => ({
+                ...base,
+                position: 'absolute',
+                zIndex: 9999,
+              }),
+            }}
+            id='0'
+            name="facilityIds"
+            defaultValue={this.state.facilityIds}
+            caption="Facilities"
+            validator={this.validators.facilities()}
+            onChange={this.handleSelectChange}
+          >
+            {this.facilitiesOptions}
+          </MultipleListFieldGroup>
+        )}
+        {Object.keys(this.state.sections).length === 0  && (
+          <MultipleListFieldGroup
+            styles={{
+              menu: base => ({
+                ...base,
+                position: 'absolute',
+                zIndex: 9999,
+              }),
+            }}
+            id='0'
+            name="materialIds"
+            defaultValue={this.state.materialIds}
+            caption="Materials"
+            onChange={this.handleSelectChange}
+          >
+            {this.materialsOptions}
+          </MultipleListFieldGroup>
+        )}
         <Section
           className={styles.noSelect}
           compact
@@ -387,8 +438,9 @@ export default class EventTypeForm extends Component {
                         }),
                       }}
                       id={sid}
-                      name="facilities"
+                      name="facilityIds"
                       caption="Facilities"
+                      defaultValue={section.facilityIds}
                       validator={isFacilitiesValid}
                       onChange={this.handleSectionSelectChange}
                     >
@@ -404,7 +456,8 @@ export default class EventTypeForm extends Component {
                         }),
                       }}
                       id={sid}
-                      name="materials"
+                      name="materialIds"
+                      defaultValue={section.facilityIds}
                       caption="Materials"
                       onChange={this.handleSectionSelectChange}
                     >

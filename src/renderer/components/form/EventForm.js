@@ -333,7 +333,7 @@ export default class EventForm extends Component {
     if (currentCategoryData.isDisabled) {
       categoryOptions.push(
         <option key={currentCategoryData.id} value={currentCategoryData.id}>
-          {l18n.findByCode(currentCategoryData.code)}
+          {`${l18n.findByCode(currentCategoryData.code)} | archived`}
         </option>
       );
     }
@@ -360,7 +360,7 @@ export default class EventForm extends Component {
             value={currentTypeData.id}
             data-has_subtypes={types.some((t) => t.parentId === currentTypeData.id)}
           >
-            {l18n.findByCode(currentTypeData.nameCode)}
+            {`${l18n.findByCode(currentTypeData.nameCode)} | archived`}
           </option>
         );
       }
@@ -381,7 +381,7 @@ export default class EventForm extends Component {
         if (currentSubTypeData.isDisabled) {
           subTypeOptions.push(
             <option key={currentSubTypeData.id} value={currentSubTypeData.id} >
-              {l18n.findByCode(currentSubTypeData.nameCode)}
+              {`${l18n.findByCode(currentSubTypeData.nameCode)} | archived`}
             </option>
           );
         }
@@ -428,7 +428,7 @@ export default class EventForm extends Component {
     if (departionGateData.isDisabled) {
       departionGateOptions.push(
         <option key={departionGateData.id} value={departionGateData.id}>
-          {l18n.findByCode(departionGateData.code)}
+          {`${l18n.findByCode(departionGateData.code)} | archived`}
         </option>
       );
     }
@@ -439,7 +439,7 @@ export default class EventForm extends Component {
     if (returnGateData.isDisabled) {
       returnGateOptions.push(
         <option key={returnGateData.id} value={returnGateData.id}>
-          {l18n.findByCode(returnGateData.code)}
+          {`${l18n.findByCode(returnGateData.code)} | archived`}
         </option>
       );
     }

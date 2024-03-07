@@ -18,6 +18,8 @@ const mapEvent = (data) => ({
   name: data.name,
   subTypes: data.subTypes,
   parentId: data.parentId,
+  materialIds: data.materialIds,
+  facilityIds: data.facilityIds,
 });
 
 export default class EventTypeContainer extends Component {
@@ -120,7 +122,13 @@ export default class EventTypeContainer extends Component {
 
   handleEdit = async (formData) => {
     const subtypes = formData.subTypes;
-  
+ 
+    if (subtypes.length > 0) {
+      formData.description = '';
+      formData.materialIds = [];
+      formData.facilityIds = [];
+    }
+
     try {
       await this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully');
   
@@ -130,11 +138,13 @@ export default class EventTypeContainer extends Component {
           name: s.name,
           description: s.description,
           parentId: formData.id,
+          materialIds: s.materialIds,
+          facilityIds: s.facilityIds,
           subTypes: [],
           valid: true,
         };
   
-        if (s.id === 0) {
+        if (s.id === 0 || typeof s.id === 'undefined') {
           await this.handleCreate(updatedData);
         } else {
           await this.postEventData(`/t_events/type/${s.id}`, updatedData);
