@@ -59,15 +59,19 @@ export default function TranslationCategoryTable ({
   };
 
   const handleCreate = () => {
-    const data = {
-      name: name
-    };
+    let dataValue;
 
     // todo: проверка так себе, конечно
     if (pageCaption === 'Categories') {
-      data.color = color;
+      dataValue = {
+        name: name,
+        color: color,
+      }
+    } else {
+      dataValue = name;
     }
-    onCreate(apiUrl.create, data);
+
+    onCreate(apiUrl.create, dataValue);
   };
 
   const onRemoveClick = (record) => {
