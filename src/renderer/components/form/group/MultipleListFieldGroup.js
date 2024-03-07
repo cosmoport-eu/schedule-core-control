@@ -11,7 +11,7 @@ export default class MultipleListFieldGroup extends PureComponent {
     index: PropTypes.number,
     onChange: PropTypes.func,
     validator: PropTypes.string,
-    children: PropTypes.node,
+    children: PropTypes.array,
     disabled: PropTypes.bool,
   };
 
@@ -42,6 +42,9 @@ export default class MultipleListFieldGroup extends PureComponent {
       opts.disabled = 'disabled';
     }
 
+    const defaultValue = this.props.children
+      .filter((t) => this.props.defaultValue.includes(t.value));
+
     return (
       <div style={{ marginTop: '1em' }} className={`bp5-form-group bp5-inline${invalidMaybeClass}`}>
         <label
@@ -58,6 +61,7 @@ export default class MultipleListFieldGroup extends PureComponent {
               <Select
                 id={this.props.name}
                 name={this.props.name}
+                defaultValue={defaultValue}
                 isMulti
                 className="basic-multi-select"
                 classNamePrefix="select"
