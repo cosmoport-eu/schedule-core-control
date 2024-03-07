@@ -27,6 +27,8 @@ export default class TableContainer extends Component {
     locale: {},
     refs: {},
     gates: [],
+    facilities: [],
+    materials: [],
     defaultRange: _date.getThreeDaysRange(),
     range: _date.getThreeDaysRange(),
   };
@@ -44,6 +46,8 @@ export default class TableContainer extends Component {
       this.props.api.fetchTranslations(),
       this.apiGetEventInRange(this.state.range),
       this.props.api.get('/gates'),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
     ])
       .then((data) =>
         this.setState({
@@ -57,6 +61,8 @@ export default class TableContainer extends Component {
           locale: data[4].en,
           events: data[5],
           gates: data[6],
+          facilities: data[7],
+          materials: data[8],
         }),
       )
       .catch((error) => ApiError(error));
@@ -114,7 +120,7 @@ export default class TableContainer extends Component {
       return <span>Loading...</span>;
     }
 
-    const { events, refs, locale, gates, range } = this.state;
+    const { events, refs, locale, gates, range, facilities, materials } = this.state;
 
     return (
       <>
@@ -125,6 +131,8 @@ export default class TableContainer extends Component {
           locale={locale}
           gates={gates}
           range={range}
+          facilities={facilities}
+          materials={materials}
           onDateRangeChange={this.handleDateChange}
           onDateRangeClear={this.handleDateClear}
           defaultRange={this.state.defaultRange}

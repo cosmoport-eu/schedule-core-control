@@ -33,6 +33,8 @@ export default class MainPage extends Component {
     locale: {},
     refs: {},
     gates: [],
+    facilities: [],
+    materials: [],
     start: _date.current(),
     end: _date.current(),
   };
@@ -55,6 +57,8 @@ export default class MainPage extends Component {
       // Fetch all the events between the current calendar view range
       this.props.api.fetchEventsInRange(this.state.start, this.state.end),
       this.props.api.fetchGates(),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
     ])
       .then((data) =>
         this.setState({
@@ -68,6 +72,8 @@ export default class MainPage extends Component {
           locale: data[4].en,
           events: data[5],
           gates: data[6],
+          facilities: data[7],
+          materials: data[8],
         }),
       )
       .catch((error) => ApiError(error));
@@ -171,7 +177,7 @@ export default class MainPage extends Component {
       return <span>Loading...</span>;
     }
 
-    const { events, locale, refs, gates } = this.state;
+    const { events, locale, refs, gates, facilities, materials } = this.state;
     const l18n = new L18n(locale);
     const refsData = new RefsData(refs);
 
@@ -198,6 +204,8 @@ export default class MainPage extends Component {
           }}
           callback={this.handleCreate}
           refs={refs}
+          facilities={facilities}
+          materials={materials}
           locale={locale}
           gates={gates}
         />

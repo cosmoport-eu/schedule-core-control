@@ -13,6 +13,8 @@ export default class EventMapper {
     eventStateId: object.state,
     startTime: object.time,
     eventTypeId: object.type,
+    facilityIds: object.facilityIds,
+    materialIds: object.materialIds,
   });
 
   static unmap = (object) => ({
@@ -29,5 +31,7 @@ export default class EventMapper {
     cost: object.cost,
     peopleLimit: object.peopleLimit,
     contestants: object.contestants,
+    facilityIds: object.facilityIds,
+    materialIds: object.materialIds,
   });
 }
