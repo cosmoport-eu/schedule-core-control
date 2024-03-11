@@ -233,7 +233,7 @@ export default class EventTypeForm extends Component {
     this.props.categoryCreateCallback(this.state.category_name, this.state.category_color);
   };
 
-  handleSectionSelectChange = (section_id, elem_name, options) => {
+  handleSectionSelectChange = (elem_name, options, section_id) => {
     const selectedValues = Array.from(options, option => option.value);
 
     this.setState((prev) => {
@@ -243,7 +243,7 @@ export default class EventTypeForm extends Component {
     });
   };
 
-  handleSelectChange = (section_id, elem_name, options) => {
+  handleSelectChange = (elem_name, options, section_id) => {
     const selectedValues = Array.from(options, option => option.value);
 
     this.setState({ [elem_name]: selectedValues });
