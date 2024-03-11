@@ -13,6 +13,7 @@ export default class MultipleListFieldGroup extends PureComponent {
     validator: PropTypes.string,
     children: PropTypes.array,
     disabled: PropTypes.bool,
+    defaultValue: PropTypes.array,
   };
 
   static defaultProps = {
@@ -22,13 +23,14 @@ export default class MultipleListFieldGroup extends PureComponent {
     validator: '',
     children: null,
     disabled: false,
+    defaultValue: [],
   };
 
   handleSelectChange = (event) => {
     this.props.onChange(
-      this.props.id,
       this.props.name,
       event,
+      this.props.id,
     );
   };
 
