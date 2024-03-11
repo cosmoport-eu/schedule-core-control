@@ -50,12 +50,12 @@ export default function TranslationCategoryTable ({
     },
   };
 
-  const handleTextChange = (id, value, oldValue) => {
+  const handleTextChange = (id, value, oldValue, locale, code) => {
     if (value === oldValue) {
       return;
     }
     
-    onTextChange(id, value, apiUrl.get);
+    onTextChange(id, value, apiUrl.get, code);
   };
 
   const handleCreate = () => {
@@ -94,6 +94,7 @@ export default function TranslationCategoryTable ({
           <TextEditor
             id={translation.id}
             text={translation.text}
+            code={record.field_name}
             onConfirm={handleTextChange}
           />
         </td>
