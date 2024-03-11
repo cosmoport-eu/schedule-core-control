@@ -49,6 +49,7 @@ export default class EventForm extends Component {
       default_duration: 0,
       default_repeat_interval: 0,
       default_cost: 0,
+      description: '',
       facilityIds: [],
       materialIds: [],
     };
@@ -75,6 +76,8 @@ export default class EventForm extends Component {
         this.state.has_subtypes && this.state.subtype === 0
           ? 'Subtype (Lesson) is not selected.'
           : '',
+      // если событие старое, то будет ошибка ?
+      // добавить проверку на дату создания ?
       facilities: () =>
         this.state.facilityIds.length === 0
           ? "Choose at least one facility" : '',
@@ -185,6 +188,7 @@ export default class EventForm extends Component {
       default_duration: defaultDuration,
       default_repeat_interval: defaultRepeatInterval,
       default_cost: defaultCost,
+      description: event.description,
       facilityIds: event.facilityIds,
       materialIds: event.materialIds,
     };
@@ -408,7 +412,7 @@ export default class EventForm extends Component {
       }
     }
 
-    const getDescriptionById = (id) => {
+    const getTypeDescriptionById = (id) => {
       const desc = types
         .filter((t) => t.id === id && t.isDisabled === false)
         .map((op) => l18n.findByCode(op.descCode));
@@ -416,25 +420,42 @@ export default class EventForm extends Component {
       return desc.length > 0 ? desc[0] : '';
     };
 
-    let description = '';
+    let typeDescription = '';
     let facilitiesOptions = {};
     let materialsOptions = {};
 
     const getTypeData = (type) => {
       if (type) {
-        description = getDescriptionById(type);
+        typeDescription = getTypeDescriptionById(type);
         return this.findEventTypeData(type);
       }
       return null;
     };
 
     const updateOptions = (typeData) => {
-      facilitiesOptions = this.props.facilities
-        .filter((f) => typeData && typeData.facilityIds.includes(f.id))
+      let facilitiesForType = [];
+      let materialsForType = [];
+
+      if (typeData.facilityIds.length > 0) {
+        facilitiesForType = this.props.facilities
+          .filter((f) => typeData && typeData.facilityIds.includes(f.id));
+      } else {
+        // для старых типов
+        facilitiesForType = this.props.facilities;
+      }
+
+      if (typeData.materialIds.length > 0) {
+        materialsForType = this.props.materials
+          .filter((m) => typeData && typeData.materialIds.includes(m.id));
+      } else {
+        // для старых типов
+        materialsForType = this.props.materials;
+      }
+
+      facilitiesOptions = facilitiesForType
         .map((f) => ({ value: f.id, label: f.name }));
 
-      materialsOptions = this.props.materials
-        .filter((m) => typeData && typeData.materialIds.includes(m.id))
+      materialsOptions = materialsForType
         .map((m) => ({ value: m.id, label: m.name }));
     };
 
@@ -532,16 +553,16 @@ export default class EventForm extends Component {
             {subTypeOptions}
           </ListFieldGroup>
         )}
-        {description !== '' && (
+        {typeDescription !== '' && (
           <TextAreaGroup
-            name="description"
-            value={description}
+            name="type_description"
+            value={typeDescription}
             inline
             disabled
           />
         )}
 
-        {description !== '' && (
+        {typeDescription !== '' && (
           <MultipleListFieldGroup
             styles={{
               menu: base => ({
@@ -560,7 +581,7 @@ export default class EventForm extends Component {
           </MultipleListFieldGroup>
         )}
 
-        {description !== '' && (
+        {typeDescription !== '' && (
           <MultipleListFieldGroup
             styles={{
               menu: base => ({
@@ -577,7 +598,6 @@ export default class EventForm extends Component {
             {materialsOptions}
           </MultipleListFieldGroup>
         )}
-
         <div
           className={`bp5-form-group ${styles.formTimeRangeContainer}${invalidTimeRangeMaybeClass}`}
         >
@@ -647,6 +667,13 @@ export default class EventForm extends Component {
             </ListFieldGroup>
           </div>
         </div>
+
+        <TextAreaGroup
+          name="description"
+          value={this.state.description}
+          onChange={this.handleChange}
+          inline
+        />
         <NumberFieldGroup
           name="cost"
           caption="Cost"
