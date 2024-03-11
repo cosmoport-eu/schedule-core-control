@@ -175,8 +175,8 @@ export default class TranslationContainer extends Component {
       .catch((error) => ApiError(error));
   };
 
-  handleTextChange = (id, value, apiUrl, okCallback, notOkCallback) => {
-    const valueObject = apiUrl === '/translations/external' ? { id, text: value } : value;
+  handleTextChange = (id, value, apiUrl, code, okCallback, notOkCallback) => {
+    const valueObject = apiUrl === '/translations/external' ? { id, text: value, code: code } : value;
 
     const apiCall = apiUrl === '/translations/external' ?
       this.props.api.post(apiUrl, valueObject) :
