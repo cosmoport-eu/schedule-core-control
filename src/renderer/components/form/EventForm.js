@@ -556,6 +556,7 @@ export default class EventForm extends Component {
         {typeDescription !== '' && (
           <TextAreaGroup
             name="type_description"
+            caption="Type"
             value={typeDescription}
             inline
             disabled
@@ -704,6 +705,15 @@ export default class EventForm extends Component {
             onChange={this.handleChange}
           >
             {stateOptions}
+          </ListFieldGroup>
+        )}
+        {!this.props.forCreate && (
+          <ListFieldGroup
+            name="status"
+            index={this.state.status}
+            onChange={this.handleChange}
+          >
+            {statusOptions}
           </ListFieldGroup>
         )}
       </>
