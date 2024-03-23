@@ -421,12 +421,17 @@ export default class EventForm extends Component {
     let typeDescription = '';
     let facilitiesOptions = {};
     let materialsOptions = {};
+    let default_repeat_interval = 0;
 
     const getTypeData = (type) => {
       if (type) {
         typeDescription = getTypeDescriptionById(type);
-        return this.findEventTypeData(type);
+        const typeData = this.findEventTypeData(type);
+        default_repeat_interval = typeData.defaultRepeatInterval;
+
+        return typeData;
       }
+
       return null;
     };
 
@@ -602,7 +607,7 @@ export default class EventForm extends Component {
               minutes={this.state.duration}
               onChange={this.handleChange}
             />
-            {this.state.default_repeat_interval > 0 && (
+            {(this.state.default_repeat_interval > 0 || default_repeat_interval > 0) && (
               <NumberFieldGroup
                 name="repeat_interval"
                 className={styles.repeat}
