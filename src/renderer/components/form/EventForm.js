@@ -82,9 +82,7 @@ export default class EventForm extends Component {
         this.state.facilityIds.length === 0
           ? "Choose at least one facility" : '',
       gate: () =>
-        this.state.gate === 0 ? 'Gate for departion is not selected.' : '',
-      gate2: () =>
-        this.state.gate2 === 0 ? 'Gate for return is not selected.' : '',
+        this.state.gate === 0 ? 'Gate is not selected.' : '',
       bought: () =>
         this.state.bought > this.state.limit ? 'Beyond the tickets limit.' : '',
     };
@@ -139,6 +137,7 @@ export default class EventForm extends Component {
   getFormData = () => {
     const data = Object.assign(this.state, {
       date: _date.toYmd(this.state.date),
+      gate2: this.state.gate,
       valid: this.isValid(),
     });
 
@@ -324,7 +323,6 @@ export default class EventForm extends Component {
       category,
       subtype,
       gate,
-      gate2,
       bought,
       facilities,
     } = this.validators;
@@ -477,14 +475,6 @@ export default class EventForm extends Component {
         </option>
       ));
     
-    const returnGateOptions = this.props.gates
-      .filter((g) => g.isDisabled === false)
-      .map((gate_) => (
-        <option key={gate_.id} value={gate_.id}>
-          {l18n.findByCode(gate_.code)}
-        </option>
-      ));
-
     const departionGateData = this.props.gates
       .filter((g) => g.id === this.state.gate)[0];
 
@@ -492,17 +482,6 @@ export default class EventForm extends Component {
       departionGateOptions.push(
         <option key={departionGateData.id} value={departionGateData.id}>
           {`${l18n.findByCode(departionGateData.code)} | archived`}
-        </option>
-      );
-    }
-
-    const returnGateData = this.props.gates
-      .filter((g) => g.id === this.state.gate2)[0];
-
-    if (returnGateData && returnGateData.isDisabled) {
-      returnGateOptions.push(
-        <option key={returnGateData.id} value={returnGateData.id}>
-          {`${l18n.findByCode(returnGateData.code)} | archived`}
         </option>
       );
     }
@@ -639,35 +618,15 @@ export default class EventForm extends Component {
             {warnings && warnings}
           </div>
         </div>
-        <div className={`bp5-form-group ${styles.formGatesContainer}`}>
-          <label
-            htmlFor="time-range"
-            className={`bp5-label bp5-inline ${styles.label_text} ${styles.timeLabel}`}
-          >
-            <span>Gates</span>
-          </label>
-          <div className={styles.formGates}>
-            <ListFieldGroup
-              name="gate"
-              caption="Departion"
-              index={this.state.gate}
-              validator={gate()}
-              onChange={this.handleChange}
-            >
-              {departionGateOptions}
-            </ListFieldGroup>
-
-            <ListFieldGroup
-              name="gate2"
-              caption="Return"
-              index={this.state.gate2}
-              validator={gate2()}
-              onChange={this.handleChange}
-            >
-              {returnGateOptions}
-            </ListFieldGroup>
-          </div>
-        </div>
+        <ListFieldGroup
+          name="gate"
+          caption="Gate"
+          index={this.state.gate}
+          validator={gate()}
+          onChange={this.handleChange}
+        >
+          {departionGateOptions}
+        </ListFieldGroup>
 
         <TextAreaGroup
           name="description"
