@@ -80,3 +80,8 @@
     margin-top: 5px;
     font-size: 12px;
 }
+
+.smaller {
+    font-size: 85% !important;
+    margin: 2em 0 1em 0;
+}

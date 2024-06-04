@@ -65,6 +65,7 @@ export default class MultipleListFieldGroup extends PureComponent {
                 name={this.props.name}
                 defaultValue={defaultValue}
                 isMulti
+                closeMenuOnSelect={false}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 styles={this.props.style}

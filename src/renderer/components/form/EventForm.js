@@ -17,6 +17,7 @@ import TextAreaGroup from './group/TextAreaGroup';
 import FacilityPropType from '../../props/FacilityPropType';
 import MaterialPropType from '../../props/MaterialPropType';
 import MultipleListFieldGroup from './group/MultipleListFieldGroup';
+import { Callout } from '@blueprintjs/core';
 
 /**
  * The class for event properties form.
@@ -112,7 +113,9 @@ export default class EventForm extends Component {
 
   // get type's data from a repository
   defaults_fill = (value) => {
-    const eventTypeData = this.findEventTypeData(value) || {
+    const typeData = this.findEventTypeData(value);
+
+    const eventTypeData = typeData || {
       defaultDuration: 0,
       defaultRepeatInterval: 0,
       defaultCost: 0,
@@ -252,7 +255,6 @@ export default class EventForm extends Component {
     const selectedValues = Array.from(options, option => option.value);
 
     this.handleChange(elem_name, selectedValues);
-    this.defaults_fill(selectedValues);
   };
 
   findEventTypeData = (value) =>
@@ -421,13 +423,11 @@ export default class EventForm extends Component {
     let typeDescription = '';
     let facilitiesOptions = {};
     let materialsOptions = {};
-    let default_repeat_interval = 0;
 
     const getTypeData = (type) => {
       if (type) {
         typeDescription = getTypeDescriptionById(type);
         const typeData = this.findEventTypeData(type);
-        default_repeat_interval = typeData.defaultRepeatInterval;
 
         return typeData;
       }
@@ -540,7 +540,7 @@ export default class EventForm extends Component {
         {typeDescription !== '' && (
           <TextAreaGroup
             name="type_description"
-            caption="Type"
+            caption="Type Description"
             value={typeDescription}
             inline
             disabled
@@ -607,15 +607,13 @@ export default class EventForm extends Component {
               minutes={this.state.duration}
               onChange={this.handleChange}
             />
-            {(this.state.default_repeat_interval > 0 || default_repeat_interval > 0) && (
-              <NumberFieldGroup
-                name="repeat_interval"
-                className={styles.repeat}
-                caption="Repeat"
-                number={this.state.repeat_interval}
-                onChange={this.handleChange}
-              />
-            )}
+            <NumberFieldGroup
+              name="repeat_interval"
+              className={styles.repeat}
+              caption="Repeat"
+              number={this.state.repeat_interval}
+              onChange={this.handleChange}
+            />
             <LabelFieldGroup className={styles.totalTime} value={totalTime} />
             {invalidTimeRange && (
               <div className="bp5-form-helper-text">{time()}</div>
@@ -633,6 +631,10 @@ export default class EventForm extends Component {
           {departionGateOptions}
         </ListFieldGroup>
 
+        <Callout className={styles.smaller}>
+          For Birthday enter the name and age of the birthday person, i. e. "Georgos 7 years".
+          This information will be displayed on the Gate.
+        </Callout>
         <TextAreaGroup
           name="description"
           value={this.state.description}
