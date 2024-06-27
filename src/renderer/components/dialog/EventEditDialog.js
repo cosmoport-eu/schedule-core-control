@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { Dialog, DialogBody, DialogFooter, Button } from '@blueprintjs/core';
 
 import RefsPropType from '../../props/RefsPropType';
-import LocalePropType from '../../props/LocalePropType';
 import GatePropType from '../../props/GatePropType';
 import EventForm from '../form/EventForm';
 import EventMapper from '../../components/mapper/EventMapper';
 import _date  from '../date/_date';
+import FacilityPropType from '../../props/FacilityPropType';
+import MaterialPropType from '../../props/MaterialPropType';
 
 /**
  * The class for event edit dialog.
@@ -18,14 +19,18 @@ export default class EventEditDialog extends PureComponent {
   static propTypes = {
     callback: PropTypes.func.isRequired,
     refs: RefsPropType.isRequired,
-    locale: LocalePropType.isRequired,
+    locale: PropTypes.objectOf(PropTypes.string).isRequired,
     gates: PropTypes.arrayOf(GatePropType),
+    facilities: PropTypes.arrayOf(FacilityPropType).isRequired,
+    materials: PropTypes.arrayOf(MaterialPropType).isRequired,
   };
 
   static defaultProps = {
     event: null,
     callback: () => {},
     gates: [],
+    facilities: [],
+    materials: [],
   };
 
   constructor(props) {
@@ -49,7 +54,7 @@ export default class EventEditDialog extends PureComponent {
   };
 
   render() {
-    const { locale, refs, gates } = this.props;
+    const { locale, refs, gates, facilities, materials } = this.props;
     const { isOpen, event } = this.state;
 
     if (!event) return;
@@ -75,6 +80,8 @@ export default class EventEditDialog extends PureComponent {
             locale={locale}
             refs={refs}
             gates={gates}
+            facilities={facilities}
+            materials={materials}
           />
         </DialogBody>
         <DialogFooter

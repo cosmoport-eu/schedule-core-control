@@ -12,6 +12,7 @@ import Message from '../components/messages/Message';
 import EventAddDialog from '../components/dialog/EventAddDialog';
 import _date from '../components/date/_date';
 import EventType from '../components/eventType/EventType';
+import RefsData from '../components/references/RefsData';
 
 export default class MainPage extends Component {
   static propTypes = {
@@ -32,6 +33,8 @@ export default class MainPage extends Component {
     locale: {},
     refs: {},
     gates: [],
+    facilities: [],
+    materials: [],
     start: _date.current(),
     end: _date.current(),
   };
@@ -46,19 +49,31 @@ export default class MainPage extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
+      this.props.api.get('/t_events/types?isActive=true'),
+      this.props.api.get('/category?localeId=1&isActive=true'),
+      this.props.api.get('/t_events/statuses'),
+      this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations(),
       // Fetch all the events between the current calendar view range
       this.props.api.fetchEventsInRange(this.state.start, this.state.end),
       this.props.api.fetchGates(),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
     ])
-      .then(([r, l, e, g]) =>
+      .then((data) =>
         this.setState({
           hasData: true,
-          refs: r,
-          locale: l.en,
-          events: e,
-          gates: g,
+          refs: {
+            types: data[0],
+            typeCategories: data[1],
+            statuses: data[2],
+            states: data[3],
+          },
+          locale: data[4].en,
+          events: data[5],
+          gates: data[6],
+          facilities: data[7],
+          materials: data[8],
         }),
       )
       .catch((error) => ApiError(error));
@@ -113,7 +128,7 @@ export default class MainPage extends Component {
 
     this.props.api
       .createEvent(formData)
-      .then((result) => Message.show(`Event has been created [${result.id}].`))
+      .then((result) => Message.show(`Event has been created.`))
       .then(() => this.eventAddDialog.suggestNext(this.props.pre))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
@@ -162,8 +177,9 @@ export default class MainPage extends Component {
       return <span>Loading...</span>;
     }
 
-    const { events, locale, refs, gates } = this.state;
-    const l18n = new L18n(locale, refs);
+    const { events, locale, refs, gates, facilities, materials } = this.state;
+    const l18n = new L18n(locale);
+    const refsData = new RefsData(refs);
 
     const et = EventType({
       categories: refs.typeCategories,
@@ -172,12 +188,13 @@ export default class MainPage extends Component {
 
     return (
       <div>
-        <PageCaption text="01 Calendar" />
+        <PageCaption text="Calendar" />
         <EventTicketBuyDialog
           ref={(dialog) => {
             this.eventTicketsDialog = dialog;
           }}
           l18n={l18n}
+          refsData={refsData}
           et={et}
           onTicketUpdate={this.handleTickets}
         />
@@ -187,6 +204,8 @@ export default class MainPage extends Component {
           }}
           callback={this.handleCreate}
           refs={refs}
+          facilities={facilities}
+          materials={materials}
           locale={locale}
           gates={gates}
         />
@@ -199,7 +218,7 @@ export default class MainPage extends Component {
         />
         <Calendar
           events={events}
-          l18n={l18n}
+          refsData={refsData}
           et={et}
           onMenu={this.handleMenu}
           onViewChange={this.handleCalendarViewChange}

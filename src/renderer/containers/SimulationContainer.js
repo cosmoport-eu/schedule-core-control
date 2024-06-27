@@ -117,7 +117,7 @@ export default class SimulationContainer extends PureComponent {
     return (
       <>
         <div className={styles.cap}>
-          <PageCaption text="02 Simulation" />
+          <PageCaption text="Simulation" />
           <Popover
             interactionKind="hover"
             popoverClassName={Classes.POPOVER_CONTENT_SIZING}

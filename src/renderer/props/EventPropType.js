@@ -11,9 +11,12 @@ export default PropTypes.shape({
   eventStatusId: PropTypes.number,
   eventTypeId: PropTypes.number,
   eventColor: PropTypes.string,
+  description: PropTypes.string,
   gateId: PropTypes.number,
   gate2Id: PropTypes.number,
   peopleLimit: PropTypes.number,
   repeatInterval: PropTypes.number,
-  startTime: PropTypes.number
+  startTime: PropTypes.number,
+  facilityIds: PropTypes.array,
+  materialIds: PropTypes.array,
 });

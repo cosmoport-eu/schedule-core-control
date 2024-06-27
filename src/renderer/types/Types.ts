@@ -6,19 +6,26 @@ export type GateType = {
   gateName: string;
 };
 
-type i18nKeys = 'id' | 'i18nStatus' | 'i18nState';
-export type EventI18nRecordType = {
-  [K in i18nKeys]?: number;
+export type FacilityType = {
+  id: number;
+  code: string;
+  name: string;
+};
+
+export type MaterialType = {
+  id: number;
+  code: string;
+  name: string;
 };
 
 export type EventStatusType = {
   id: number;
-  i18nStatus: number;
+  code: string;
 };
 
 export type EventStateType = {
   id: number;
-  i18nState: number;
+  code: string;
 };
 
 export type EventTypeType = {
@@ -27,25 +34,19 @@ export type EventTypeType = {
   defaultCost: number;
   defaultDuration: number;
   defaultRepeatInterval: number;
-  i18nEventTypeDescription: number;
-  i18nEventTypeName: number;
+  descCode: string;
+  nameCode: string;
 };
 
 export type EventTypeCategoryType = {
   id: number;
   parent: number;
-  i18nEventTypeCategoryName: number;
+  code: string;
+  color: string;
 };
 
 export type EventFormDataType = {
   [key: string]: number | string | boolean;
-};
-
-export type LocaleType = {
-  [index: number | string]: {
-    id: number;
-    values: string[];
-  };
 };
 
 export type RefsType = {

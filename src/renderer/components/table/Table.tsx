@@ -11,8 +11,9 @@ import {
   EventType,
   EventFormDataType,
   GateType,
-  LocaleType,
   RefsType,
+  MaterialType,
+  FacilityType,
 } from '../../types/Types';
 import Message from '../messages/Message';
 
@@ -22,7 +23,9 @@ type Props = {
   auth?: boolean;
   events?: EventType[];
   gates?: GateType[];
-  locale: LocaleType;
+  facilities?: FacilityType[],
+  materials?: MaterialType[],
+  locale: object;
   onCreate?: (data: EventFormDataType, suggest: (time: number) => void) => void;
   onDateRangeChange?: (range: DateRange) => void;
   onDateRangeClear?: () => void;
@@ -37,6 +40,8 @@ export default function Table({
   auth = false,
   events = [],
   gates = [],
+  facilities = [],
+  materials = [],
   locale,
   onCreate = () => {},
   onDateRangeChange = () => {},
@@ -72,6 +77,8 @@ export default function Table({
         refs={refs}
         locale={locale}
         gates={gates}
+        facilities={facilities}
+        materials={materials}
       />
       <EventEditDialog
         ref={editDialogRef}
@@ -79,6 +86,8 @@ export default function Table({
         refs={refs}
         locale={locale}
         gates={gates}
+        facilities={facilities}
+        materials={materials}
       />
       <div className={styles.controls}>
         <Button minimal icon="add" onClick={handleAddClick} />

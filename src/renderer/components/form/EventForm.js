@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import EventPropType from '../../props/EventPropType';
 import RefsPropType from '../../props/RefsPropType';
-import LocalePropType from '../../props/LocalePropType';
 import GatePropType from '../../props/GatePropType';
 import L18n from '../l18n/L18n';
 import DateFiledGroup from './group/DateFieldGroup';
@@ -15,6 +14,10 @@ import _date from '../date/_date';
 
 import styles from './EventForm.module.css';
 import TextAreaGroup from './group/TextAreaGroup';
+import FacilityPropType from '../../props/FacilityPropType';
+import MaterialPropType from '../../props/MaterialPropType';
+import MultipleListFieldGroup from './group/MultipleListFieldGroup';
+import { Callout } from '@blueprintjs/core';
 
 /**
  * The class for event properties form.
@@ -35,8 +38,8 @@ export default class EventForm extends Component {
       limit: 0,
       bought: 0,
       category: 0,
-      subcategory: 0,
-      tree: false,
+      subtype: 0,
+      has_subtypes: false,
       type: 0,
       gate: 0,
       gate2: 0,
@@ -47,6 +50,9 @@ export default class EventForm extends Component {
       default_duration: 0,
       default_repeat_interval: 0,
       default_cost: 0,
+      description: '',
+      facilityIds: [],
+      materialIds: [],
     };
 
     // Overrides initial data with passed in parameters
@@ -67,14 +73,17 @@ export default class EventForm extends Component {
       type: () => (this.state.type === 0 ? 'Type is not selected.' : ''),
       category: () =>
         this.state.category === 0 ? 'Category is not selected.' : '',
-      subcategory: () =>
-        this.state.tree && this.state.subcategory === 0
-          ? 'Subcategory is not selected.'
+      subtype: () =>
+        this.state.has_subtypes && this.state.subtype === 0
+          ? 'Subtype (Lesson) is not selected.'
           : '',
+      // если событие старое, то будет ошибка ?
+      // добавить проверку на дату создания ?
+      facilities: () =>
+        this.state.facilityIds.length === 0
+          ? "Choose at least one facility" : '',
       gate: () =>
-        this.state.gate === 0 ? 'Gate for departion is not selected.' : '',
-      gate2: () =>
-        this.state.gate2 === 0 ? 'Gate for return is not selected.' : '',
+        this.state.gate === 0 ? 'Gate is not selected.' : '',
       bought: () =>
         this.state.bought > this.state.limit ? 'Beyond the tickets limit.' : '',
     };
@@ -104,7 +113,9 @@ export default class EventForm extends Component {
 
   // get type's data from a repository
   defaults_fill = (value) => {
-    const eventTypeData = this.findEventTypeData(value) || {
+    const typeData = this.findEventTypeData(value);
+
+    const eventTypeData = typeData || {
       defaultDuration: 0,
       defaultRepeatInterval: 0,
       defaultCost: 0,
@@ -129,11 +140,12 @@ export default class EventForm extends Component {
   getFormData = () => {
     const data = Object.assign(this.state, {
       date: _date.toYmd(this.state.date),
+      gate2: this.state.gate,
       valid: this.isValid(),
     });
 
-    if (this.state.subcategory) {
-      data.type = this.state.subcategory;
+    if (this.state.subtype) {
+      data.type = this.state.subtype;
     }
 
     return data;
@@ -147,19 +159,15 @@ export default class EventForm extends Component {
   fillState = (event) => {
     if (!event) return;
 
-    const { categoryId, defaultDuration, defaultRepeatInterval, defaultCost } =
+    const { categoryId, defaultDuration, defaultRepeatInterval, defaultCost, parentId } =
       this.findEventTypeData(event.eventTypeId);
+    
+    let [type, subtype, has_subtypes] = [event.eventTypeId, 0, false];
 
-    // build the category tree
-    let category = categoryId;
-    const cat = this.findEventTypeCategory(category);
-
-    let [type, subcategory, tree] = [event.eventTypeId, 0, false];
-    if (cat.parent) {
-      subcategory = type;
-      type = category;
-      category = cat.parent;
-      tree = true;
+    if (parentId !== null && parentId !== 0) {
+      subtype = type;
+      type = parentId;
+      has_subtypes = true;
     }
 
     this.state = {
@@ -169,9 +177,9 @@ export default class EventForm extends Component {
       duration: event.durationTime,
       limit: event.peopleLimit,
       bought: event.contestants,
-      category: category,
-      subcategory: subcategory,
-      tree: tree,
+      category: categoryId,
+      subtype: subtype,
+      has_subtypes: has_subtypes,
       type: type,
       gate: event.gateId,
       gate2: event.gate2Id,
@@ -182,6 +190,9 @@ export default class EventForm extends Component {
       default_duration: defaultDuration,
       default_repeat_interval: defaultRepeatInterval,
       default_cost: defaultCost,
+      description: event.description,
+      facilityIds: event.facilityIds,
+      materialIds: event.materialIds,
     };
   };
 
@@ -217,35 +228,40 @@ export default class EventForm extends Component {
    * @since 0.1.0
    */
   handleTypeChange = (name, value, event) => {
-    // is it a tree
-    let tree = false;
+    let has_subtypes = false;
     const opts = event.currentTarget.selectedOptions || [];
     if (opts.length > 0) {
-      tree = opts[0].dataset.tree || false;
+      has_subtypes = opts[0].dataset.has_subtypes === "true";
     }
 
-    this.setState({ subcategory: 0, tree: tree });
+    this.setState({ subtype: 0, has_subtypes: has_subtypes });
     this.handleChange(name, value);
 
     this.defaults_fill(value);
   };
 
   handleCategoryChange = (name, value) => {
-    this.setState({ type: 0, subcategory: 0, tree: false });
+    this.setState({ type: 0, subtype: 0, has_subtypes: false });
     this.handleChange(name, value);
     this.defaults_reset();
   };
 
-  handleSubCategoryChange = (name, value) => {
+  handleSubTypeChange = (name, value) => {
     this.handleChange(name, value);
     this.defaults_fill(value);
+  };
+
+  handleAdditionalSelectChange = (elem_name, options) => {
+    const selectedValues = Array.from(options, option => option.value);
+
+    this.handleChange(elem_name, selectedValues);
   };
 
   findEventTypeData = (value) =>
     this.props.refs.types.find((type) => type.id === value);
 
   findEventTypeCategory = (value) =>
-    this.props.refs.typeCategories.find((type) => type.id === value);
+    this.props.refs.typeCategories.find((category) => category.id === value);
 
   /**
    * Handles the change event on an input field of <day> type.
@@ -296,88 +312,184 @@ export default class EventForm extends Component {
   };
 
   render() {
-    const { types, typeCategories, statuses, states } =
+    const { states, statuses, typeCategories, types } =
       this.props.refs;
 
     if (!typeCategories || !types || !statuses) {
-      return <div>:(</div>;
+      return <div>Data not found</div>;
     }
 
     const {
       time,
       type,
       category,
-      subcategory,
+      subtype,
       gate,
-      gate2,
       bought,
+      facilities,
     } = this.validators;
-    const l18n = new L18n(this.props.locale, this.props.refs);
+
+    const l18n = new L18n(this.props.locale);
 
     const statusOptions = statuses.map((op) => (
       <option key={op.id} value={op.id}>
-        {l18n.findTranslationById(op, 'i18nStatus')}
+        {l18n.findByCode(op.code)}
       </option>
     ));
+
     const stateOptions = states.map((op) => (
       <option key={op.id} value={op.id}>
-        {l18n.findTranslationById(op, 'i18nState')}
+        {l18n.findByCode(op.code)}
       </option>
     ));
+
     const categoryOptions = typeCategories
-      .filter((t) => t.parent === 0)
+      .filter((t) => t.isDisabled === false)
       .map((op) => (
         <option key={op.id} value={op.id}>
-          {l18n.findTranslationById(op, 'i18nEventTypeCategoryName')}
+          {l18n.findByCode(op.code)}
         </option>
       ));
 
     let typeOptions = [];
     if (this.state.category) {
+      const currentCategoryData = this.findEventTypeCategory(this.state.category);
+      if (currentCategoryData.isDisabled) {
+        categoryOptions.push(
+          <option key={currentCategoryData.id} value={currentCategoryData.id}>
+            {`${l18n.findByCode(currentCategoryData.code)} | archived`}
+          </option>
+        );
+      }
+
       typeOptions = types
-        .filter((t) => t.categoryId === this.state.category)
+        .filter((t) =>t.categoryId === this.state.category && t.parentId === null && t.isDisabled === false)
+        .map((op) => ({
+          ...op,
+          has_subtypes: types.some((t) => t.parentId === op.id),
+        }))
         .map((op) => (
-          <option key={op.id} value={op.id}>
-            {l18n.findTranslationById(op, 'i18nEventTypeName')}
-          </option>
-        ));
-      const typeSubOptions = typeCategories
-        .filter((t) => t.parent === this.state.category)
-        .map((op) => (
-          <option key={op.id} value={op.id} data-tree={true}>
-            {l18n.findTranslationById(op, 'i18nEventTypeCategoryName')}
-          </option>
-        ));
-      typeOptions.push(typeSubOptions);
-    }
-
-    let subTypeOptions = [];
-    if (this.state.type && this.state.category) {
-      subTypeOptions = types
-        .filter((t) => t.categoryId === this.state.type)
-        .map((op) => (
-          <option key={op.id} value={op.id}>
-            {l18n.findTranslationById(op, 'i18nEventTypeName')}
+          <option key={op.id} value={op.id} data-has_subtypes={op.has_subtypes}>
+            {l18n.findByCode(op.nameCode)}
           </option>
         ));
     }
 
-    let subTypeDescription = '';
-    if (this.state.subcategory) {
-      const desc = types
-        .filter((t) => t.id === this.state.subcategory)
-        .map((op) => l18n.findTranslationById(op, 'i18nEventTypeDescription'));
-
-      if (desc.length > 0) {
-        subTypeDescription = desc[0];
+    if (this.state.category && this.state.type) {
+      const currentTypeData = this.findEventTypeData(this.state.type);
+      if (currentTypeData.isDisabled) {
+        typeOptions.push(
+          <option
+            key={currentTypeData.id}
+            value={currentTypeData.id}
+            data-has_subtypes={types.some((t) => t.parentId === currentTypeData.id)}
+          >
+            {`${l18n.findByCode(currentTypeData.nameCode)} | archived`}
+          </option>
+        );
       }
     }
 
-    const gateOptions = this.props.gates.map((gate_) => (
-      <option key={gate_.id} value={gate_.id}>
-        {gate_.id} - {gate_.number} {gate_.gateName}
-      </option>
-    ));
+    let subTypeOptions = [];
+    if (this.state.category && this.state.type) {
+      subTypeOptions = types
+        .filter((t) => t.parentId === this.state.type && t.isDisabled === false)
+        .map((op) => (
+          <option key={op.id} value={op.id}>
+            {l18n.findByCode(op.nameCode)}
+          </option>
+        ));
+
+      if (this.state.subtype !== 0) {
+        const currentSubTypeData = this.findEventTypeData(this.state.subtype);
+        if (currentSubTypeData.isDisabled) {
+          subTypeOptions.push(
+            <option key={currentSubTypeData.id} value={currentSubTypeData.id} >
+              {`${l18n.findByCode(currentSubTypeData.nameCode)} | archived`}
+            </option>
+          );
+        }
+      }
+    }
+
+    const getTypeDescriptionById = (id) => {
+      const desc = types
+        .filter((t) => t.id === id && t.isDisabled === false)
+        .map((op) => l18n.findByCode(op.descCode));
+    
+      return desc.length > 0 ? desc[0] : '';
+    };
+
+    let typeDescription = '';
+    let facilitiesOptions = {};
+    let materialsOptions = {};
+
+    const getTypeData = (type) => {
+      if (type) {
+        typeDescription = getTypeDescriptionById(type);
+        const typeData = this.findEventTypeData(type);
+
+        return typeData;
+      }
+
+      return null;
+    };
+
+    const updateOptions = (typeData) => {
+      let facilitiesForType = [];
+      let materialsForType = [];
+
+      if (typeData.facilityIds.length > 0) {
+        facilitiesForType = this.props.facilities
+          .filter((f) => typeData && typeData.facilityIds.includes(f.id));
+      } else {
+        // для старых типов
+        facilitiesForType = this.props.facilities;
+      }
+
+      if (typeData.materialIds.length > 0) {
+        materialsForType = this.props.materials
+          .filter((m) => typeData && typeData.materialIds.includes(m.id));
+      } else {
+        // для старых типов
+        materialsForType = this.props.materials;
+      }
+
+      facilitiesOptions = facilitiesForType
+        .map((f) => ({ value: f.id, label: f.name }));
+
+      materialsOptions = materialsForType
+        .map((m) => ({ value: m.id, label: m.name }));
+    };
+
+    if (this.state.type) {
+      const typeData = getTypeData(this.state.type);
+      updateOptions(typeData);
+    }
+
+    if (this.state.subtype) {
+      const typeData = getTypeData(this.state.subtype);
+      updateOptions(typeData);
+    }
+
+    const departionGateOptions = this.props.gates
+      .filter((g) => g.isDisabled === false)
+      .map((gate_) => (
+        <option key={gate_.id} value={gate_.id}>
+          {l18n.findByCode(gate_.code)}
+        </option>
+      ));
+    
+    const departionGateData = this.props.gates
+      .filter((g) => g.id === this.state.gate)[0];
+
+    if (departionGateData && departionGateData.isDisabled) {
+      departionGateOptions.push(
+        <option key={departionGateData.id} value={departionGateData.id}>
+          {`${l18n.findByCode(departionGateData.code)} | archived`}
+        </option>
+      );
+    }
 
     const { date } = this.state;
     const timeRange = this.state.time + this.state.duration;
@@ -414,24 +526,62 @@ export default class EventForm extends Component {
         >
           {typeOptions}
         </ListFieldGroup>
-        {this.state.tree && (
+        {subTypeOptions.length > 0 && (
           <ListFieldGroup
-            name="subcategory"
+            name="subtype"
             caption="Subtype"
-            index={this.state.subcategory}
-            validator={subcategory()}
-            onChange={this.handleSubCategoryChange}
+            index={this.state.subtype}
+            validator={subtype()}
+            onChange={this.handleSubTypeChange}
           >
             {subTypeOptions}
           </ListFieldGroup>
         )}
-        {this.state.tree && (
+        {typeDescription !== '' && (
           <TextAreaGroup
-            name="description"
-            value={subTypeDescription}
+            name="type_description"
+            caption="Type Description"
+            value={typeDescription}
             inline
             disabled
           />
+        )}
+
+        {typeDescription !== '' && (
+          <MultipleListFieldGroup
+            styles={{
+              menu: base => ({
+                ...base,
+                position: 'absolute',
+                zIndex: 9999,
+              }),
+            }}
+            name="facilityIds"
+            defaultValue={this.state.facilityIds}
+            caption="Facilities"
+            validator={facilities()}
+            onChange={this.handleAdditionalSelectChange}
+          >
+            {facilitiesOptions}
+          </MultipleListFieldGroup>
+        )}
+
+        {typeDescription !== '' && (
+          <MultipleListFieldGroup
+            styles={{
+              menu: base => ({
+                ...base,
+                position: 'absolute',
+                zIndex: 9999,
+              }),
+            }}
+            name="materialIds"
+            defaultValue={this.state.materialIds}
+            caption="Materials"
+            onChange={this.handleAdditionalSelectChange}
+          >
+            {materialsOptions}
+          </MultipleListFieldGroup>
         )}
         <div
           className={`bp5-form-group ${styles.formTimeRangeContainer}${invalidTimeRangeMaybeClass}`}
@@ -457,15 +607,13 @@ export default class EventForm extends Component {
               minutes={this.state.duration}
               onChange={this.handleChange}
             />
-            {this.state.default_repeat_interval > 0 && (
-              <NumberFieldGroup
-                name="repeat_interval"
-                className={styles.repeat}
-                caption="Repeat"
-                number={this.state.repeat_interval}
-                onChange={this.handleChange}
-              />
-            )}
+            <NumberFieldGroup
+              name="repeat_interval"
+              className={styles.repeat}
+              caption="Repeat"
+              number={this.state.repeat_interval}
+              onChange={this.handleChange}
+            />
             <LabelFieldGroup className={styles.totalTime} value={totalTime} />
             {invalidTimeRange && (
               <div className="bp5-form-helper-text">{time()}</div>
@@ -473,35 +621,26 @@ export default class EventForm extends Component {
             {warnings && warnings}
           </div>
         </div>
-        <div className={`bp5-form-group ${styles.formGatesContainer}`}>
-          <label
-            htmlFor="time-range"
-            className={`bp5-label bp5-inline ${styles.label_text} ${styles.timeLabel}`}
-          >
-            <span>Gates</span>
-          </label>
-          <div className={styles.formGates}>
-            <ListFieldGroup
-              name="gate"
-              caption="Departion"
-              index={this.state.gate}
-              validator={gate()}
-              onChange={this.handleChange}
-            >
-              {gateOptions}
-            </ListFieldGroup>
+        <ListFieldGroup
+          name="gate"
+          caption="Gate"
+          index={this.state.gate}
+          validator={gate()}
+          onChange={this.handleChange}
+        >
+          {departionGateOptions}
+        </ListFieldGroup>
 
-            <ListFieldGroup
-              name="gate2"
-              caption="Return"
-              index={this.state.gate2}
-              validator={gate2()}
-              onChange={this.handleChange}
-            >
-              {gateOptions}
-            </ListFieldGroup>
-          </div>
-        </div>
+        <Callout className={styles.smaller}>
+          For Birthday enter the name and age of the birthday person, i. e. "Georgos 7 years".
+          This information will be displayed on the Gate.
+        </Callout>
+        <TextAreaGroup
+          name="description"
+          value={this.state.description}
+          onChange={this.handleChange}
+          inline
+        />
         <NumberFieldGroup
           name="cost"
           caption="Cost"
@@ -534,6 +673,15 @@ export default class EventForm extends Component {
             {stateOptions}
           </ListFieldGroup>
         )}
+        {!this.props.forCreate && (
+          <ListFieldGroup
+            name="status"
+            index={this.state.status}
+            onChange={this.handleChange}
+          >
+            {statusOptions}
+          </ListFieldGroup>
+        )}
       </>
     );
   }
@@ -543,16 +691,25 @@ EventForm.propTypes = {
   forCreate: PropTypes.bool,
   event: EventPropType,
   refs: RefsPropType.isRequired,
-  locale: LocalePropType.isRequired,
+  locale: PropTypes.objectOf(PropTypes.string).isRequired,
   gates: PropTypes.arrayOf(GatePropType).isRequired,
+  facilities: PropTypes.arrayOf(FacilityPropType).isRequired,
+  materials: PropTypes.arrayOf(MaterialPropType).isRequired,
   date: PropTypes.string,
 };
 
 EventForm.defaultProps = {
   forCreate: false,
   event: null,
-  refs: { statuses: [], states: [], types: [] },
+  refs: {
+    states: [],
+    statuses: [],
+    typeCategories: [],
+    types: [],
+  },
   locale: {},
   gates: [],
+  facilities: [],
+  materials: [],
   date: '',
 };

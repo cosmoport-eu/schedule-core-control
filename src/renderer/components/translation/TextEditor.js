@@ -6,17 +6,21 @@ export default class TextEditor extends Component {
   static propTypes = {
     id: PropTypes.number,
     text: PropTypes.string,
-    onConfirm: PropTypes.func
+    code: PropTypes.string,
+    onConfirm: PropTypes.func,
+    locale:PropTypes.number,
   }
 
   static defaultProps = {
     id: 0,
     text: '',
+    code: '',
+    locale: 0,
     onConfirm: () => { }
   }
 
   onConfirm = (value) => {
-    this.props.onConfirm(this.props.id, value, this.props.text);
+    this.props.onConfirm(this.props.id, value, this.props.text, this.props.locale, this.props.code);
   }
 
   render() {

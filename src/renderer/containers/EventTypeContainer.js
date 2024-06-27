@@ -16,7 +16,10 @@ const mapEvent = (data) => ({
   defaultCost: data.default_cost,
   description: data.description,
   name: data.name,
-  subtypes: data.subtypes,
+  subTypes: data.subTypes,
+  parentId: data.parentId,
+  materialIds: data.materialIds,
+  facilityIds: data.facilityIds,
 });
 
 export default class EventTypeContainer extends Component {
@@ -35,6 +38,8 @@ export default class EventTypeContainer extends Component {
   state = {
     hasData: false,
     locale: {},
+    facilities: {},
+    materials: {},
     refs: {}
   };
 
@@ -44,35 +49,28 @@ export default class EventTypeContainer extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
+      this.props.api.get('/t_events/types?isActive=true'),
+      this.props.api.get('/category?localeId=1&isActive=true'),
+      this.props.api.get('/t_events/statuses'),
+      this.props.api.get('/t_events/states'),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
       this.props.api.fetchTranslations()
     ])
       .then((data) =>
         this.setState({
           hasData: true,
-          refs: data[0],
-          locale: data[1].en
+          refs: {
+            types: data[0],
+            typeCategories: data[1],
+            statuses: data[2],
+            states: data[3],
+          },
+          facilities: data[4],
+          materials: data[5],
+          locale: data[6].en,
         }),
       )
-      .catch((error) => ApiError(error));
-  };
-
-  handleCreate = (formData) => {
-    if (!formData.valid) {
-      Message.show('Please check the form data.', 'error');
-      return;
-    }
-
-    this.props.api
-      .createEventType(mapEvent(formData))
-      .then((result) => {
-        const id = result.eventTypes[0].id;
-        Message.show(`Event type has been created [${id}].`);
-        this.getData();
-
-        return 1;
-      })
-      .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
 
@@ -88,27 +86,91 @@ export default class EventTypeContainer extends Component {
     }
 
     this.props.api
-      .createEventTypeCategory({
+      .post('/category', {
         name: name,
         color: color
       })
       .then((result) => {
-        Message.show(`Event type category has been created [${result.id}].`);
+        Message.show(`Event type category has been created.`);
         this.getData();
       })
       .catch((error) => ApiError(error));
   };
 
-  // api ещё нет
-  handleEdit = (formData) => {
-    console.log('EDIT');
+  // name & desciption fields for Type / Subtypes
+  handleTextChange = (id, data) => {
+    this.props.api.post(`/t_events/type/text/${id}`, data)
+      .then(() => {})
+      .catch((error) => {
+        ApiError(error);
+      });
   };
 
-  handleDelete = (data) => {
-    this.props.api
-      .deleteEventType(data.id)
+  handleCreate = (formData) => {
+    if (!formData.valid) {
+      Message.show('Please check the form data.', 'error');
+      return;
+    }
+  
+    this.postEventData('/t_events/type', formData, 'Event type has been created.')
+      .then(() => {
+        this.getData();
+        this.handleRefresh();
+      })
+      .catch((error) => ApiError(error));
+  };
+
+  handleEdit = async (formData) => {
+    const subtypes = formData.subTypes;
+ 
+    if (subtypes.length > 0) {
+      formData.description = '';
+      formData.materialIds = [];
+      formData.facilityIds = [];
+    }
+
+    try {
+      await this.postEventData(`/t_events/type/${formData.id}`, formData, 'Record changed successfully');
+  
+      for (const s of subtypes) {
+        const updatedData = {
+          ...formData,
+          name: s.name,
+          description: s.description,
+          parentId: formData.id,
+          materialIds: s.materialIds,
+          facilityIds: s.facilityIds,
+          subTypes: [],
+          valid: true,
+        };
+  
+        if (s.id === 0 || typeof s.id === 'undefined') {
+          await this.handleCreate(updatedData);
+        } else {
+          await this.postEventData(`/t_events/type/${s.id}`, updatedData);
+        }
+      }
+  
+      this.getData();
+    } catch (error) {
+      ApiError(error);
+    }
+  };
+
+  postEventData = (url, formData, successMessage) => {
+    return this.props.api
+      .post(url, mapEvent(formData))
       .then((result) => {
-        Message.show(`Subtype ${data.name} has been deleted [:${result.deleted}]`);
+        Message.show(successMessage);
+        return result;
+      });
+  };
+
+  handleDelete = (id) => {
+    this.props.api
+      .delete(`/t_events/type/${id}`)
+      .then((result) => {
+        Message.show('record deleted successfully');
         this.getData();
         return 1;
       })
@@ -125,22 +187,32 @@ export default class EventTypeContainer extends Component {
       return <span>Loading...</span>;
     }
 
-    const { refs, locale } = this.state;
+    const { refs, locale, facilities, materials } = this.state;
+
+    const types = refs.types
+      .filter((t) => t.parentId === 0 || t.parentId === null);
+
+    const subtypes = refs.types
+      .filter((t) => t.parentId !== 0 && t.parentId !== null);
 
     return (
       <div>
-        <PageCaption text="04 Types" />
+        <PageCaption text="Types" />
 
         <EventTypeTable
           ref={(table) => {
             this.table = table;
           }}
-          refs={refs}
           locale={locale}
-          types={refs.types}
+          categories={refs.typeCategories}
+          types={types}
+          subtypes={subtypes}
+          facilities={facilities}
+          materials={materials}
           onCreate={this.handleCreate}
           onCreateCategory={this.handleCreateCategory}
-          onEdit={this.handleEdit}
+          onTextChange={this.handleTextChange}
+          onUpdate={this.handleEdit}
           onDelete={this.handleDelete}
           onRefresh={this.handleRefresh}
           auth={this.props.auth}

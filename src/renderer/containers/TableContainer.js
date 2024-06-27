@@ -27,6 +27,8 @@ export default class TableContainer extends Component {
     locale: {},
     refs: {},
     gates: [],
+    facilities: [],
+    materials: [],
     defaultRange: _date.getThreeDaysRange(),
     range: _date.getThreeDaysRange(),
   };
@@ -37,18 +39,30 @@ export default class TableContainer extends Component {
 
   getData = () => {
     Promise.all([
-      this.props.api.fetchReferenceData(),
+      this.props.api.get('/t_events/types'),
+      this.props.api.get('/category?localeId=1'),
+      this.props.api.get('/t_events/statuses'),
+      this.props.api.get('/t_events/states'),
       this.props.api.fetchTranslations(),
       this.apiGetEventInRange(this.state.range),
-      this.props.api.fetchGates(),
+      this.props.api.get('/gates'),
+      this.props.api.get('/facility?localeId=1'),
+      this.props.api.get('/material?localeId=1'),
     ])
       .then((data) =>
         this.setState({
           hasData: true,
-          refs: data[0],
-          locale: data[1].en,
-          events: data[2],
-          gates: data[3],
+          refs: {
+            types: data[0],
+            typeCategories: data[1],
+            statuses: data[2],
+            states: data[3],
+          },
+          locale: data[4].en,
+          events: data[5],
+          gates: data[6],
+          facilities: data[7],
+          materials: data[8],
         }),
       )
       .catch((error) => ApiError(error));
@@ -57,7 +71,7 @@ export default class TableContainer extends Component {
   handleCreate = (formData, suggester) => {
     this.props.api
       .createEvent(formData)
-      .then((result) => Message.show(`Event has been created [${result.id}].`))
+      .then((result) => Message.show(`Event has been created.`))
       .then(() => suggester && suggester(this.props.pre))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
@@ -66,7 +80,7 @@ export default class TableContainer extends Component {
   handleEdit = (formData) => {
     this.props.api
       .updateEvent(formData)
-      .then((result) => Message.show(`Event has been updated [${result.id}].`))
+      .then((result) => Message.show(`Event has been updated.`))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
@@ -74,7 +88,7 @@ export default class TableContainer extends Component {
   handleDelete = (id) => {
     this.props.api
       .deleteEvent(id)
-      .then((result) => Message.show(`Deleted ${result.deleted}.`))
+      .then((result) => Message.show(`Deleted.`))
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
@@ -106,17 +120,19 @@ export default class TableContainer extends Component {
       return <span>Loading...</span>;
     }
 
-    const { events, refs, locale, gates, range } = this.state;
+    const { events, refs, locale, gates, range, facilities, materials } = this.state;
 
     return (
       <>
-        <PageCaption text="03 Timetable" />
+        <PageCaption text="Timetable" />
         <Table
           events={events}
           refs={refs}
           locale={locale}
           gates={gates}
           range={range}
+          facilities={facilities}
+          materials={materials}
           onDateRangeChange={this.handleDateChange}
           onDateRangeClear={this.handleDateClear}
           defaultRange={this.state.defaultRange}
