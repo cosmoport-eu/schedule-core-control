@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Table from '../tableStructure/Table';
-import {Button, Classes, H1, HTMLTable, Popover, NonIdealState } from '@blueprintjs/core';
+import {Button, Classes, H1, HTMLTable, Popover, NonIdealState, Icon, Intent } from '@blueprintjs/core';
 import PageCaption from '../page/PageCaption';
 import Caption from '../page/Caption';
 import TableSection from '../tableStructure/TableSection';
 import styles from '../eventTable/EventTable.module.css';
 import TextEditor from '../translation/TextEditor';
 import TextFieldGroup from '../form/group/TextFieldGroup';
+import { IconFieldGroup } from '../form/group/IconFieldGroup';
+import { IconSize } from "@blueprintjs/icons";
 
 export default function TranslationCategoryTable ({
   data = {},
@@ -22,26 +24,29 @@ export default function TranslationCategoryTable ({
   pageCaption = 'Unknown Table',
   onRefresh = () => {},
   onTextChange = () => {},
+  onIconChange = () => {},
   onCreate = (apiUrlCreate, data) => {},
   onDelete = (apiUrlDelete, data) => {}
 }) {
   const [
-    {name, color},
+    {name, icon, color},
     setState,
   ] = useState({
     name: '',
+    icon: '',
     color: '#808080', // for Category
   });
-  
+
   const validators = {
     name: () => (name === '' ? "Category name shouldn't be empty" : ''),
+    icon: () => (icon === '' ? "Icon shouldn't be empty" : ''),
     color: () => {
       if (color === '') {
         return "Category color shouldn't be empty";
       }
 
       const hexColorPattern = /^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{4}){1,2}$/;
-      
+
       if (!hexColorPattern.test(color)) {
         return 'Invalid color format. Color should be in hex format (#RRGGBB, #RGB, #RRGGBBAA, or #RGBA)';
       }
@@ -50,11 +55,19 @@ export default function TranslationCategoryTable ({
     },
   };
 
+  const handleIconChange = (id, value, oldValue,) => {
+    if (value === oldValue) {
+      return;
+    }
+    console.log({id, value, oldValue,});
+    onIconChange(id, value,);
+  };
+
   const handleTextChange = (id, value, oldValue, locale, code) => {
     if (value === oldValue) {
       return;
     }
-    
+
     onTextChange(id, value, apiUrl.get, code);
   };
 
@@ -65,6 +78,7 @@ export default function TranslationCategoryTable ({
     if (pageCaption === 'Categories') {
       dataValue = {
         name: name,
+        icon: name,
         color: color,
       }
     } else {
@@ -77,6 +91,7 @@ export default function TranslationCategoryTable ({
   const onRemoveClick = (record) => {
     onDelete(apiUrl.delete, {
       id: record.id,
+      // icon: record.field_icon,
       name: record.field_name
     });
   };
@@ -85,10 +100,25 @@ export default function TranslationCategoryTable ({
     setState((prevState) => ({ ...prevState, [name_]: value }));
   };
 
+  const headerByPage = h => (pageCaption === 'Facilities' || pageCaption === 'Materials') ? [h[0], 'Icon', ...h.slice(1), ] : h
+
   const records = data.map((record) => (
     <tr key={record.id}>
       <td>{record.field_name}</td>
-
+      {pageCaption === 'Facilities' || pageCaption === 'Materials' ?
+      <td>
+        <IconFieldGroup
+          id={record.id}
+          name="icon"
+          value={record.field_icon}
+          // validator={validators.icon()}
+          onChange={i => {}}
+          onConfirm={handleIconChange}
+          inline
+          fill
+        />
+      </td>
+      :<></>}
       {record.translations.map(translation => (
         <td key={translation.id}>
           <TextEditor
@@ -132,6 +162,19 @@ export default function TranslationCategoryTable ({
                 <>
                   <div style={{ fontWeight: 'bold' }}>Create new record for {pageCaption}</div>
                   <br />
+                  {/*
+                    pageCaption === 'Facilities' || pageCaption === 'Materials' ?
+                    <IconFieldGroup
+                      name="icon"
+                      caption="Icon"
+                      value={icon}
+                      validator={validators.icon()}
+                      onChange={handleChange}
+                      inline
+                      fill
+                    />
+                    : <></>
+                  */}
                   <TextFieldGroup
                     name="name"
                     caption="Name"
@@ -142,7 +185,7 @@ export default function TranslationCategoryTable ({
                     fill
                   />
                   {
-                    pageCaption === 'Categories' ? 
+                    pageCaption === 'Categories' ?
                     <TextFieldGroup
                       name="color"
                       caption="Color"
@@ -201,11 +244,11 @@ export default function TranslationCategoryTable ({
             <div style={{ marginTop: '1em' }}>
               <HTMLTable compact striped className={styles.eventTable}>
                 <TableSection
-                    data={headers}
+                    data={headerByPage(headers)}
                     isHeader={true}
                 />
                 <TableSection
-                    data={headers}
+                    data={headerByPage(headers)}
                     isHeader={false}
                 />
                 <tbody>{records}</tbody>

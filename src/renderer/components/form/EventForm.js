@@ -17,6 +17,7 @@ import TextAreaGroup from './group/TextAreaGroup';
 import FacilityPropType from '../../props/FacilityPropType';
 import MaterialPropType from '../../props/MaterialPropType';
 import MultipleListFieldGroup from './group/MultipleListFieldGroup';
+import CheckListFieldGroup from './group/CheckListFieldGroup';
 import { Callout } from '@blueprintjs/core';
 
 /**
@@ -161,7 +162,7 @@ export default class EventForm extends Component {
 
     const { categoryId, defaultDuration, defaultRepeatInterval, defaultCost, parentId } =
       this.findEventTypeData(event.eventTypeId);
-    
+
     let [type, subtype, has_subtypes] = [event.eventTypeId, 0, false];
 
     if (parentId !== null && parentId !== 0) {
@@ -252,6 +253,7 @@ export default class EventForm extends Component {
   };
 
   handleAdditionalSelectChange = (elem_name, options) => {
+    console.log({elem_name, options});
     const selectedValues = Array.from(options, option => option.value);
 
     this.handleChange(elem_name, selectedValues);
@@ -416,13 +418,13 @@ export default class EventForm extends Component {
       const desc = types
         .filter((t) => t.id === id && t.isDisabled === false)
         .map((op) => l18n.findByCode(op.descCode));
-    
+
       return desc.length > 0 ? desc[0] : '';
     };
 
     let typeDescription = '';
-    let facilitiesOptions = {};
-    let materialsOptions = {};
+    let facilitiesOptions = [];
+    let materialsOptions = [];
 
     const getTypeData = (type) => {
       if (type) {
@@ -459,7 +461,7 @@ export default class EventForm extends Component {
         .map((f) => ({ value: f.id, label: f.name }));
 
       materialsOptions = materialsForType
-        .map((m) => ({ value: m.id, label: m.name }));
+        .map((m) => ({ value: m.id, label: m.name, qty: m.qty }));
     };
 
     if (this.state.type) {
@@ -479,7 +481,7 @@ export default class EventForm extends Component {
           {l18n.findByCode(gate_.code)}
         </option>
       ));
-    
+
     const departionGateData = this.props.gates
       .filter((g) => g.id === this.state.gate)[0];
 
@@ -582,6 +584,29 @@ export default class EventForm extends Component {
           >
             {materialsOptions}
           </MultipleListFieldGroup>
+        )}
+        <p>TEST MODE</p>
+        {typeDescription !== '' && (
+          <div style={{display: 'flex'}}>
+            <div style={{width: '40%'}}>
+              <CheckListFieldGroup
+                options={facilitiesOptions}
+                name="facilityIds"
+                defaultValue={this.state.facilityIds}
+                caption="Facilities"
+                onChange={this.handleAdditionalSelectChange}
+              />
+            </div>
+            <div style={{width: '60%'}}>
+              <CheckListFieldGroup
+                options={materialsOptions}
+                name="materialIds"
+                defaultValue={this.state.materialIds}
+                caption="Materials"
+                onChange={this.handleAdditionalSelectChange}
+              />
+            </div>
+          </div>
         )}
         <div
           className={`bp5-form-group ${styles.formTimeRangeContainer}${invalidTimeRangeMaybeClass}`}

@@ -177,11 +177,10 @@ export default class TranslationContainer extends Component {
 
   handleTextChange = (id, value, apiUrl, code, okCallback, notOkCallback) => {
     const valueObject = apiUrl === '/translations/external' ? { id, text: value, code: code } : value;
-
     const apiCall = apiUrl === '/translations/external' ?
       this.props.api.post(apiUrl, valueObject) :
       this.props.api.updateTranslationTextForId(id, valueObject);
-  
+
     apiCall
       .then(() => {
         Message.show('Translation updated');
@@ -193,7 +192,23 @@ export default class TranslationContainer extends Component {
         if (notOkCallback) notOkCallback();
       });
   };
-  
+
+  handleIconChange = (id, value, okCallback, notOkCallback) => {
+    const apiCall = this.state.currentCategory.name === 'Materials' ?
+                    this.props.api.updateMaterialIcon(id, value):
+                    this.props.api.updateFacilityIcon(id, value)
+    apiCall
+      .then(() => {
+        Message.show('Icon updated');
+        this.getData();
+        if (okCallback) okCallback();
+      })
+      .catch((error) => {
+        ApiError(error);
+        if (notOkCallback) notOkCallback();
+      });
+  };
+
   handleCreateRecord = (apiUrlCreate, data) => {
     this.props.api
       .post(apiUrlCreate, data)
@@ -207,39 +222,39 @@ export default class TranslationContainer extends Component {
       .then(() => this.handleRefresh())
       .catch((error) => ApiError(error));
   };
-  
+
   handleDeleteRecord = async (apiUrlDelete, data) => {
     try {
       await this.props.api.delete(`${apiUrlDelete}/${data.id}`);
       Message.show(`Record #${data.id} has been deleted`);
-  
+
       if (apiUrlDelete === '/category') {
         await this.removeConnectedTypes(data.id);
       }
-  
+
       this.handleRefresh();
-  
+
       return 1;
     } catch (error) {
       ApiError(error);
     }
   };
-  
+
   removeConnectedTypes = async (categoryId) => {
     try {
       const result = await this.props.api.get('/t_events/types?isActive=true');
       const typesToDelete = result.filter((t) => t.categoryId === categoryId);
-  
+
       for (const typeToDelete of typesToDelete) {
         await this.removeRecord(`/t_events/type/${typeToDelete.id}`);
       }
-  
+
       Message.show('Connected types put in archive');
     } catch (error) {
       ApiError(error);
     }
   };
-  
+
   removeRecord = async (apiUrl) => {
     try {
       await this.props.api.delete(apiUrl);
@@ -275,35 +290,40 @@ export default class TranslationContainer extends Component {
           }
         ])
       );
+      console.log('#3', {tableData});
     } else if (currentCategory.apiUrl.get.includes('external')) {
       const groupByCode = (data) => {
         return Object.values(
           data.reduce((acc, item) => {
             acc[item.code] = acc[item.code] || {
               field_name: item.code,
+              field_icon: item.icon,
               translations: [],
             };
-      
+
             acc[item.code].translations.push({
               id: item.id,
               localeId: item.localeId,
               text: item.text,
             });
-      
+            console.log('#4', {acc});
             return acc;
           }, {})
         );
       };
 
       tableData = groupByCode(currentCategoryData);
+      console.log('#1', {tableData});
     } else {
       tableData = currentCategoryData.map((category) => {
         return {
           id: category.id,
           field_name: category.code,
+          field_icon: category.icon,
           translations: category.translations
         }
       });
+      console.log('#2', {tableData});
     }
 
     const categoriesButtons = buttonLinks.map((category) => (
@@ -346,6 +366,7 @@ export default class TranslationContainer extends Component {
               onCreate={this.handleCreateRecord}
               onRefresh={this.handleRefresh}
               onTextChange={this.handleTextChange}
+              onIconChange={this.handleIconChange}
             />
           </div>
           :
