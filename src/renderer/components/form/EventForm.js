@@ -436,7 +436,11 @@ export default class EventForm extends Component {
 
       return null;
     };
-
+    function calcDefaultIds(options = [], ids = []) {
+      return (options.length === 1 && ids.length === 0)
+      ? [options[0].value]
+      : ids
+    }
     const updateOptions = (typeData) => {
       let facilitiesForType = [];
       let materialsForType = [];
@@ -457,11 +461,16 @@ export default class EventForm extends Component {
         materialsForType = this.props.materials;
       }
 
-      facilitiesOptions = facilitiesForType
-        .map((f) => ({ value: f.id, label: f.name }));
+      facilitiesOptions = facilitiesForType.map((f) => ({ value: f.id, label: f.name }));
 
-      materialsOptions = materialsForType
-        .map((m) => ({ value: m.id, label: m.name, qty: m.qty }));
+      materialsOptions = materialsForType.map((m) => ({ value: m.id, label: m.name, qty: m.qty }));
+
+      if(facilitiesOptions.length === 1 && this.state.facilityIds.length === 0) {
+        this.setState(prevState => ({...prevState, ...{ facilityIds: [facilitiesOptions[0].value] }}))
+      }
+      if(materialsOptions.length === 1 && this.state.materialIds.length === 0) {
+        this.setState(prevState => ({...prevState, ...{ materialIds: [materialsOptions[0].value] }}))
+      }
     };
 
     if (this.state.type) {
@@ -559,7 +568,8 @@ export default class EventForm extends Component {
               }),
             }}
             name="facilityIds"
-            defaultValue={this.state.facilityIds}
+            // defaultValue={this.state.facilityIds}
+            defaultValue={ calcDefaultIds(facilitiesOptions, this.state.facilityIds) }
             caption="Facilities"
             validator={facilities()}
             onChange={this.handleAdditionalSelectChange}
@@ -578,21 +588,22 @@ export default class EventForm extends Component {
               }),
             }}
             name="materialIds"
-            defaultValue={this.state.materialIds}
+            // defaultValue={this.state.materialIds}
+            defaultValue={ calcDefaultIds(materialsOptions, this.state.materialIds) }
             caption="Materials"
             onChange={this.handleAdditionalSelectChange}
           >
             {materialsOptions}
           </MultipleListFieldGroup>
         )}
-        <p>TEST MODE</p>
         {typeDescription !== '' && (
           <div style={{display: 'flex'}}>
-            <div style={{width: '40%'}}>
+            <div style={{width: '40%'}}><p>===DUBUG MODE===</p>
               <CheckListFieldGroup
                 options={facilitiesOptions}
                 name="facilityIds"
-                defaultValue={this.state.facilityIds}
+                defaultValue={ calcDefaultIds(facilitiesOptions, this.state.facilityIds) }
+                // defaultValue={ this.state.facilityIds }
                 caption="Facilities"
                 onChange={this.handleAdditionalSelectChange}
               />
@@ -601,7 +612,8 @@ export default class EventForm extends Component {
               <CheckListFieldGroup
                 options={materialsOptions}
                 name="materialIds"
-                defaultValue={this.state.materialIds}
+                defaultValue={ calcDefaultIds(materialsOptions, this.state.materialIds) }
+                // defaultValue={ this.state.materialIds }
                 caption="Materials"
                 onChange={this.handleAdditionalSelectChange}
               />
