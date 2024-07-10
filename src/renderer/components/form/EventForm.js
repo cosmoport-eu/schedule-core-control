@@ -557,7 +557,7 @@ export default class EventForm extends Component {
             disabled
           />
         )}
-
+        {/*
         {typeDescription !== '' && (
           <MultipleListFieldGroup
             styles={{
@@ -596,9 +596,14 @@ export default class EventForm extends Component {
             {materialsOptions}
           </MultipleListFieldGroup>
         )}
+        */}
+        {/* <p>
+        this.state.facilityIds=<code>{JSON.stringify(this.state.facilityIds)}</code><br/>
+        this.state.materialIds=<code>{JSON.stringify(this.state.materialIds)}</code><br/>
+        </p> */}
         {typeDescription !== '' && (
           <div style={{display: 'flex'}}>
-            <div style={{width: '40%'}}><p>===DUBUG MODE===</p>
+            <div style={{width: '40%'}}>
               <CheckListFieldGroup
                 options={facilitiesOptions}
                 name="facilityIds"

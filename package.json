@@ -88,7 +88,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.21",
-    "cosmoport-core-api-client": "file:../schedule-core-api-client",
+    "cosmoport-core-api-client": "https://github.com/cosmoport-eu/schedule-core-api-client/archive/refs/tags/v0.2.7.tar.gz",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^6.1.4",
