@@ -11,6 +11,8 @@ import LocaleMapper from '../components/mapper/LocaleMapper';
 import PageCaption from '../components/page/PageCaption';
 import TextValueEditor from '../components/editor/TextValueEditor';
 import BusinessHoursEditor from '../components/editor/bs/BusinessHoursEditor';
+import { TimePicker } from '@blueprintjs/datetime';
+import _date from '../components/date/_date';
 
 import styles from '../components/settings/Settings.module.css';
 
@@ -180,22 +182,40 @@ export default class SettingsContainer extends Component {
         <PageCaption text="Settings" />
 
         <div className="bp5-callout" style={{ fontSize: '80%' }}>
-          All of these changes are applied in real time. 
+          All of these changes are applied in real time.
           So no need to restart any of the applications.
         </div>
 
         <div className={styles.container}>
+          <Caption text="Up counter" />
+          <div>
+            <p>Default time for up counter between event</p>
+          </div>
+          <div className={'bp5-control-group'}>
+            <TimePicker
+              defaultValue={_date.toDate(60)}
+              selectAllOnFocus
+              onChange={()=>{}}
+            />
+            <Button
+              style={{ width: '7em' }}
+              text="Save"
+              onClick={()=>{}}
+            />
+          </div>
+        </div>
+        <div className={styles.container}>
           <Caption text="Simulation" />
           <div>
             <p>
-              Here you can change the time interval for displaying the flight 
+              Here you can change the time interval for displaying the flight
               departure/arrival message on the gate display.
             </p>
             <p style={{ fontSize: '85%' }}>
-              It is not recommended to set this value less than 5 
+              It is not recommended to set this value less than 5
               because some of the intervals might overlap each other.
             </p>
-            
+
             <TextValueEditor
               className={styles.edit}
               id={boardingSetting.id}
@@ -204,7 +224,7 @@ export default class SettingsContainer extends Component {
               selectAllOnFocus
             />
           </div>
-  
+
           <Caption text={'Working hours'} />
           <div>
             <p>
