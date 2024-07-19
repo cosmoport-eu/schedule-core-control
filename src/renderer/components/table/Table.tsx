@@ -60,10 +60,15 @@ export default function Table({
 
   const handleAddClick = () => addDialogRef.current?.toggleDialog();
   const handleCreate = (data: EventFormDataType, ok: boolean) => {
+    console.log("Table->ADD", data)
     ok ? onCreate(data, suggestNext) : showFormError();
   };
-  const handleEdit = (event: EventType) => editDialogRef.current?.edit(event);
+  const handleEdit = (event: EventType) => {
+    console.log("Table->EDIT->handleEdit", event);
+    editDialogRef.current?.edit(event);
+  }
   const handleEditApply = (data: EventType, ok: boolean) => {
+    console.log("Table->EDIT->handleEditApply", data);
     ok ? onEdit(data) : showFormError();
   };
   const handlePreDelete = (id: number) => deleteAlertRef.current?.open(id);

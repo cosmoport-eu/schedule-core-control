@@ -54,6 +54,7 @@ export default class EventForm extends Component {
       description: '',
       facilityIds: [],
       materialIds: [],
+      qty: [],
     };
 
     // Overrides initial data with passed in parameters
@@ -148,7 +149,7 @@ export default class EventForm extends Component {
     if (this.state.subtype) {
       data.type = this.state.subtype;
     }
-
+    console.log('EventForm->getFormData()', data)
     return data;
   };
 
@@ -194,6 +195,7 @@ export default class EventForm extends Component {
       description: event.description,
       facilityIds: event.facilityIds,
       materialIds: event.materialIds,
+      qty: event.qty,
     };
   };
 
@@ -253,9 +255,13 @@ export default class EventForm extends Component {
   };
 
   handleAdditionalSelectChange = (elem_name, options) => {
-    console.log({elem_name, options});
+    // console.log('EventForm->handleAdditionalSelectChange->qty', {elem_name, options},);
+    if(elem_name === 'materialIds') {
+      const qty = options?.map(m => ({timetable_id: this.props.event?.id, material_id: m.value, qty: m.qty }))
+      this.handleChange('qty', qty);
+      console.log('EventForm->handleAdditionalSelectChange->qty', {qty},);
+    }
     const selectedValues = Array.from(options, option => option.value);
-
     this.handleChange(elem_name, selectedValues);
   };
 
@@ -615,7 +621,11 @@ export default class EventForm extends Component {
             </div>
             <div style={{width: '60%'}}>
               <CheckListFieldGroup
-                options={materialsOptions}
+                options={materialsOptions.map((m) => {
+                  const q = this.state.qty.find(q => q.material_id === m.value);
+                  if(q) return {...m, ...{qty: q.qty}}
+                  else return m
+                })}
                 name="materialIds"
                 defaultValue={ calcDefaultIds(materialsOptions, this.state.materialIds) }
                 // defaultValue={ this.state.materialIds }

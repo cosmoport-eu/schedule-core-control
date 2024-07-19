@@ -8,7 +8,7 @@ export default class CheckListFieldGroup extends PureComponent {
     this.state = {
       checkedList:  this.props.options.filter((opt, i) => this.props.defaultValue.includes(opt.value)),
     };
-    console.log('default', this.state.checkedList)
+    console.log('this.state.checkedList', this.state.checkedList)
   }
 
   static propTypes = {
@@ -32,13 +32,21 @@ export default class CheckListFieldGroup extends PureComponent {
     defaultValue: [],
   };
 
-  handleSelectChange = event => {
+  handleSelectChange = (event) => {
     let checkedList = this.state.checkedList
     let value = event.target.value;
     //
     if(event.target.type === "text") {
       const index = parseInt(event.target.attributes.getNamedItem('index').value)
-      checkedList[index]['qty'] = value
+      // console.log('event.target.name=', event.target.name, 'checkedList=', checkedList)
+      // console.log({i, index})
+      const checkedId = event.target.dataset.id
+      checkedList.forEach((item, i) => {
+        if(item.value === Number(checkedId)) {
+          checkedList[i]['qty'] = value
+        }
+      })
+      //checkedList[index]['qty'] = value
     } else {
       const item = JSON.parse(value);
       const checked = JSON.parse(event.target.checked);
@@ -85,10 +93,11 @@ export default class CheckListFieldGroup extends PureComponent {
                     />
                     {item.hasOwnProperty('qty') && <input
                       disabled={!this.state.checkedList.map(item => item.value).includes(item.value)}
-                      key={`${this.props.name}_input_${i}`}
-                      name={`${this.props.name}_input_${i}`}
+                      key={`material_${item.value}`}
+                      name={`material_${item.value}`}
+                      data-id={item.value}
                       index={i}
-                      value={item.qty}
+                      value={item.qty ? item.qty : ""}
                       type="text"
                       style={{maxWidth:'30%', display:'inline-flex'}}
                       onChange={this.handleSelectChange}

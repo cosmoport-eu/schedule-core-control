@@ -41,7 +41,7 @@ export default class EventEditDialog extends PureComponent {
 
   passState = () => {
     const data = this.form.getFormData();
-
+    console.log('EventEditDialog->passState', data)
     this.props.callback(EventMapper.fromForm(data), data.valid);
   };
 
@@ -85,7 +85,7 @@ export default class EventEditDialog extends PureComponent {
           />
         </DialogBody>
         <DialogFooter
-          actions={ 
+          actions={
             <Button
             onClick={is_past ? this.toggleDialog : this.passState}
             text={is_past ? 'Close modal' : 'Update'}

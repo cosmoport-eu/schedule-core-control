@@ -39,7 +39,7 @@ export default class EventAddDialog extends Component {
 
   passState = () => {
     const data = this.form.getFormData();
-
+    console.log('EventAddDialog->passState->EventMapper.fromForm(data)', EventMapper.fromForm(data))
     this.props.callback(EventMapper.fromForm(data), data.valid);
   };
 
