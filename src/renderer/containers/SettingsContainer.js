@@ -41,6 +41,7 @@ export default class SettingsContainer extends Component {
 
     this.state = {
       hasData: false,
+      upcounter: 0,
       locales: [],
       trans: {},
       settings: []
@@ -155,6 +156,7 @@ export default class SettingsContainer extends Component {
     const {
       hasData,
       locales,
+      upcounter,
       settings,
       trans
     } = this.state;
@@ -176,6 +178,7 @@ export default class SettingsContainer extends Component {
     const boardingSetting = this.findSetting(settings, 'boarding_time');
     const syncAddrSetting = this.findSetting(settings, 'sync_server_address');
     const businessHoursSetting = this.findSetting(settings, 'business_hours');
+    const upcounterSetting = this.findSetting(settings, 'upcounter');
 
     return (
       <>
@@ -191,16 +194,22 @@ export default class SettingsContainer extends Component {
           <div>
             <p>Default time for up counter between event</p>
           </div>
+          this.state.upcounter={this.state.upcounter}
           <div className={'bp5-control-group'}>
             <TimePicker
-              defaultValue={_date.toDate(60)}
+              defaultValue={_date.toDate(30)}
               selectAllOnFocus
-              onChange={()=>{}}
+              onChange={e => {
+                console.log('e.value', _date.toMinutes(e))
+                this.setState(prevState => ({
+                  upcounter: _date.toMinutes(e)
+                }));
+              }}
             />
             <Button
               style={{ width: '7em' }}
               text="Save"
-              onClick={()=>{}}
+              onClick={() => this.handleUpdateSettings(upcounterSetting.id, this.state.upcounter.toString())}
             />
           </div>
         </div>
