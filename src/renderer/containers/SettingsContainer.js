@@ -194,10 +194,9 @@ export default class SettingsContainer extends Component {
           <div>
             <p>Default time for up counter between event</p>
           </div>
-          this.state.upcounter={this.state.upcounter}
           <div className={'bp5-control-group'}>
             <TimePicker
-              defaultValue={_date.toDate(30)}
+              defaultValue={_date.toDate(upcounterSetting.value)}
               selectAllOnFocus
               onChange={e => {
                 console.log('e.value', _date.toMinutes(e))
