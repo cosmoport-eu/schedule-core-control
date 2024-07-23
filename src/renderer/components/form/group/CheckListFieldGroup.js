@@ -8,7 +8,7 @@ export default class CheckListFieldGroup extends PureComponent {
     this.state = {
       checkedList:  this.props.options.filter((opt, i) => this.props.defaultValue.includes(opt.value)),
     };
-    console.log('this.state.checkedList', this.state.checkedList)
+    // console.log('this.state.checkedList', this.state.checkedList)
   }
 
   static propTypes = {

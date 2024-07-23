@@ -68,7 +68,7 @@ export default class App extends Component {
       onmessage(...args) {
         const message = args[0].data;
 
-        console.log(message);
+        console.log('WS->Control->MSG->', message, 'CONF:', config.address.ws)
 
         if (message === ':update-nodes:') {
           self.state.api

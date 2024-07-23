@@ -149,7 +149,7 @@ export default class EventForm extends Component {
     if (this.state.subtype) {
       data.type = this.state.subtype;
     }
-    console.log('EventForm->getFormData()', data)
+    // console.log('EventForm->getFormData()', data)
     return data;
   };
 
@@ -259,7 +259,7 @@ export default class EventForm extends Component {
     if(elem_name === 'materialIds') {
       const qty = options?.map(m => ({timetable_id: this.props.event?.id, material_id: m.value, qty: m.qty }))
       this.handleChange('qty', qty);
-      console.log('EventForm->handleAdditionalSelectChange->qty', {qty},);
+      // console.log('EventForm->handleAdditionalSelectChange->qty', {qty},);
     }
     const selectedValues = Array.from(options, option => option.value);
     this.handleChange(elem_name, selectedValues);
