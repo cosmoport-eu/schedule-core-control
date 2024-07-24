@@ -1,6 +1,6 @@
 {
   "name": "cosmoport-core-control",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Cosmoport core control",
   "license": "MIT",
   "private": true,
