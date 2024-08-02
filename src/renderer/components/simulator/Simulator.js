@@ -73,7 +73,7 @@ export default class Simulator extends Component {
 
   update = () => {
     const date = new Date();
-
+    // console.log('Simulator->update', date.getSeconds())
     if (date.getSeconds() === 0) {
       this.tick(_date.toMinutes(date));
       if (this.isNewDay(date)) {

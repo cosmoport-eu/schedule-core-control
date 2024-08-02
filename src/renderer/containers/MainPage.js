@@ -125,7 +125,6 @@ export default class MainPage extends Component {
       Message.show('Please check the form data.', 'error');
       return;
     }
-    console.log('createEvent(formData)', formData)
     this.props.api
       .createEvent(formData)
       .then((result) => Message.show(`Event has been created.`))

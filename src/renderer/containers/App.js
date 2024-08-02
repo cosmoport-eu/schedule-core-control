@@ -203,7 +203,7 @@ export default class App extends Component {
   };
 
   handleTurnGateOn = (action) => {
-    console.info('gateOn', action);
+    console.info('App->handleTurnGateOn()', 'before_departion');
     this.fireUpTheGate(action.event, 'before_departion');
   };
 
@@ -219,7 +219,7 @@ export default class App extends Component {
   };
 
   handleReturn = (action) => {
-    console.info('return', action);
+    console.info('App->handleReturn()', 'before_return');
     this.setEventStatus(action.event, action);
     this.fireUpTheGate(action.event, 'before_return');
   };
