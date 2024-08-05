@@ -176,7 +176,7 @@ export default class App extends Component {
   };
 
   handleStatusChange = (action) => {
-    console.info('status', action);
+    // console.info('status', action);
 
     this.setEventStatus(action.event, action);
   };
@@ -193,7 +193,7 @@ export default class App extends Component {
     const ev = event;
     ev.eventStatusId = statusIdMap;
     const modifiedEvent = EventMapper.unmap(ev);
-
+    // console.log('App::setEventStatus()', modifiedEvent);
     this.state.api
       .updateEvent(modifiedEvent)
       .then((result) =>
@@ -203,7 +203,7 @@ export default class App extends Component {
   };
 
   handleTurnGateOn = (action) => {
-    console.info('App->handleTurnGateOn()', 'before_departion');
+    // console.info('App->handleTurnGateOn()', 'before_departion');
     this.fireUpTheGate(action.event, 'before_departion');
   };
 
@@ -219,7 +219,7 @@ export default class App extends Component {
   };
 
   handleReturn = (action) => {
-    console.info('App->handleReturn()', 'before_return');
+    // console.info('App->handleReturn()', 'before_return');
     this.setEventStatus(action.event, action);
     this.fireUpTheGate(action.event, 'before_return');
   };

@@ -73,7 +73,7 @@ export default class Simulator extends Component {
 
   update = () => {
     const date = new Date();
-    // console.log('Simulator->update', date.getSeconds())
+    // console.log('Simulator::update()::getSeconds()', date.getSeconds())
     if (date.getSeconds() === 0) {
       this.tick(_date.toMinutes(date));
       if (this.isNewDay(date)) {
@@ -85,6 +85,7 @@ export default class Simulator extends Component {
   isNewDay = (date) => date.getMinutes() === 0 && date.getSeconds() === 0;
 
   tick = (minutes) => {
+    // console.log({minutes})
     this.calculateBusiness();
     this.doActionsForMinute(minutes);
     this.setState({ ticks: this.state.ticks + 1 }, () => {
