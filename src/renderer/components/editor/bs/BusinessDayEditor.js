@@ -24,7 +24,7 @@ export default class BusinessDayEditor extends Component {
 
     return (
       <div key={day.day} style={{ display: 'flex', gap: '.5em' }}>
-        <span style={{width: "2.5em"}}>{day.day}({day.start})</span>
+        <span style={{width: "3.5em"}}>{day.day}({day.start})</span>
         <TimePicker
           {...active}
           defaultValue={_date.toDate(day.start)}

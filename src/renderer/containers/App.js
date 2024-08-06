@@ -110,7 +110,7 @@ export default class App extends Component {
               ?.value,
             10,
           ) || 10;
-
+        console.log({boardingTime})
         const business = settings.find(
           (setting) => setting.param === 'business_hours',
         )?.value;

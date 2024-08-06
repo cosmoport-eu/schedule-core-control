@@ -118,6 +118,7 @@ export default class Simulator extends Component {
       .sort((a, b) => a.time - b.time || a.weight - b.weight);
 
   eventsToActions = (event, pre, archive) => {
+    console.log('Simulator::eventsToActions::pre', {pre})
     const boardingTime = event.startTime - pre > 0 ? event.startTime - pre : 0;
     const eventTime = event.startTime;
     const timeOfReturn = event.startTime + event.durationTime;

@@ -39,7 +39,7 @@ export default class TextValueEditor extends Component {
       <div style={{ display: 'flex', margin: '2em 0' }}>
         <EditableText
           className={className}
-          style={{ width: '7em' }}
+          style={{ minWidth: '7em' }}
           type="number"
           placeholder=""
           selectAllOnFocus

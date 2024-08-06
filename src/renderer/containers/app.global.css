@@ -45,3 +45,6 @@ h2 {
   color: #182026;
   cursor: default;
 }
+.bp5-editable-text {
+  min-width: 3em;
+}

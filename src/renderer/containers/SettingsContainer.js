@@ -188,30 +188,33 @@ export default class SettingsContainer extends Component {
           All of these changes are applied in real time.
           So no need to restart any of the applications.
         </div>
-
-        <div className={styles.container}>
-          <Caption text="Up counter" />
-          <div>
-            <p>Default time for up counter between event</p>
-          </div>
-          <div className={'bp5-control-group'}>
-            <TimePicker
-              defaultValue={_date.toDate(upcounterSetting.value)}
-              selectAllOnFocus
-              onChange={e => {
-                console.log('e.value', _date.toMinutes(e))
-                this.setState(prevState => ({
-                  upcounter: _date.toMinutes(e)
-                }));
-              }}
-            />
-            <Button
-              style={{ width: '7em' }}
-              text="Save"
-              onClick={() => this.handleUpdateSettings(upcounterSetting.id, this.state.upcounter.toString())}
-            />
-          </div>
-        </div>
+        {
+          /*
+            <div className={styles.container}>
+              <Caption text="Up counter" />
+              <div>
+                <p>Default time for up counter between event</p>
+              </div>
+              <div className={'bp5-control-group'}>
+                <TimePicker
+                  defaultValue={_date.toDate(upcounterSetting.value)}
+                  selectAllOnFocus
+                  onChange={e => {
+                    console.log('e.value', _date.toMinutes(e))
+                    this.setState(prevState => ({
+                      upcounter: _date.toMinutes(e)
+                    }));
+                  }}
+                />
+                <Button
+                  style={{ width: '7em' }}
+                  text="Save"
+                  onClick={() => this.handleUpdateSettings(upcounterSetting.id, this.state.upcounter.toString())}
+                />
+              </div>
+            </div>
+          */
+        }
         <div className={styles.container}>
           <Caption text="Simulation" />
           <div>
